@@ -1,11 +1,13 @@
-import React from 'react'
+import { BookForm } from "./BookForm";
 
 const Page = () => {
   return (
     <div>
-      本を登録画面
+      <h1>本を登録</h1>
+      <p>本の情報</p>
+      <BookForm />
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;
