@@ -24,10 +24,14 @@ type SubmitValues = {
 };
 
 export const BookForm = () => {
-  const { register, handleSubmit } = useForm<FormValues>();
+  const { register, handleSubmit, setValue, watch } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     // API叩く
+    console.log(data);
   };
+
+  const status = watch("status");
+  const rating = watch("rating");
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <select {...register("status")}>
@@ -36,7 +40,23 @@ export const BookForm = () => {
         <option value="COMPLETED">読み終わった</option>
         <option value="ON_HOLD">積読</option>
       </select>
-      <p>評価</p>
+      {status === "COMPLETED" && (
+        <div>
+          <p>評価</p>
+          <div>
+            {[1, 2, 3, 4, 5].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setValue("rating", value)}
+                aria-label={`${value}点`}
+              >
+                {rating !== null && value <= rating ? "★" : "☆"}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <div>
         <label htmlFor="review">感想</label>
         <textarea id="review" {...register("review")} />
