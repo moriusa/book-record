@@ -28,6 +28,7 @@ export interface RakutenBookItem {
   salesDate: string;
   smallImageUrl: string;
   title: string;
+  size: string;
 }
 
 export interface RakutenBooksResponse {
@@ -47,12 +48,13 @@ export const fetchRakutenBooks = async (
   const params = new URLSearchParams({
     applicationId: RAKUTEN_APP_ID,
     accessKey: RAKUTEN_ACCESS_KEY,
-    keyword: bookTitle,
+    title: bookTitle,
     hits: String(itemLen),
     formatVersion: "2",
+    sort: "sales"
   });
   const res = await fetch(
-    `https://openapi.rakuten.co.jp/services/api/BooksTotal/Search/20170404?${params}`,
+    `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params}`,
     {
       headers: {
         Origin: REGISTERED_SITE_URL,

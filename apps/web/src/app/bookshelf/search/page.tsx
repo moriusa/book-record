@@ -9,8 +9,10 @@ const Page = () => {
   const [books, setBooks] = useState<RakutenBookItem[]>([]);
   const handleSearch = async (key: string) => {
     const data = await fetchRakutenBooks(key);
-    const filteredData = data.Items.filter((item) => item.title.includes(key));
-    console.log(filteredData);
+    const filteredData = data.Items.filter((item) => {
+      return item.title.includes(key) && item.size !== "";
+    });
+    console.log(data);
     setBooks(filteredData);
   };
   return (
