@@ -30,7 +30,7 @@ export const useBookSearch = () => {
             item.publisherName.includes(param.publisherName) && item.size !== ""
           );
         }
-        return false
+        return false;
       });
 
       setBooks(filteredData);

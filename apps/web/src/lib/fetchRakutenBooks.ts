@@ -2,38 +2,47 @@
 
 export type RakutenBookItem = {
   affiliateUrl: string;
-  artistName: string;
   author: string;
+  authorKana: string;
   availability: string;
   booksGenreId: string;
   chirayomiUrl: string;
+  contents: string;
   discountPrice: number;
   discountRate: number;
-  hardware: string;
   isbn: string;
   itemCaption: string;
   itemPrice: number;
   itemUrl: string;
-  jan: string;
-  label: string;
   largeImageUrl: string;
   limitedFlag: number;
   listPrice: number;
   mediumImageUrl: string;
-  os: string;
   postageFlag: number;
   publisherName: string;
   reviewAverage: string;
   reviewCount: number;
   salesDate: string;
-  smallImageUrl: string;
-  title: string;
+  seriesName: string;
+  seriesNameKana: string;
   size: string;
-}
+  smallImageUrl: string;
+  subTitle: string;
+  subTitleKana: string;
+  title: string;
+  titleKana: string;
+};
 
 export type RakutenBooksResponse = {
   Items: RakutenBookItem[];
-}
+  count: number;
+  page: number;
+  first: number;
+  hits: number;
+  last: number;
+  carrier: number;
+  pageCount: number;
+};
 
 export type RakutenBookSearchParams = {
   title?: string;
