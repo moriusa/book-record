@@ -1,9 +1,10 @@
 "use client";
 import { FaSearch } from "react-icons/fa";
 import { useState } from "react";
+import { RakutenBookSearchParams } from "@/lib/fetchRakutenBooks";
 
 type SearchBoxProps = {
-  onSearch: (keyword: string) => void;
+  onSearch: ({ title }: RakutenBookSearchParams) => void;
 };
 
 export const SearchBox = ({ onSearch }: SearchBoxProps) => {
@@ -15,7 +16,7 @@ export const SearchBox = ({ onSearch }: SearchBoxProps) => {
       return;
     }
 
-    onSearch(trimmedKeyword);
+    onSearch({ title: trimmedKeyword });
   };
   return (
     <form

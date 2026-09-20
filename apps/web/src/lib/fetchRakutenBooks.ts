@@ -1,6 +1,6 @@
 "use server";
 
-export interface RakutenBookItem {
+export type RakutenBookItem = {
   affiliateUrl: string;
   artistName: string;
   author: string;
@@ -31,13 +31,23 @@ export interface RakutenBookItem {
   size: string;
 }
 
-export interface RakutenBooksResponse {
+export type RakutenBooksResponse = {
   Items: RakutenBookItem[];
 }
 
-export const fetchRakutenBooks = async (
-  bookTitle: string,
-): Promise<RakutenBooksResponse> => {
+export type RakutenBookSearchParams = {
+  title?: string;
+  isbn?: string;
+  author?: string;
+  publisherName?: string;
+};
+
+export const fetchRakutenBooks = async ({
+  title,
+  isbn,
+  author,
+  publisherName,
+}: RakutenBookSearchParams): Promise<RakutenBooksResponse> => {
   const RAKUTEN_APP_ID = process.env.RAKUTEN_APPLICATION_ID;
   const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY;
   const itemLen = 30;
@@ -48,11 +58,26 @@ export const fetchRakutenBooks = async (
   const params = new URLSearchParams({
     applicationId: RAKUTEN_APP_ID,
     accessKey: RAKUTEN_ACCESS_KEY,
-    title: bookTitle,
     hits: String(itemLen),
     formatVersion: "2",
-    sort: "sales"
+    sort: "sales",
   });
+
+  if (title) {
+    params.set("title", title);
+  }
+
+  if (isbn) {
+    params.set("isbn", isbn);
+  }
+
+  if (author) {
+    params.set("author", author);
+  }
+
+  if (publisherName) {
+    params.set("publisherName", publisherName);
+  }
   const res = await fetch(
     `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params}`,
     {
