@@ -27,7 +27,6 @@ const Page = () => {
           </Link>
         ))}
       </div>
-      <Link href={"/bookshelf/new"}>追加フォーム</Link>
     </div>
   );
 };
