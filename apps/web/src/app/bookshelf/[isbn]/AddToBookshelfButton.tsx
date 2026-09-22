@@ -2,10 +2,14 @@
 
 import Link from "next/link";
 
-export const AddToBookshelfButton = () => {
+type Props = {
+  isbn: string;
+};
+
+export const AddToBookshelfButton = ({ isbn }: Props) => {
   return (
     <Link
-      href={"/bookshelf/new"}
+      href={`/bookshelf/${isbn}/register`}
       className="rounded-lg bg-black px-6 py-3 font-bold text-white transition hover:opacity-80 text-center"
     >
       本棚に追加
