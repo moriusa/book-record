@@ -44,7 +44,7 @@ export const BookForm = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto max-w-xl space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+      className="mx-auto max-w-xl space-y-6 rounded-2xl"
     >
       {/* 読書ステータス */}
       <div>
