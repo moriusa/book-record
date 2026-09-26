@@ -1,14 +1,14 @@
 import { Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { books } from "../db/schema.js";
+import { users } from "../db/schema.js";
 
-const booksRouter = new Hono();
+const usersRouter = new Hono();
 
-booksRouter.get("/:id", async (c) => {
+usersRouter.get("/:id", async (c) => {
   const id = c.req.param("id");
 
-  const result = await db.select().from(books).where(eq(books.id, id));
+  const result = await db.select().from(users).where(eq(users.id, id));
 
   if (result.length === 0) {
     return c.json(
@@ -22,22 +22,18 @@ booksRouter.get("/:id", async (c) => {
   return c.json(result[0]);
 });
 
-booksRouter.post("/", async (c) => {
+usersRouter.post("/", async (c) => {
   const body = await c.req.json();
 
   const result = await db
-    .insert(books)
+    .insert(users)
     .values({
-      userId: body.userId,
-      title: body.title,
-      author: body.author,
-      status: body.status,
-      rating: body.rating,
-      review: body.review,
+      email: body.email,
+      name: body.name,
     })
     .returning();
 
   return c.json(result[0], 201);
 });
 
-export default booksRouter;
+export default usersRouter;

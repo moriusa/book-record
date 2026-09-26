@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -16,7 +16,7 @@ export const users = pgTable("users", {
 });
 
 export const books = pgTable("books", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").defaultRandom().primaryKey(),
 
   userId: uuid("user_id")
     .notNull()
