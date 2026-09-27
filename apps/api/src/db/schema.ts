@@ -17,16 +17,14 @@ export const users = pgTable("users", {
 
 export const books = pgTable("books", {
   id: uuid("id").defaultRandom().primaryKey(),
-
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id),
-
   title: varchar("title", { length: 255 }).notNull(),
   author: varchar("author", { length: 255 }).notNull(),
-
   status: varchar("status", { length: 30 }).notNull(),
-
   rating: smallint("rating"),
   review: text("review"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
