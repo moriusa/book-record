@@ -1,10 +1,29 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
+import { fetchAuthSession } from "aws-amplify/auth";
+import { apiFetch } from "@/lib/api";
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      const response = await apiFetch("/books", {method: "GET"});
+
+      const data = await response.json();
+
+      console.log(data);
+    };
+
+    void fetchBooks();
+  }, []);
+
   return (
-    <div>
-      <button>本を探す</button>
-      <button>本を登録する</button>
-    </div>
+    <main>
+      <h1>Book Record</h1>
+
+      {isLoggedIn ? <p>ログインしています</p> : <p>ログインしていません</p>}
+    </main>
   );
 }
