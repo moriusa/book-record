@@ -12,7 +12,9 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      DATABASE_URL = var.database_url
+      DATABASE_URL         = var.database_url
+      COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
+      COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.web.id
     }
   }
 }

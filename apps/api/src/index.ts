@@ -15,12 +15,6 @@ app.use(
   }),
 );
 
-app.get("/health", (c) => {
-  return c.json({
-    status: "ok",
-  });
-});
-
 app.route("/users", usersRouter);
 app.route("/books", booksRouter);
 

@@ -2,10 +2,11 @@ import { Hono } from "hono";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { books } from "../db/schema.js";
+import { authMiddleware } from "../middleware/auth.js";
 
 const booksRouter = new Hono();
 
-booksRouter.get("/", async (c) => {
+booksRouter.get("/", authMiddleware, async (c) => {
   const result = await db.select().from(books);
 
   if (result.length === 0) {
@@ -20,7 +21,7 @@ booksRouter.get("/", async (c) => {
   return c.json(result);
 });
 
-booksRouter.get("/:id", async (c) => {
+booksRouter.get("/:id", authMiddleware, async (c) => {
   const id = c.req.param("id");
 
   const result = await db.select().from(books).where(eq(books.id, id));
@@ -84,10 +85,7 @@ booksRouter.patch("/:id", async (c) => {
 booksRouter.delete("/:id", async (c) => {
   const id = c.req.param("id");
 
-  const result = await db
-    .delete(books)
-    .where(eq(books.id, id))
-    .returning();
+  const result = await db.delete(books).where(eq(books.id, id)).returning();
 
   if (result.length === 0) {
     return c.json(
