@@ -21,3 +21,8 @@ provider "aws" {
 output "api_url" {
   value = aws_apigatewayv2_stage.default.invoke_url
 }
+
+variable "database_url" {
+  type      = string
+  sensitive = true
+}

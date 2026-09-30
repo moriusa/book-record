@@ -9,6 +9,12 @@ resource "aws_lambda_function" "api" {
   filename = data.archive_file.lambda.output_path
 
   source_code_hash = data.archive_file.lambda.output_base64sha256
+
+  environment {
+    variables = {
+      DATABASE_URL = var.database_url
+    }
+  }
 }
 
 resource "aws_lambda_permission" "api_gateway" {
