@@ -16563,7 +16563,7 @@ var import_crypto2 = require("crypto");
 // ../../node_modules/.pnpm/aws-jwt-verify@5.2.1/node_modules/aws-jwt-verify/dist/esm/https-node.js
 var import_https = require("https");
 var import_stream = require("stream");
-async function fetch(uri, requestOptions, data) {
+async function fetch2(uri, requestOptions, data) {
   let responseTimeout;
   return new Promise((resolve, reject) => {
     const req = (0, import_https.request)(uri, {
@@ -16617,7 +16617,7 @@ var JwtSignatureAlgorithmHashNames;
   JwtSignatureAlgorithmHashNames2["ES512"] = "RSA-SHA512";
 })(JwtSignatureAlgorithmHashNames || (JwtSignatureAlgorithmHashNames = {}));
 var nodeWebCompat = {
-  fetch,
+  fetch: fetch2,
   transformJwkToKeyObjectSync: (jwk) => (0, import_crypto2.createPublicKey)({
     key: jwk,
     format: "jwk"
@@ -16652,7 +16652,7 @@ var nodeWebCompat = {
 };
 
 // ../../node_modules/.pnpm/aws-jwt-verify@5.2.1/node_modules/aws-jwt-verify/dist/esm/https.js
-var fetch2 = nodeWebCompat.fetch.bind(void 0);
+var fetch3 = nodeWebCompat.fetch.bind(void 0);
 var SimpleFetcher = class {
   constructor(props) {
     this.defaultRequestOptions = {
@@ -16671,12 +16671,12 @@ var SimpleFetcher = class {
   async fetch(uri, requestOptions, data) {
     requestOptions = { ...this.defaultRequestOptions, ...requestOptions };
     try {
-      return await fetch2(uri, requestOptions, data);
+      return await fetch3(uri, requestOptions, data);
     } catch (err) {
       if (err instanceof NonRetryableFetchError) {
         throw err;
       }
-      return fetch2(uri, requestOptions, data);
+      return fetch3(uri, requestOptions, data);
     }
   }
 };
@@ -17560,16 +17560,30 @@ var CognitoJwtVerifier = class _CognitoJwtVerifier extends JwtVerifierBase {
 CognitoJwtVerifier.USER_POOL_ID_REGEX = /^(?<region>(?:eusc-[a-z]{2}|[a-z]{2})-(gov-)?[a-z]+-\d)_[a-zA-Z0-9]+$/;
 
 // src/services/user.ts
-var getOrCreateUser = async (payload) => {
+var getCognitoUserInfo = async (token) => {
+  const response = await fetch(
+    "https://book-record-auth.auth.ap-northeast-1.amazoncognito.com/oauth2/userInfo",
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+  if (!response.ok) {
+    throw new Error(`Cognito UserInfo failed: ${response.status}`);
+  }
+  return response.json();
+};
+var getOrCreateUser = async (payload, token) => {
   const existingUsers = await db.select().from(users).where(eq(users.cognitoSub, payload.sub)).limit(1);
   const existingUser = existingUsers[0];
   if (existingUser) {
     return existingUser;
   }
-  const email = typeof payload.email === "string" ? payload.email : null;
+  const userInfo = await getCognitoUserInfo(token);
   const createdUsers = await db.insert(users).values({
     cognitoSub: payload.sub,
-    email
+    email: userInfo.email ?? null
   }).returning();
   return createdUsers[0];
 };
@@ -17590,8 +17604,7 @@ var authMiddleware = async (c, next) => {
   const token = authorization.slice("Bearer ".length);
   try {
     const payload = await verifier.verify(token);
-    console.log("JWT payload:", payload);
-    const user = await getOrCreateUser(payload);
+    const user = await getOrCreateUser(payload, token);
     c.set("user", user);
     await next();
   } catch (error) {

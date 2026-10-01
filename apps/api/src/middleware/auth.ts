@@ -23,8 +23,7 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
 
   try {
     const payload = await verifier.verify(token);
-    console.log("JWT payload:", payload);
-    const user = await getOrCreateUser(payload);
+    const user = await getOrCreateUser(payload, token);
 
     c.set("user", user);
 
