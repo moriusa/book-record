@@ -1,12 +1,10 @@
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import type { MiddlewareHandler } from "hono";
 import { AppEnv } from "../types/hono.js";
+import { getOrCreateUser } from "../services/user.js";
 
 const userPoolId = process.env.COGNITO_USER_POOL_ID;
 const clientId = process.env.COGNITO_CLIENT_ID;
-
-console.log("userPoolId:", userPoolId);
-console.log("clientId:", clientId);
 
 const verifier = CognitoJwtVerifier.create({
   userPoolId: userPoolId!,
@@ -25,8 +23,10 @@ export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
 
   try {
     const payload = await verifier.verify(token);
+    console.log("JWT payload:", payload);
+    const user = await getOrCreateUser(payload);
 
-    c.set("user", payload);
+    c.set("user", user);
 
     await next();
   } catch (error) {

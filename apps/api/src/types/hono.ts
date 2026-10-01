@@ -1,7 +1,7 @@
-import { CognitoJwtPayload } from "aws-jwt-verify/jwt-model";
+import { users } from "../db/schema.js";
 
 export type AppEnv = {
   Variables: {
-    user: CognitoJwtPayload;
+    user: typeof users.$inferSelect;
   };
 };

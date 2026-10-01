@@ -12,7 +12,7 @@ booksRouter.get("/", authMiddleware, async (c) => {
   const result = await db
     .select()
     .from(books)
-    .where(eq(books.userId, user.sub));
+    .where(eq(books.userId, user.id));
 
   if (result.length === 0) {
     return c.json(
@@ -33,7 +33,7 @@ booksRouter.get("/:id", authMiddleware, async (c) => {
   const result = await db
     .select()
     .from(books)
-    .where(and(eq(books.id, id), eq(books.userId, user.sub)));
+    .where(and(eq(books.id, id), eq(books.userId, user.id)));
 
   if (result.length === 0) {
     return c.json(
@@ -54,7 +54,7 @@ booksRouter.post("/", authMiddleware, async (c) => {
   const result = await db
     .insert(books)
     .values({
-      userId: user.sub,
+      userId: user.id,
       title: body.title,
       author: body.author,
       status: body.status,
@@ -78,7 +78,7 @@ booksRouter.patch("/:id", async (c) => {
       review: body.review,
       updatedAt: new Date(),
     })
-    .where(and(eq(books.id, id), eq(books.userId, user.sub)))
+    .where(and(eq(books.id, id), eq(books.userId, user.id)))
     .returning();
 
   if (result.length === 0) {
@@ -99,7 +99,7 @@ booksRouter.delete("/:id", async (c) => {
 
   const result = await db
     .delete(books)
-    .where(and(eq(books.id, id), eq(books.userId, user.sub)))
+    .where(and(eq(books.id, id), eq(books.userId, user.id)))
     .returning();
 
   if (result.length === 0) {

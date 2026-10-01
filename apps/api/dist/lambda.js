@@ -16466,7 +16466,8 @@ var db = drizzle(process.env.DATABASE_URL);
 // src/db/schema.ts
 var users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  cognitoSub: text("cognito_sub").notNull().unique(),
+  email: varchar("email", { length: 255 }).unique(),
   name: varchar("name", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
@@ -17558,11 +17559,24 @@ var CognitoJwtVerifier = class _CognitoJwtVerifier extends JwtVerifierBase {
 };
 CognitoJwtVerifier.USER_POOL_ID_REGEX = /^(?<region>(?:eusc-[a-z]{2}|[a-z]{2})-(gov-)?[a-z]+-\d)_[a-zA-Z0-9]+$/;
 
+// src/services/user.ts
+var getOrCreateUser = async (payload) => {
+  const existingUsers = await db.select().from(users).where(eq(users.cognitoSub, payload.sub)).limit(1);
+  const existingUser = existingUsers[0];
+  if (existingUser) {
+    return existingUser;
+  }
+  const email = typeof payload.email === "string" ? payload.email : null;
+  const createdUsers = await db.insert(users).values({
+    cognitoSub: payload.sub,
+    email
+  }).returning();
+  return createdUsers[0];
+};
+
 // src/middleware/auth.ts
 var userPoolId = process.env.COGNITO_USER_POOL_ID;
 var clientId = process.env.COGNITO_CLIENT_ID;
-console.log("userPoolId:", userPoolId);
-console.log("clientId:", clientId);
 var verifier = CognitoJwtVerifier.create({
   userPoolId,
   tokenUse: "access",
@@ -17576,7 +17590,9 @@ var authMiddleware = async (c, next) => {
   const token = authorization.slice("Bearer ".length);
   try {
     const payload = await verifier.verify(token);
-    c.set("user", payload);
+    console.log("JWT payload:", payload);
+    const user = await getOrCreateUser(payload);
+    c.set("user", user);
     await next();
   } catch (error) {
     console.error("JWT verification failed:", error);
@@ -17587,7 +17603,8 @@ var authMiddleware = async (c, next) => {
 // src/routes/books.ts
 var booksRouter = new Hono2();
 booksRouter.get("/", authMiddleware, async (c) => {
-  const result = await db.select().from(books);
+  const user = c.get("user");
+  const result = await db.select().from(books).where(eq(books.userId, user.id));
   if (result.length === 0) {
     return c.json(
       {
@@ -17599,8 +17616,9 @@ booksRouter.get("/", authMiddleware, async (c) => {
   return c.json(result);
 });
 booksRouter.get("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
   const id = c.req.param("id");
-  const result = await db.select().from(books).where(eq(books.id, id));
+  const result = await db.select().from(books).where(and(eq(books.id, id), eq(books.userId, user.id)));
   if (result.length === 0) {
     return c.json(
       {
@@ -17611,10 +17629,11 @@ booksRouter.get("/:id", authMiddleware, async (c) => {
   }
   return c.json(result[0]);
 });
-booksRouter.post("/", async (c) => {
+booksRouter.post("/", authMiddleware, async (c) => {
+  const user = c.get("user");
   const body = await c.req.json();
   const result = await db.insert(books).values({
-    userId: body.userId,
+    userId: user.id,
     title: body.title,
     author: body.author,
     status: body.status,
@@ -17624,6 +17643,7 @@ booksRouter.post("/", async (c) => {
   return c.json(result[0], 201);
 });
 booksRouter.patch("/:id", async (c) => {
+  const user = c.get("user");
   const id = c.req.param("id");
   const body = await c.req.json();
   const result = await db.update(books).set({
@@ -17631,7 +17651,7 @@ booksRouter.patch("/:id", async (c) => {
     rating: body.rating,
     review: body.review,
     updatedAt: /* @__PURE__ */ new Date()
-  }).where(eq(books.id, id)).returning();
+  }).where(and(eq(books.id, id), eq(books.userId, user.id))).returning();
   if (result.length === 0) {
     return c.json(
       {
@@ -17643,8 +17663,9 @@ booksRouter.patch("/:id", async (c) => {
   return c.json(result[0]);
 });
 booksRouter.delete("/:id", async (c) => {
+  const user = c.get("user");
   const id = c.req.param("id");
-  const result = await db.delete(books).where(eq(books.id, id)).returning();
+  const result = await db.delete(books).where(and(eq(books.id, id), eq(books.userId, user.id))).returning();
   if (result.length === 0) {
     return c.json(
       {
@@ -17671,14 +17692,6 @@ usersRouter.get("/:id", async (c) => {
     );
   }
   return c.json(result[0]);
-});
-usersRouter.post("/", async (c) => {
-  const body = await c.req.json();
-  const result = await db.insert(users).values({
-    email: body.email,
-    name: body.name
-  }).returning();
-  return c.json(result[0], 201);
 });
 var users_default = usersRouter;
 
