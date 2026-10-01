@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AmplifyProvider from "@/components/providers/AmplifyProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +28,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <AmplifyProvider />
-        <Header />
-        <main className="bg-gray-100 h-screen">
-          <div className="p-3">{children}</div>
-        </main>
+        <AuthProvider>
+          <Header />
+          <main className="bg-gray-100 h-screen">
+            <div className="p-3">{children}</div>
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );

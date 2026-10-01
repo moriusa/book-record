@@ -8,6 +8,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    // fetchAuthSession()
     const fetchBooks = async () => {
       const response = await apiFetch("/books", {method: "GET"});
 
