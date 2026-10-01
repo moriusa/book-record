@@ -1,5 +1,6 @@
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import type { MiddlewareHandler } from "hono";
+import { AppEnv } from "../types/hono.js";
 
 const userPoolId = process.env.COGNITO_USER_POOL_ID;
 const clientId = process.env.COGNITO_CLIENT_ID;
@@ -13,7 +14,7 @@ const verifier = CognitoJwtVerifier.create({
   clientId: clientId!,
 });
 
-export const authMiddleware: MiddlewareHandler = async (c, next) => {
+export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   const authorization = c.req.header("Authorization");
 
   if (!authorization?.startsWith("Bearer ")) {

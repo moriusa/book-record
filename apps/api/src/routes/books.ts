@@ -1,13 +1,18 @@
 import { Hono } from "hono";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { books } from "../db/schema.js";
 import { authMiddleware } from "../middleware/auth.js";
+import { AppEnv } from "../types/hono.js";
 
-const booksRouter = new Hono();
+const booksRouter = new Hono<AppEnv>();
 
 booksRouter.get("/", authMiddleware, async (c) => {
-  const result = await db.select().from(books);
+  const user = c.get("user");
+  const result = await db
+    .select()
+    .from(books)
+    .where(eq(books.userId, user.sub));
 
   if (result.length === 0) {
     return c.json(
@@ -22,9 +27,13 @@ booksRouter.get("/", authMiddleware, async (c) => {
 });
 
 booksRouter.get("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
   const id = c.req.param("id");
 
-  const result = await db.select().from(books).where(eq(books.id, id));
+  const result = await db
+    .select()
+    .from(books)
+    .where(and(eq(books.id, id), eq(books.userId, user.sub)));
 
   if (result.length === 0) {
     return c.json(
@@ -38,13 +47,14 @@ booksRouter.get("/:id", authMiddleware, async (c) => {
   return c.json(result[0]);
 });
 
-booksRouter.post("/", async (c) => {
+booksRouter.post("/", authMiddleware, async (c) => {
+  const user = c.get("user");
   const body = await c.req.json();
 
   const result = await db
     .insert(books)
     .values({
-      userId: body.userId,
+      userId: user.sub,
       title: body.title,
       author: body.author,
       status: body.status,
@@ -57,6 +67,7 @@ booksRouter.post("/", async (c) => {
 });
 
 booksRouter.patch("/:id", async (c) => {
+  const user = c.get("user");
   const id = c.req.param("id");
   const body = await c.req.json();
   const result = await db
@@ -67,7 +78,7 @@ booksRouter.patch("/:id", async (c) => {
       review: body.review,
       updatedAt: new Date(),
     })
-    .where(eq(books.id, id))
+    .where(and(eq(books.id, id), eq(books.userId, user.sub)))
     .returning();
 
   if (result.length === 0) {
@@ -83,9 +94,13 @@ booksRouter.patch("/:id", async (c) => {
 });
 
 booksRouter.delete("/:id", async (c) => {
+  const user = c.get("user");
   const id = c.req.param("id");
 
-  const result = await db.delete(books).where(eq(books.id, id)).returning();
+  const result = await db
+    .delete(books)
+    .where(and(eq(books.id, id), eq(books.userId, user.sub)))
+    .returning();
 
   if (result.length === 0) {
     return c.json(

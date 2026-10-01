@@ -3,8 +3,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import booksRouter from "./routes/books.js";
 import usersRouter from "./routes/users.js";
+import { AppEnv } from "./types/hono.js";
 
-const app = new Hono();
+const app = new Hono<AppEnv>();
 
 app.use(
   "*",
