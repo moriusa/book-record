@@ -1,5 +1,7 @@
 "use server";
 
+import { fetcher } from "./fetcher";
+
 export type RakutenBookItem = {
   affiliateUrl: string;
   author: string;
@@ -87,7 +89,7 @@ export const fetchRakutenBooks = async ({
   if (publisherName) {
     params.set("publisherName", publisherName);
   }
-  const res = await fetch(
+  const res = await fetcher(
     `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params}`,
     {
       headers: {
@@ -96,12 +98,7 @@ export const fetchRakutenBooks = async ({
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       },
-      // next: { revalidate: 86400, tags: ["rakuten-books"] }, // 1日
     },
   );
-
-  if (!res.ok) {
-    throw new Error(`楽天APIエラー: ${res.status}`);
-  }
-  return res.json();
+  return res;
 };

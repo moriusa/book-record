@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import AmplifyProvider from "@/components/providers/AmplifyProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,10 +30,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <AmplifyProvider />
         <AuthProvider>
-          <Header />
-          <main className="bg-gray-100 h-screen">
-            <div className="p-3">{children}</div>
-          </main>
+          <QueryProvider>
+            <Header />
+            <main className="bg-gray-100 h-screen">
+              <div className="p-3">{children}</div>
+            </main>
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>
