@@ -44,7 +44,7 @@ const Page = async ({ params }: Props) => {
 
         {/* 登録フォーム */}
         <div className="mt-6">
-          <BookForm />
+          <BookForm bookData={book}/>
         </div>
       </div>
     </div>

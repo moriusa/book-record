@@ -16475,11 +16475,16 @@ var users = pgTable("users", {
 var books = pgTable("books", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id),
+  isbn: varchar("isbn", { length: 20 }).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   author: varchar("author", { length: 255 }).notNull(),
+  publisher: varchar("publisher", { length: 255 }).notNull(),
+  salesDate: varchar("sales_date", { length: 20 }),
+  imageUrl: varchar("image_url", { length: 255 }),
   status: varchar("status", { length: 30 }).notNull(),
   rating: smallint("rating"),
   review: text("review"),
+  completedAt: date("completed_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
@@ -17647,11 +17652,16 @@ booksRouter.post("/", authMiddleware, async (c) => {
   const body = await c.req.json();
   const result = await db.insert(books).values({
     userId: user.id,
+    isbn: body.isbn,
     title: body.title,
     author: body.author,
+    publisher: body.publisherName,
+    salesDate: body.salesDate,
+    imageUrl: body.largeImageUrl,
     status: body.status,
     rating: body.rating,
-    review: body.review
+    review: body.review,
+    completedAt: body.completedAt
   }).returning();
   return c.json(result[0], 201);
 });

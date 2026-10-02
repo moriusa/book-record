@@ -2,33 +2,35 @@
 import { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FaRegStar, FaStar } from "react-icons/fa";
+import { useCreateBook } from "./hooks/useCreateBook";
+import { useRouter } from "next/navigation";
 
 type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 type FormValues = {
   status: BookStatus;
-  completedAt: Date | null;
+  completedAt: string | null;
   rating: number | null;
   review: string | null;
 };
 type BookInfo = {
-  id: string;
   isbn: string;
   title: string;
   author: string;
-  publisher: string | null;
-  publishedAt: Date | null;
-  coverImageUrl: string | null;
+  publisherName: string | null;
+  salesDate: string | null;
+  largeImageUrl: string | null;
+};
+type Props = {
+  bookData: BookInfo;
 };
 
-type SubmitValues = {
-  form: FormValues;
-  book: BookInfo;
-};
-
-export const BookForm = () => {
+export const BookForm = ({ bookData }: Props) => {
+  const router = useRouter();
   const { register, handleSubmit, setValue, watch } = useForm<FormValues>();
+  // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
   const rating = watch("rating");
+  const createBookMutation = useCreateBook();
 
   useEffect(() => {
     if (status !== "COMPLETED") {
@@ -37,8 +39,17 @@ export const BookForm = () => {
   }, [status, setValue]);
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
-    // API叩く
-    console.log(data);
+    createBookMutation.mutate(
+      {
+        ...bookData,
+        ...data,
+      },
+      {
+        onSuccess: () => {
+          router.push("/bookshelf");
+        },
+      },
+    );
   };
 
   return (
@@ -66,6 +77,25 @@ export const BookForm = () => {
           <option value="ON_HOLD">積読</option>
         </select>
       </div>
+
+      {/* 読み終わった日 */}
+      {status === "COMPLETED" && (
+        <div>
+          <label
+            htmlFor="completedAt"
+            className="mb-2 block text-sm font-semibold text-gray-700"
+          >
+            読み終わった日
+          </label>
+
+          <input
+            id="completedAt"
+            type="date"
+            {...register("completedAt")}
+            className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+          />
+        </div>
+      )}
 
       {/* 評価 */}
       {status === "COMPLETED" && (

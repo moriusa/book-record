@@ -55,11 +55,16 @@ booksRouter.post("/", authMiddleware, async (c) => {
     .insert(books)
     .values({
       userId: user.id,
+      isbn: body.isbn,
       title: body.title,
       author: body.author,
+      publisher: body.publisherName,
+      salesDate: body.salesDate,
+      imageUrl: body.largeImageUrl,
       status: body.status,
       rating: body.rating,
       review: body.review,
+      completedAt: body.completedAt
     })
     .returning();
 
