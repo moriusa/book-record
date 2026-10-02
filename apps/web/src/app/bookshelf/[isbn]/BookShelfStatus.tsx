@@ -17,10 +17,7 @@ const bookStatus = {
 };
 
 const BookShelfStatus = ({ bookData }: Props) => {
-  const { data: books } = useGetBookByIsbn(bookData.isbn);
-
-  if (!books) return null;
-  const book = books[0];
+  const { data: book } = useGetBookByIsbn(bookData.isbn);
 
   return (
     <div className="mt-6 rounded-2xl border bg-white p-6 shadow-sm">

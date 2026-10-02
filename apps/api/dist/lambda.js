@@ -17629,18 +17629,7 @@ var authMiddleware = async (c, next) => {
 var booksRouter = new Hono2();
 booksRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
-  const isbn = c.req.query("isbn");
-  const conditions = [eq(books.userId, user.id)];
-  if (isbn) {
-    conditions.push(eq(books.isbn, isbn));
-  }
-  const result = await db.select().from(books).where(and(...conditions));
-  return c.json(result);
-});
-booksRouter.get("/:id", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const id = c.req.param("id");
-  const result = await db.select().from(books).where(and(eq(books.id, id), eq(books.userId, user.id)));
+  const result = await db.select().from(books).where(eq(books.userId, user.id));
   if (result.length === 0) {
     return c.json(
       {
@@ -17648,6 +17637,15 @@ booksRouter.get("/:id", authMiddleware, async (c) => {
       },
       404
     );
+  }
+  return c.json(result);
+});
+booksRouter.get("/:isbn", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const isbn = c.req.param("isbn");
+  const result = await db.select().from(books).where(and(eq(books.isbn, isbn), eq(books.userId, user.id)));
+  if (result.length === 0) {
+    return c.json({ message: "Book not found" }, 404);
   }
   return c.json(result[0]);
 });
