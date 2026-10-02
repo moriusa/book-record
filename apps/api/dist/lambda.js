@@ -9744,6 +9744,9 @@ function iife(fn, ...args) {
 }
 
 // ../../node_modules/.pnpm/drizzle-orm@0.45.3_pg@8.23.0/node_modules/drizzle-orm/pg-core/unique-constraint.js
+function unique(name) {
+  return new UniqueOnConstraintBuilder(name);
+}
 function uniqueKeyName(table, columns) {
   return `${table[TableName]}_${columns.join("_")}_unique`;
 }
@@ -16472,22 +16475,26 @@ var users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()
 });
-var books = pgTable("books", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id),
-  isbn: varchar("isbn", { length: 20 }).notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  author: varchar("author", { length: 255 }).notNull(),
-  publisher: varchar("publisher", { length: 255 }).notNull(),
-  salesDate: varchar("sales_date", { length: 20 }),
-  imageUrl: varchar("image_url", { length: 255 }),
-  status: varchar("status", { length: 30 }).notNull(),
-  rating: smallint("rating"),
-  review: text("review"),
-  completedAt: date("completed_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull()
-});
+var books = pgTable(
+  "books",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().references(() => users.id),
+    isbn: varchar("isbn", { length: 20 }).notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    author: varchar("author", { length: 255 }).notNull(),
+    publisher: varchar("publisher", { length: 255 }).notNull(),
+    salesDate: varchar("sales_date", { length: 20 }),
+    imageUrl: varchar("image_url", { length: 255 }),
+    status: varchar("status", { length: 30 }).notNull(),
+    rating: smallint("rating"),
+    review: text("review"),
+    completedAt: date("completed_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+  },
+  (table) => [unique("books_user_id_isbn_unique").on(table.userId, table.isbn)]
+);
 
 // ../../node_modules/.pnpm/aws-jwt-verify@5.2.1/node_modules/aws-jwt-verify/dist/esm/error.js
 var JwtBaseError = class extends Error {
@@ -17650,20 +17657,38 @@ booksRouter.get("/:id", authMiddleware, async (c) => {
 booksRouter.post("/", authMiddleware, async (c) => {
   const user = c.get("user");
   const body = await c.req.json();
-  const result = await db.insert(books).values({
-    userId: user.id,
-    isbn: body.isbn,
-    title: body.title,
-    author: body.author,
-    publisher: body.publisherName,
-    salesDate: body.salesDate,
-    imageUrl: body.largeImageUrl,
-    status: body.status,
-    rating: body.rating,
-    review: body.review,
-    completedAt: body.completedAt
-  }).returning();
-  return c.json(result[0], 201);
+  try {
+    const result = await db.insert(books).values({
+      userId: user.id,
+      isbn: body.isbn,
+      title: body.title,
+      author: body.author,
+      publisher: body.publisherName,
+      salesDate: body.salesDate,
+      imageUrl: body.largeImageUrl,
+      status: body.status,
+      rating: body.rating,
+      review: body.review,
+      completedAt: body.completedAt
+    }).returning();
+    return c.json(result[0], 201);
+  } catch (error) {
+    console.error(error);
+    if (error instanceof Error && error.cause instanceof Error && "code" in error.cause && error.cause.code === "23505") {
+      return c.json(
+        {
+          message: "\u3053\u306E\u672C\u306F\u3059\u3067\u306B\u672C\u68DA\u306B\u767B\u9332\u3055\u308C\u3066\u3044\u307E\u3059"
+        },
+        409
+      );
+    }
+    return c.json(
+      {
+        message: "\u672C\u306E\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
+      },
+      500
+    );
+  }
 });
 booksRouter.patch("/:id", async (c) => {
   const user = c.get("user");

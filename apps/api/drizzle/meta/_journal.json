@@ -43,6 +43,13 @@
       "when": 1790900480850,
       "tag": "0005_tiresome_proudstar",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790901435368,
+      "tag": "0006_fat_terrax",
+      "breakpoints": true
     }
   ]
 }

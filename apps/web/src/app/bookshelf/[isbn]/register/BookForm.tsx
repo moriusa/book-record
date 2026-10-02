@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { useCreateBook } from "./hooks/useCreateBook";
@@ -25,6 +25,8 @@ type Props = {
 };
 
 export const BookForm = ({ bookData }: Props) => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const router = useRouter();
   const { register, handleSubmit, setValue, watch } = useForm<FormValues>();
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -47,6 +49,9 @@ export const BookForm = ({ bookData }: Props) => {
       {
         onSuccess: () => {
           router.push("/bookshelf");
+        },
+        onError: (error) => {
+          setErrorMessage(error.message);
         },
       },
     );
@@ -147,6 +152,7 @@ export const BookForm = ({ bookData }: Props) => {
       >
         本棚に登録
       </button>
+      {errorMessage && <p role="alert" className="text-red-700">{errorMessage}</p>}
     </form>
   );
 };

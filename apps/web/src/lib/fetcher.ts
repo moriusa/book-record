@@ -38,7 +38,8 @@ export async function authFetcher<T>(
   });
 
   if (!res.ok) {
-    throw new Error(`HTTP ${res.status}`);
+    const errorBody: { message?: string } = await res.json();
+    throw new Error(`${res.status}: ${errorBody.message}`);
   }
 
   return res.json();

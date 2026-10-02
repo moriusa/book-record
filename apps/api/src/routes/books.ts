@@ -9,10 +9,7 @@ const booksRouter = new Hono<AppEnv>();
 
 booksRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
-  const result = await db
-    .select()
-    .from(books)
-    .where(eq(books.userId, user.id));
+  const result = await db.select().from(books).where(eq(books.userId, user.id));
 
   if (result.length === 0) {
     return c.json(
@@ -51,24 +48,48 @@ booksRouter.post("/", authMiddleware, async (c) => {
   const user = c.get("user");
   const body = await c.req.json();
 
-  const result = await db
-    .insert(books)
-    .values({
-      userId: user.id,
-      isbn: body.isbn,
-      title: body.title,
-      author: body.author,
-      publisher: body.publisherName,
-      salesDate: body.salesDate,
-      imageUrl: body.largeImageUrl,
-      status: body.status,
-      rating: body.rating,
-      review: body.review,
-      completedAt: body.completedAt
-    })
-    .returning();
+  try {
+    const result = await db
+      .insert(books)
+      .values({
+        userId: user.id,
+        isbn: body.isbn,
+        title: body.title,
+        author: body.author,
+        publisher: body.publisherName,
+        salesDate: body.salesDate,
+        imageUrl: body.largeImageUrl,
+        status: body.status,
+        rating: body.rating,
+        review: body.review,
+        completedAt: body.completedAt,
+      })
+      .returning();
 
-  return c.json(result[0], 201);
+    return c.json(result[0], 201);
+  } catch (error) {
+    console.error(error);
+    if (
+      error instanceof Error &&
+      error.cause instanceof Error &&
+      "code" in error.cause &&
+      error.cause.code === "23505"
+    ) {
+      return c.json(
+        {
+          message: "この本はすでに本棚に登録されています",
+        },
+        409,
+      );
+    }
+
+    return c.json(
+      {
+        message: "本の登録に失敗しました",
+      },
+      500,
+    );
+  }
 });
 
 booksRouter.patch("/:id", async (c) => {
