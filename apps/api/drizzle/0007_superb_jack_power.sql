@@ -1,0 +1,1 @@
+ALTER TABLE "books" ALTER COLUMN "publisher" DROP NOT NULL;

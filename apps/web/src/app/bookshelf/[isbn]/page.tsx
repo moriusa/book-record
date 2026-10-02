@@ -1,6 +1,6 @@
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
 import Image from "next/image";
-import { AddToBookshelfButton } from "./AddToBookshelfButton";
+import BookShelfStatus from "./BookShelfStatus";
 
 type Props = {
   params: Promise<{ isbn: string }>;
@@ -16,8 +16,8 @@ const Page = async ({ params }: Props) => {
     <div className="mx-auto max-w-3xl px-4 py-8">
       {/* 本の基本情報 */}
       <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-          <div className="relative mx-auto h-60 w-40 shrink-0 overflow-hidden rounded-lg sm:mx-0">
+        <div className="flex flex-col gap-8 sm:flex-row">
+          <div className="relative mx-auto h-72 w-48 shrink-0 sm:mx-0">
             <Image
               src={book.largeImageUrl}
               alt={book.title}
@@ -26,35 +26,37 @@ const Page = async ({ params }: Props) => {
             />
           </div>
 
-          <div className="min-w-0 flex-1 pt-2">
-            <h1 className="wrap-break-word text-xl font-bold leading-relaxed">
-              {book.title}
-            </h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold leading-relaxed">{book.title}</h1>
 
-            <p className="mt-4 wrap-break-word text-base text-gray-600">
-              {book.author}
-            </p>
+            <p className="mt-3 text-base text-gray-600">{book.author}</p>
+
+            <dl className="mt-8 space-y-3 text-sm">
+              <div className="flex">
+                <dt className="w-20 shrink-0 text-gray-500">出版社</dt>
+                <dd>{book.publisherName || "-"}</dd>
+              </div>
+
+              <div className="flex">
+                <dt className="w-20 shrink-0 text-gray-500">シリーズ</dt>
+                <dd>{book.seriesName || "-"}</dd>
+              </div>
+
+              <div className="flex">
+                <dt className="w-20 shrink-0 text-gray-500">発売日</dt>
+                <dd>{book.salesDate || "-"}</dd>
+              </div>
+
+              <div className="flex">
+                <dt className="w-20 shrink-0 text-gray-500">ジャンル</dt>
+                <dd>{book.size || "-"}</dd>
+              </div>
+            </dl>
           </div>
-          <AddToBookshelfButton isbn={book.isbn} />
-        </div>
-
-        {/* 詳細情報 */}
-        <div className="mt-6 border-t pt-5">
-          <dl className="grid grid-cols-[90px_1fr] gap-y-3 text-sm">
-            <dt className="text-gray-500">出版社</dt>
-            <dd>{book.publisherName || "-"}</dd>
-
-            <dt className="text-gray-500">シリーズ</dt>
-            <dd>{book.seriesName || "-"}</dd>
-
-            <dt className="text-gray-500">発売日</dt>
-            <dd>{book.salesDate || "-"}</dd>
-
-            <dt className="text-gray-500">ジャンル</dt>
-            <dd>{book.size || "-"}</dd>
-          </dl>
         </div>
       </div>
+
+      <BookShelfStatus bookData={book} />
 
       {/* 作品紹介 */}
       <div className="mt-6 rounded-2xl border bg-white p-6 shadow-sm">

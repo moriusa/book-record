@@ -16483,7 +16483,7 @@ var books = pgTable(
     isbn: varchar("isbn", { length: 20 }).notNull(),
     title: varchar("title", { length: 255 }).notNull(),
     author: varchar("author", { length: 255 }).notNull(),
-    publisher: varchar("publisher", { length: 255 }).notNull(),
+    publisher: varchar("publisher", { length: 255 }),
     salesDate: varchar("sales_date", { length: 20 }),
     imageUrl: varchar("image_url", { length: 255 }),
     status: varchar("status", { length: 30 }).notNull(),
@@ -17629,15 +17629,12 @@ var authMiddleware = async (c, next) => {
 var booksRouter = new Hono2();
 booksRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
-  const result = await db.select().from(books).where(eq(books.userId, user.id));
-  if (result.length === 0) {
-    return c.json(
-      {
-        message: "Books not found"
-      },
-      404
-    );
+  const isbn = c.req.query("isbn");
+  const conditions = [eq(books.userId, user.id)];
+  if (isbn) {
+    conditions.push(eq(books.isbn, isbn));
   }
+  const result = await db.select().from(books).where(and(...conditions));
   return c.json(result);
 });
 booksRouter.get("/:id", authMiddleware, async (c) => {

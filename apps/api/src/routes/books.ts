@@ -9,16 +9,18 @@ const booksRouter = new Hono<AppEnv>();
 
 booksRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
-  const result = await db.select().from(books).where(eq(books.userId, user.id));
+  const isbn = c.req.query("isbn");
 
-  if (result.length === 0) {
-    return c.json(
-      {
-        message: "Books not found",
-      },
-      404,
-    );
+  const conditions = [eq(books.userId, user.id)];
+
+  if (isbn) {
+    conditions.push(eq(books.isbn, isbn));
   }
+
+  const result = await db
+    .select()
+    .from(books)
+    .where(and(...conditions));
 
   return c.json(result);
 });

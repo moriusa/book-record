@@ -5,7 +5,7 @@ import { FaRegStar, FaStar } from "react-icons/fa";
 import { useCreateBook } from "./hooks/useCreateBook";
 import { useRouter } from "next/navigation";
 
-type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
+export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 type FormValues = {
   status: BookStatus;
   completedAt: string | null;
@@ -45,6 +45,7 @@ export const BookForm = ({ bookData }: Props) => {
       {
         ...bookData,
         ...data,
+        completedAt: data.completedAt || null,
       },
       {
         onSuccess: () => {
@@ -152,7 +153,11 @@ export const BookForm = ({ bookData }: Props) => {
       >
         本棚に登録
       </button>
-      {errorMessage && <p role="alert" className="text-red-700">{errorMessage}</p>}
+      {errorMessage && (
+        <p role="alert" className="text-red-700">
+          {errorMessage}
+        </p>
+      )}
     </form>
   );
 };
