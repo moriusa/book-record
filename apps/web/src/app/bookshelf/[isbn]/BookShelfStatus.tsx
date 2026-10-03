@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { RakutenBookItem } from "@/lib/fetchRakutenBooks";
 import { useGetBookByIsbn } from "../hooks/useGetBookByIsbn";
 import { AddToBookshelfButton } from "./AddToBookshelfButton";
@@ -38,6 +39,15 @@ const BookShelfStatus = ({ bookData }: Props) => {
               </span>
             </div>
           )}
+
+          <div className="mt-5 border-t pt-5">
+            <Link
+              href={`/bookshelf/edit/${book.id}`}
+              className="block rounded-lg border px-4 py-2 text-center text-sm font-medium transition hover:bg-gray-50"
+            >
+              本棚の内容を編集
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="mt-5">

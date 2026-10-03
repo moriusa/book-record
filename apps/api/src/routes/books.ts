@@ -9,8 +9,29 @@ const booksRouter = new Hono<AppEnv>();
 
 booksRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
+  const isbn = c.req.query("isbn");
 
-  const result = await db.select().from(books).where(eq(books.userId, user.id));
+  const conditions = [eq(books.userId, user.id)];
+  if (isbn) {
+    conditions.push(eq(books.isbn, isbn));
+  }
+
+  const result = await db
+    .select()
+    .from(books)
+    .where(and(...conditions));
+
+  return c.json(result);
+});
+
+booksRouter.get("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const id = c.req.param("id");
+
+  const result = await db
+    .select()
+    .from(books)
+    .where(and(eq(books.id, id), eq(books.userId, user.id)));
 
   if (result.length === 0) {
     return c.json(
@@ -19,22 +40,6 @@ booksRouter.get("/", authMiddleware, async (c) => {
       },
       404,
     );
-  }
-
-  return c.json(result);
-});
-
-booksRouter.get("/:isbn", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const isbn = c.req.param("isbn");
-
-  const result = await db
-    .select()
-    .from(books)
-    .where(and(eq(books.isbn, isbn), eq(books.userId, user.id)));
-
-  if (result.length === 0) {
-    return c.json({ message: "Book not found" }, 404);
   }
 
   return c.json(result[0]);
@@ -58,7 +63,7 @@ booksRouter.post("/", authMiddleware, async (c) => {
         status: body.status,
         rating: body.rating,
         review: body.review,
-        completedAt: body.completedAt,
+        completedAt: body.completedAt || null,
       })
       .returning();
 
@@ -88,7 +93,7 @@ booksRouter.post("/", authMiddleware, async (c) => {
   }
 });
 
-booksRouter.patch("/:id", async (c) => {
+booksRouter.patch("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   const body = await c.req.json();
@@ -98,6 +103,7 @@ booksRouter.patch("/:id", async (c) => {
       status: body.status,
       rating: body.rating,
       review: body.review,
+      completedAt: body.completedAt || null,
       updatedAt: new Date(),
     })
     .where(and(eq(books.id, id), eq(books.userId, user.id)))
@@ -115,7 +121,7 @@ booksRouter.patch("/:id", async (c) => {
   return c.json(result[0]);
 });
 
-booksRouter.delete("/:id", async (c) => {
+booksRouter.delete("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
 

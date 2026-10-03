@@ -1,6 +1,6 @@
 import { authFetcher } from "@/lib/fetcher";
 import { useQuery } from "@tanstack/react-query";
-import { BookStatus } from "../[isbn]/register/BookForm";
+import { BookStatus } from "../[isbn]/register/AddBookForm";
 
 export type Book = {
   id: string;
@@ -20,14 +20,9 @@ export function useGetBookByIsbn(isbn: string) {
   return useQuery({
     queryKey: ["book", "isbn", isbn],
     queryFn: async () => {
-      try {
-        return await authFetcher<Book>(`/books/${isbn}`);
-      } catch (error) {
-        if (error instanceof Error && error.message.includes("404")) {
-          return null;
-        }
-        throw error;
-      }
+      const res = await authFetcher<Book[]>(`/books?isbn=${isbn}`);
+      if (res.length === 0) return null;
+      return res[0];
     },
     retry: false,
   });

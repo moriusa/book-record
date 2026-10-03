@@ -1,5 +1,5 @@
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
-import { BookForm } from "./BookForm";
+import { AddBookForm } from "./AddBookForm";
 import Image from "next/image";
 
 type Props = {
@@ -44,7 +44,7 @@ const Page = async ({ params }: Props) => {
 
         {/* 登録フォーム */}
         <div className="mt-6">
-          <BookForm bookData={book}/>
+          <AddBookForm bookData={book} />
         </div>
       </div>
     </div>
