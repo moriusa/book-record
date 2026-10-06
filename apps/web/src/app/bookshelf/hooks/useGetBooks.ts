@@ -1,6 +1,6 @@
 import { authFetcher } from "@/lib/fetcher";
+import { Book } from "@/types/book";
 import { useQuery } from "@tanstack/react-query";
-import { Book } from "./useGetBookByIsbn";
 
 export function useGetBooks() {
   return useQuery({

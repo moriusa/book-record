@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import BookshelfToolbar, {
   FilterStatus,
+  GroupOption,
   SortOption,
 } from "@/components/ui/BookshelfToolbar";
 import { useGetBooks } from "./hooks/useGetBooks";
@@ -11,8 +12,8 @@ import BookshelfList from "@/components/ui/BookShelfList";
 
 const Page = () => {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("ALL");
-
   const [sortOption, setSortOption] = useState<SortOption>("CREATED_DESC");
+  const [groupOption, setGroupOption] = useState<GroupOption>("NONE");
 
   const { data, isLoading, error } = useGetBooks();
 
@@ -40,14 +41,17 @@ const Page = () => {
       <BookshelfToolbar
         filterStatus={filterStatus}
         sortOption={sortOption}
+        groupOption={groupOption}
         onFilterChange={setFilterStatus}
         onSortChange={setSortOption}
+        onGroupChange={setGroupOption}
       />
 
       <BookshelfList
         books={data ?? []}
         filterStatus={filterStatus}
         sortOption={sortOption}
+        groupOption={groupOption}
       />
     </main>
   );

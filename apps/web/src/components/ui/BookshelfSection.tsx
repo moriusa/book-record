@@ -1,12 +1,5 @@
+import { Book } from "@/types/book";
 import BookCard from "./BookCard";
-
-type Book = {
-  id: string;
-  isbn: string;
-  title: string;
-  author: string;
-  imageUrl: string | null;
-};
 
 type Props = {
   title: string;

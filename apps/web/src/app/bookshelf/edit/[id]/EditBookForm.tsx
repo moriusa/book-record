@@ -7,23 +7,10 @@ import { useQuery } from "@tanstack/react-query";
 import BookFormFields, { BookFormValues } from "@/components/ui/BookFormFields";
 import { useUpdateBook } from "./hooks/useUpdateBook";
 import { useRouter } from "next/navigation";
+import { Book } from "@/types/book";
 
 type Props = {
   id: string;
-};
-
-type Book = {
-  id: string;
-  isbn: string;
-  title: string;
-  author: string;
-  publisher: string;
-  salesDate: string | null;
-  imageUrl: string | null;
-  status: BookFormValues["status"];
-  completedAt: string | null;
-  rating: number | null;
-  review: string | null;
 };
 
 const EditBookForm = ({ id }: Props) => {

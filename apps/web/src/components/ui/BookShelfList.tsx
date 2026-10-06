@@ -1,22 +1,12 @@
+import { Book, BookStatus } from "@/types/book";
 import BookshelfSection from "./BookshelfSection";
-import type { BookStatus } from "./BookFormFields";
-import type { FilterStatus, SortOption } from "./BookshelfToolbar";
-
-type Book = {
-  id: string;
-  isbn: string;
-  title: string;
-  author: string;
-  imageUrl: string | null;
-  status: BookStatus;
-  rating: number | null;
-  createdAt: string;
-};
+import type { FilterStatus, GroupOption, SortOption } from "./BookshelfToolbar";
 
 type Props = {
   books: Book[];
   filterStatus: FilterStatus;
   sortOption: SortOption;
+  groupOption: GroupOption;
 };
 
 const statusLabels = {
@@ -26,12 +16,19 @@ const statusLabels = {
   ON_HOLD: "積読",
 } satisfies Record<BookStatus, string>;
 
-const BookshelfList = ({ books, filterStatus, sortOption }: Props) => {
+const BookshelfList = ({
+  books,
+  filterStatus,
+  sortOption,
+  groupOption,
+}: Props) => {
+  // ① フィルター
   const filteredBooks =
     filterStatus === "ALL"
       ? books
       : books.filter((book) => book.status === filterStatus);
 
+  // ② ソート
   const sortedBooks = [...filteredBooks].sort((a, b) => {
     switch (sortOption) {
       case "CREATED_DESC":
@@ -52,14 +49,29 @@ const BookshelfList = ({ books, filterStatus, sortOption }: Props) => {
     }
   });
 
-  // 「すべて」の場合はステータスで分けない
-  if (filterStatus === "ALL") {
-    return <BookshelfSection title="すべて" books={sortedBooks} />;
+  // ③ グループなし
+  if (groupOption === "NONE") {
+    if (filterStatus === "ALL") {
+      return <BookshelfSection title="すべて" books={sortedBooks} />;
+    }
+
+    return (
+      <BookshelfSection
+        title={statusLabels[filterStatus]}
+        books={sortedBooks}
+      />
+    );
   }
 
-  // 特定のステータスの場合は、そのステータスだけ表示
+  // ④ 作者ごとのグループ化
+  const booksByAuthor = Map.groupBy(sortedBooks, (book) => book.author);
+
   return (
-    <BookshelfSection title={statusLabels[filterStatus]} books={sortedBooks} />
+    <div>
+      {[...booksByAuthor.entries()].map(([author, books]) => (
+        <BookshelfSection key={author} title={author} books={books} />
+      ))}
+    </div>
   );
 };
 

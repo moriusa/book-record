@@ -1,5 +1,6 @@
 "use client";
 
+import { BookStatus } from "@/types/book";
 import {
   Control,
   Controller,
@@ -7,12 +8,6 @@ import {
   UseFormWatch,
 } from "react-hook-form";
 import { FaRegStar, FaStar } from "react-icons/fa";
-
-export type BookStatus =
-  | "WANT_TO_READ"
-  | "READING"
-  | "COMPLETED"
-  | "ON_HOLD";
 
 export type BookFormValues = {
   status: BookStatus;

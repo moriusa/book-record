@@ -1,4 +1,4 @@
-import type { BookStatus } from "./BookFormFields";
+import { BookStatus } from "@/types/book";
 
 export type FilterStatus = "ALL" | BookStatus;
 
@@ -8,11 +8,15 @@ export type SortOption =
   | "TITLE_ASC"
   | "RATING_DESC";
 
+export type GroupOption = "NONE" | "AUTHOR";
+
 type Props = {
   filterStatus: FilterStatus;
   sortOption: SortOption;
+  groupOption: GroupOption;
   onFilterChange: (status: FilterStatus) => void;
   onSortChange: (option: SortOption) => void;
+  onGroupChange: (option: GroupOption) => void;
 };
 
 const filterOptions = [
@@ -30,11 +34,18 @@ const sortOptions = [
   { value: "RATING_DESC", label: "評価が高い順" },
 ] satisfies { value: SortOption; label: string }[];
 
+const groupOptions = [
+  { value: "NONE", label: "グループなし" },
+  { value: "AUTHOR", label: "作者ごと" },
+] satisfies { value: GroupOption; label: string }[];
+
 const BookshelfToolbar = ({
   filterStatus,
   sortOption,
+  groupOption,
   onFilterChange,
   onSortChange,
+  onGroupChange,
 }: Props) => {
   return (
     <div className="mt-6 space-y-5">
@@ -65,7 +76,7 @@ const BookshelfToolbar = ({
       </div>
 
       {/* ソート */}
-      <div className="flex justify-end">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <select
           value={sortOption}
           onChange={(event) => {
@@ -80,6 +91,26 @@ const BookshelfToolbar = ({
           className="w-full rounded-lg border bg-white px-3 py-2 text-sm sm:w-auto"
         >
           {sortOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={groupOption}
+          onChange={(event) => {
+            const option = groupOptions.find(
+              (option) => option.value === event.target.value,
+            );
+
+            if (option) {
+              onGroupChange(option.value);
+            }
+          }}
+          className="w-full rounded-lg border bg-white px-3 py-2 text-sm sm:w-auto"
+        >
+          {groupOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
