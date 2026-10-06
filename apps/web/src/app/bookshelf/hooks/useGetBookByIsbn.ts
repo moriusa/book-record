@@ -11,9 +11,10 @@ export type Book = {
   salesDate: string;
   imageUrl: string;
   status: BookStatus;
-  rating: string;
+  rating: number;
   review: string;
   completedAt: string;
+  createdAt: string;
 };
 
 export function useGetBookByIsbn(isbn: string) {

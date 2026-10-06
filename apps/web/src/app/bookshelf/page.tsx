@@ -1,24 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import BookshelfToolbar, {
+  FilterStatus,
+  SortOption,
+} from "@/components/ui/BookshelfToolbar";
 import { useGetBooks } from "./hooks/useGetBooks";
-import BookshelfSection from "@/components/ui/BookshelfSection";
-
-const statusOrder = [
-  "WANT_TO_READ",
-  "READING",
-  "COMPLETED",
-  "ON_HOLD",
-] as const;
-
-const statusLabels = {
-  WANT_TO_READ: "読みたい",
-  READING: "読んでいる",
-  COMPLETED: "読み終わった",
-  ON_HOLD: "積読",
-} satisfies Record<(typeof statusOrder)[number], string>;
+import BookshelfList from "@/components/ui/BookShelfList";
 
 const Page = () => {
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("ALL");
+
+  const [sortOption, setSortOption] = useState<SortOption>("CREATED_DESC");
+
   const { data, isLoading, error } = useGetBooks();
 
   if (isLoading) {
@@ -42,17 +37,18 @@ const Page = () => {
         </Link>
       </div>
 
-      {statusOrder.map((status) => {
-        const books = data?.filter((book) => book.status === status) ?? [];
+      <BookshelfToolbar
+        filterStatus={filterStatus}
+        sortOption={sortOption}
+        onFilterChange={setFilterStatus}
+        onSortChange={setSortOption}
+      />
 
-        return (
-          <BookshelfSection
-            key={status}
-            title={statusLabels[status]}
-            books={books}
-          />
-        );
-      })}
+      <BookshelfList
+        books={data ?? []}
+        filterStatus={filterStatus}
+        sortOption={sortOption}
+      />
     </main>
   );
 };
