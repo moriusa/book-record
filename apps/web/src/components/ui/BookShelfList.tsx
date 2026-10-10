@@ -1,6 +1,11 @@
-import { Book, BookStatus } from "@/types/book";
+import {
+  Book,
+  BookStatus,
+  FilterStatus,
+  GroupOption,
+  SortOption,
+} from "@/types/book";
 import BookshelfSection from "./BookshelfSection";
-import type { FilterStatus, GroupOption, SortOption } from "./BookshelfToolbar";
 
 type Props = {
   books: Book[];
@@ -63,12 +68,19 @@ const BookshelfList = ({
     );
   }
 
-  // ④ 作者ごとのグループ化
-  const booksByAuthor = Map.groupBy(sortedBooks, (book) => book.author);
+  const groupBooks = (books: Book[], groupOption: GroupOption) => {
+    if (groupOption === "NONE") {
+      return new Map([["すべて", books]]);
+    }
+
+    return Map.groupBy(books, (book) => book.author || "作者不明");
+  };
+
+  const groupedBooks = groupBooks(sortedBooks, groupOption);
 
   return (
     <div>
-      {[...booksByAuthor.entries()].map(([author, books]) => (
+      {[...groupedBooks.entries()].map(([author, books]) => (
         <BookshelfSection key={author} title={author} books={books} />
       ))}
     </div>

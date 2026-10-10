@@ -1,14 +1,4 @@
-import { BookStatus } from "@/types/book";
-
-export type FilterStatus = "ALL" | BookStatus;
-
-export type SortOption =
-  | "CREATED_DESC"
-  | "CREATED_ASC"
-  | "TITLE_ASC"
-  | "RATING_DESC";
-
-export type GroupOption = "NONE" | "AUTHOR";
+import { FilterStatus, GroupOption, SortOption } from "@/types/book";
 
 type Props = {
   filterStatus: FilterStatus;
@@ -37,7 +27,10 @@ const sortOptions = [
 const groupOptions = [
   { value: "NONE", label: "グループなし" },
   { value: "AUTHOR", label: "作者ごと" },
-] satisfies { value: GroupOption; label: string }[];
+] satisfies {
+  value: GroupOption;
+  label: string;
+}[];
 
 const BookshelfToolbar = ({
   filterStatus,

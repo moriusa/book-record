@@ -2,13 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import BookshelfToolbar, {
-  FilterStatus,
-  GroupOption,
-  SortOption,
-} from "@/components/ui/BookshelfToolbar";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
+import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
+import { FilterStatus, SortOption, GroupOption } from "@/types/book";
 
 const Page = () => {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("ALL");
