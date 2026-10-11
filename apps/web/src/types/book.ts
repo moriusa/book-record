@@ -1,7 +1,7 @@
 export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 
 export type FilterStatus = "ALL" | BookStatus;
-export type GroupOption = "NONE" | "AUTHOR";
+export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER";
 export type SortOption =
   | "CREATED_DESC"
   | "CREATED_ASC"

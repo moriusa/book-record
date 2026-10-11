@@ -27,6 +27,7 @@ const sortOptions = [
 const groupOptions = [
   { value: "NONE", label: "グループなし" },
   { value: "AUTHOR", label: "作者ごと" },
+  { value: "PUBLISHER", label: "出版社ごと" },
 ] satisfies {
   value: GroupOption;
   label: string;

@@ -71,9 +71,11 @@ const BookshelfList = ({
   const groupBooks = (books: Book[], groupOption: GroupOption) => {
     if (groupOption === "NONE") {
       return new Map([["すべて", books]]);
+    } else if (groupOption === "AUTHOR") {
+      return Map.groupBy(books, (book) => book.author || "作者不明");
+    } else {
+      return Map.groupBy(books, (book) => book.publisher || "出版社不明");
     }
-
-    return Map.groupBy(books, (book) => book.author || "作者不明");
   };
 
   const groupedBooks = groupBooks(sortedBooks, groupOption);
