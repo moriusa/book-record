@@ -58,6 +58,7 @@ booksRouter.post("/", authMiddleware, async (c) => {
         title: body.title,
         author: body.author,
         publisher: body.publisherName,
+        series: body.seriesName,
         salesDate: body.salesDate,
         imageUrl: body.largeImageUrl,
         status: body.status,

@@ -29,6 +29,7 @@ export const books = pgTable(
     title: varchar("title", { length: 255 }).notNull(),
     author: varchar("author", { length: 255 }).notNull(),
     publisher: varchar("publisher", { length: 255 }),
+    series: varchar("series", { length: 255 }),
     salesDate: varchar("sales_date", { length: 20 }),
     imageUrl: varchar("image_url", { length: 255 }),
     status: varchar("status", { length: 30 }).notNull(),
