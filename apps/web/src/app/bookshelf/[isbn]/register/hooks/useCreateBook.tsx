@@ -6,6 +6,7 @@ type CreateBookInput = {
   title: string;
   author: string;
   publisherName: string | null;
+  seriesName: string | null;
   salesDate: string | null;
   largeImageUrl: string | null;
   status: string;

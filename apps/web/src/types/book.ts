@@ -1,7 +1,7 @@
 export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 
 export type FilterStatus = "ALL" | BookStatus;
-export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER";
+export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER" | "SERIES";
 export type SortOption =
   | "CREATED_DESC"
   | "CREATED_ASC"
@@ -14,6 +14,7 @@ export type Book = {
   title: string;
   author: string;
   publisher: string;
+  series: string | null;
   salesDate: string;
   imageUrl: string | null;
   status: BookStatus;

@@ -57,6 +57,13 @@
       "when": 1790954267015,
       "tag": "0007_superb_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791984973907,
+      "tag": "0008_dear_christian_walker",
+      "breakpoints": true
     }
   ]
 }
