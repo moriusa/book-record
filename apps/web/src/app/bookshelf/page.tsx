@@ -19,6 +19,9 @@ const Page = () => {
   const [groupOption, setGroupOption] = useState<GroupOption>("NONE");
 
   const { data, isLoading, error } = useGetBooks();
+  const filteredBookCount = (data ?? []).filter(
+    (book) => filterStatus === "ALL" || book.status === filterStatus,
+  ).length;
 
   if (isLoading) {
     return <p className="p-6">読み込み中...</p>;
@@ -43,6 +46,7 @@ const Page = () => {
 
       <BookshelfToolbar
         filterStatus={filterStatus}
+        filteredBookCount={filteredBookCount}
         sortOption={sortOption}
         sortDirection={sortDirection}
         groupOption={groupOption}

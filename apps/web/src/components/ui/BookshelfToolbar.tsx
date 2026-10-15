@@ -16,6 +16,7 @@ import {
 
 type Props = {
   filterStatus: FilterStatus;
+  filteredBookCount: number;
   sortOption: SortOption;
   sortDirection: SortDirection;
   groupOption: GroupOption;
@@ -51,6 +52,7 @@ const groupOptions = [
 
 const BookshelfToolbar = ({
   filterStatus,
+  filteredBookCount,
   sortOption,
   sortDirection,
   groupOption,
@@ -108,10 +110,14 @@ const BookshelfToolbar = ({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
           <div className="mb-2.5 flex items-center gap-2 text-sm font-bold text-stone-800">
-            <span className="flex size-7 items-center justify-center rounded-lg bg-amber-100 text-amber-900">
-              <RiFilter3Line aria-hidden="true" />
-            </span>
+            <RiFilter3Line aria-hidden="true" className="text-base text-stone-500" />
             読書ステータス
+            <span
+              className="ml-1 rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-extrabold tabular-nums text-amber-950 shadow-sm"
+              aria-live="polite"
+            >
+              {filteredBookCount}冊
+            </span>
           </div>
           <div className="relative">
             <div
