@@ -18,7 +18,7 @@ export default function LoginButton() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="rounded-md bg-black px-4 py-2 text-white"
+        className="rounded-lg bg-stone-900 px-3.5 py-2 text-sm font-semibold text-amber-50 shadow-sm transition hover:-translate-y-0.5 hover:bg-stone-800 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
       >
         ログイン
       </button>
