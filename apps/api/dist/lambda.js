@@ -16479,14 +16479,22 @@ var books = pgTable(
   "books",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").notNull().references(() => users.id),
     isbn: varchar("isbn", { length: 20 }).notNull(),
     title: varchar("title", { length: 255 }).notNull(),
     author: varchar("author", { length: 255 }).notNull(),
     publisher: varchar("publisher", { length: 255 }),
     series: varchar("series", { length: 255 }),
     salesDate: varchar("sales_date", { length: 20 }),
-    imageUrl: varchar("image_url", { length: 255 }),
+    imageUrl: varchar("image_url", { length: 255 })
+  },
+  (table) => [unique("books_isbn_unique").on(table.isbn)]
+);
+var userBooks = pgTable(
+  "user_books",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().references(() => users.id),
+    bookId: uuid("book_id").notNull().references(() => books.id),
     status: varchar("status", { length: 30 }).notNull(),
     rating: smallint("rating"),
     review: text("review"),
@@ -16494,7 +16502,9 @@ var books = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
   },
-  (table) => [unique("books_user_id_isbn_unique").on(table.userId, table.isbn)]
+  (table) => [
+    unique("user_books_user_id_book_id_unique").on(table.userId, table.bookId)
+  ]
 );
 
 // ../../node_modules/.pnpm/aws-jwt-verify@5.2.1/node_modules/aws-jwt-verify/dist/esm/error.js
@@ -17628,99 +17638,116 @@ var authMiddleware = async (c, next) => {
 
 // src/routes/books.ts
 var booksRouter = new Hono2();
+var bookSelection = {
+  id: userBooks.id,
+  isbn: books.isbn,
+  title: books.title,
+  author: books.author,
+  publisher: books.publisher,
+  series: books.series,
+  salesDate: books.salesDate,
+  imageUrl: books.imageUrl,
+  status: userBooks.status,
+  rating: userBooks.rating,
+  review: userBooks.review,
+  completedAt: userBooks.completedAt,
+  createdAt: userBooks.createdAt,
+  updatedAt: userBooks.updatedAt
+};
+var findUserBookById = async (id, userId) => {
+  const result = await db.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(and(eq(userBooks.id, id), eq(userBooks.userId, userId))).limit(1);
+  return result[0];
+};
+var isUniqueViolation = (error) => {
+  if (typeof error !== "object" || error === null) {
+    return false;
+  }
+  if ("code" in error && error.code === "23505") {
+    return true;
+  }
+  return "cause" in error && typeof error.cause === "object" && error.cause !== null && "code" in error.cause && error.cause.code === "23505";
+};
 booksRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
   const isbn = c.req.query("isbn");
-  const conditions = [eq(books.userId, user.id)];
-  if (isbn) {
-    conditions.push(eq(books.isbn, isbn));
-  }
-  const result = await db.select().from(books).where(and(...conditions));
+  const result = await db.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(
+    isbn ? and(eq(userBooks.userId, user.id), eq(books.isbn, isbn)) : eq(userBooks.userId, user.id)
+  );
   return c.json(result);
 });
 booksRouter.get("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
-  const id = c.req.param("id");
-  const result = await db.select().from(books).where(and(eq(books.id, id), eq(books.userId, user.id)));
-  if (result.length === 0) {
-    return c.json(
-      {
-        message: "Book not found"
-      },
-      404
-    );
+  const book = await findUserBookById(c.req.param("id"), user.id);
+  if (!book) {
+    return c.json({ message: "Book not found" }, 404);
   }
-  return c.json(result[0]);
+  return c.json(book);
 });
 booksRouter.post("/", authMiddleware, async (c) => {
   const user = c.get("user");
   const body = await c.req.json();
   try {
-    const result = await db.insert(books).values({
-      userId: user.id,
-      isbn: body.isbn,
-      title: body.title,
-      author: body.author,
-      publisher: body.publisherName,
-      series: body.seriesName,
-      salesDate: body.salesDate,
-      imageUrl: body.largeImageUrl,
-      status: body.status,
-      rating: body.rating,
-      review: body.review,
-      completedAt: body.completedAt || null
-    }).returning();
-    return c.json(result[0], 201);
+    const result = await db.transaction(async (tx) => {
+      const insertedBooks = await tx.insert(books).values({
+        isbn: body.isbn,
+        title: body.title,
+        author: body.author,
+        publisher: body.publisherName,
+        series: body.seriesName,
+        salesDate: body.salesDate,
+        imageUrl: body.largeImageUrl
+      }).onConflictDoNothing({ target: books.isbn }).returning({ id: books.id });
+      const bookId = insertedBooks[0]?.id ?? (await tx.select({ id: books.id }).from(books).where(eq(books.isbn, body.isbn)).limit(1))[0]?.id;
+      if (!bookId) {
+        throw new Error("Book could not be created or found");
+      }
+      const createdUserBooks = await tx.insert(userBooks).values({
+        userId: user.id,
+        bookId,
+        status: body.status,
+        rating: body.rating,
+        review: body.review,
+        completedAt: body.completedAt || null
+      }).returning({ id: userBooks.id });
+      const createdUserBook = createdUserBooks[0];
+      if (!createdUserBook) {
+        throw new Error("User book could not be created");
+      }
+      const created = await tx.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(eq(userBooks.id, createdUserBook.id)).limit(1);
+      return created[0];
+    });
+    return c.json(result, 201);
   } catch (error) {
     console.error(error);
-    if (error instanceof Error && error.cause instanceof Error && "code" in error.cause && error.cause.code === "23505") {
-      return c.json(
-        {
-          message: "\u3053\u306E\u672C\u306F\u3059\u3067\u306B\u672C\u68DA\u306B\u767B\u9332\u3055\u308C\u3066\u3044\u307E\u3059"
-        },
-        409
-      );
+    if (isUniqueViolation(error)) {
+      return c.json({ message: "\u3053\u306E\u672C\u306F\u3059\u3067\u306B\u672C\u68DA\u306B\u767B\u9332\u3055\u308C\u3066\u3044\u307E\u3059" }, 409);
     }
-    return c.json(
-      {
-        message: "\u672C\u306E\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F"
-      },
-      500
-    );
+    return c.json({ message: "\u672C\u306E\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
   }
 });
 booksRouter.patch("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
   const body = await c.req.json();
-  const result = await db.update(books).set({
+  const result = await db.update(userBooks).set({
     status: body.status,
     rating: body.rating,
     review: body.review,
     completedAt: body.completedAt || null,
     updatedAt: /* @__PURE__ */ new Date()
-  }).where(and(eq(books.id, id), eq(books.userId, user.id))).returning();
+  }).where(and(eq(userBooks.id, id), eq(userBooks.userId, user.id))).returning({ id: userBooks.id });
   if (result.length === 0) {
-    return c.json(
-      {
-        message: "Book not found"
-      },
-      404
-    );
+    return c.json({ message: "Book not found" }, 404);
   }
-  return c.json(result[0]);
+  const book = await findUserBookById(result[0].id, user.id);
+  return c.json(book);
 });
 booksRouter.delete("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
-  const result = await db.delete(books).where(and(eq(books.id, id), eq(books.userId, user.id))).returning();
+  const result = await db.delete(userBooks).where(and(eq(userBooks.id, id), eq(userBooks.userId, user.id))).returning();
   if (result.length === 0) {
-    return c.json(
-      {
-        message: "Book not found"
-      },
-      404
-    );
+    return c.json({ message: "Book not found" }, 404);
   }
   return c.json(result[0]);
 });
