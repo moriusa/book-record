@@ -27,12 +27,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ja"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-dvh flex-col bg-[#f7f5f0] text-stone-900">
         <AmplifyProvider />
         <AuthProvider>
           <QueryProvider>
             <Header />
-            <main className="bg-gray-100 h-screen">
+            <main className="flex-1 bg-[#f7f5f0]">
               <div className="p-3">{children}</div>
             </main>
           </QueryProvider>

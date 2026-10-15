@@ -133,7 +133,7 @@ const BookshelfToolbar = ({
               })}
             </div>
             {canScrollLeft && (
-              <div className="absolute inset-y-0 left-0 flex w-14 items-center bg-gradient-to-r from-[#f3f4f6] via-[#f3f4f6]/85 to-transparent sm:hidden">
+              <div className="absolute inset-y-0 left-0 flex w-14 items-center bg-gradient-to-r from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
                 <button
                   type="button"
                   onClick={() => scrollFilters("left")}
@@ -145,7 +145,7 @@ const BookshelfToolbar = ({
               </div>
             )}
             {canScrollRight && (
-              <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-gradient-to-l from-[#f3f4f6] via-[#f3f4f6]/85 to-transparent sm:hidden">
+              <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-gradient-to-l from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
                 <button
                   type="button"
                   onClick={() => scrollFilters("right")}
