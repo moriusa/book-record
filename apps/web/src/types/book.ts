@@ -2,11 +2,8 @@ export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 
 export type FilterStatus = "ALL" | BookStatus;
 export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER" | "SERIES";
-export type SortOption =
-  | "CREATED_DESC"
-  | "CREATED_ASC"
-  | "TITLE_ASC"
-  | "RATING_DESC";
+export type SortOption = "CREATED" | "TITLE" | "RATING";
+export type SortDirection = "ASC" | "DESC";
 
 export type Book = {
   id: string;

@@ -3,6 +3,7 @@ import {
   BookStatus,
   FilterStatus,
   GroupOption,
+  SortDirection,
   SortOption,
 } from "@/types/book";
 import BookshelfSection from "./BookshelfSection";
@@ -11,6 +12,7 @@ type Props = {
   books: Book[];
   filterStatus: FilterStatus;
   sortOption: SortOption;
+  sortDirection: SortDirection;
   groupOption: GroupOption;
 };
 
@@ -25,6 +27,7 @@ const BookshelfList = ({
   books,
   filterStatus,
   sortOption,
+  sortDirection,
   groupOption,
 }: Props) => {
   // ① フィルター
@@ -35,23 +38,18 @@ const BookshelfList = ({
 
   // ② ソート
   const sortedBooks = [...filteredBooks].sort((a, b) => {
-    switch (sortOption) {
-      case "CREATED_DESC":
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+    const comparison = (() => {
+      switch (sortOption) {
+        case "CREATED":
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        case "TITLE":
+          return a.title.localeCompare(b.title, "ja");
+        case "RATING":
+          return (a.rating ?? 0) - (b.rating ?? 0);
+      }
+    })();
 
-      case "CREATED_ASC":
-        return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-
-      case "TITLE_ASC":
-        return a.title.localeCompare(b.title, "ja");
-
-      case "RATING_DESC":
-        return (b.rating ?? 0) - (a.rating ?? 0);
-    }
+    return sortDirection === "ASC" ? comparison : -comparison;
   });
 
   // ③ グループなし

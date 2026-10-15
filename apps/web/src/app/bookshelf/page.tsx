@@ -5,11 +5,17 @@ import Link from "next/link";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
-import { FilterStatus, SortOption, GroupOption } from "@/types/book";
+import {
+  FilterStatus,
+  SortDirection,
+  SortOption,
+  GroupOption,
+} from "@/types/book";
 
 const Page = () => {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("ALL");
-  const [sortOption, setSortOption] = useState<SortOption>("CREATED_DESC");
+  const [sortOption, setSortOption] = useState<SortOption>("CREATED");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("DESC");
   const [groupOption, setGroupOption] = useState<GroupOption>("NONE");
 
   const { data, isLoading, error } = useGetBooks();
@@ -38,9 +44,11 @@ const Page = () => {
       <BookshelfToolbar
         filterStatus={filterStatus}
         sortOption={sortOption}
+        sortDirection={sortDirection}
         groupOption={groupOption}
         onFilterChange={setFilterStatus}
         onSortChange={setSortOption}
+        onSortDirectionChange={setSortDirection}
         onGroupChange={setGroupOption}
       />
 
@@ -48,6 +56,7 @@ const Page = () => {
         books={data ?? []}
         filterStatus={filterStatus}
         sortOption={sortOption}
+        sortDirection={sortDirection}
         groupOption={groupOption}
       />
     </main>

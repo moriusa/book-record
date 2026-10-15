@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FilterStatus, GroupOption, SortOption } from "@/types/book";
+import {
+  FilterStatus,
+  GroupOption,
+  SortDirection,
+  SortOption,
+} from "@/types/book";
 import {
   RiArrowRightSLine,
   RiFilter3Line,
@@ -12,9 +17,11 @@ import {
 type Props = {
   filterStatus: FilterStatus;
   sortOption: SortOption;
+  sortDirection: SortDirection;
   groupOption: GroupOption;
   onFilterChange: (status: FilterStatus) => void;
   onSortChange: (option: SortOption) => void;
+  onSortDirectionChange: (direction: SortDirection) => void;
   onGroupChange: (option: GroupOption) => void;
 };
 
@@ -27,10 +34,9 @@ const filterOptions = [
 ] satisfies { value: FilterStatus; label: string }[];
 
 const sortOptions = [
-  { value: "CREATED_DESC", label: "登録が新しい順" },
-  { value: "CREATED_ASC", label: "登録が古い順" },
-  { value: "TITLE_ASC", label: "タイトル順" },
-  { value: "RATING_DESC", label: "評価が高い順" },
+  { value: "CREATED", label: "登録順" },
+  { value: "TITLE", label: "タイトル順" },
+  { value: "RATING", label: "評価順" },
 ] satisfies { value: SortOption; label: string }[];
 
 const groupOptions = [
@@ -46,9 +52,11 @@ const groupOptions = [
 const BookshelfToolbar = ({
   filterStatus,
   sortOption,
+  sortDirection,
   groupOption,
   onFilterChange,
   onSortChange,
+  onSortDirectionChange,
   onGroupChange,
 }: Props) => {
   const filterScrollRef = useRef<HTMLDivElement>(null);
@@ -108,7 +116,7 @@ const BookshelfToolbar = ({
           <div className="relative">
             <div
               ref={filterScrollRef}
-              className="-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 pr-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 pr-10 scrollbar-none [&::-webkit-scrollbar]:hidden"
               role="group"
               aria-label="読書ステータスで絞り込む"
             >
@@ -133,7 +141,7 @@ const BookshelfToolbar = ({
               })}
             </div>
             {canScrollLeft && (
-              <div className="absolute inset-y-0 left-0 flex w-14 items-center bg-gradient-to-r from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
+              <div className="absolute inset-y-0 left-0 flex w-14 items-center bg-linear-to-r from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
                 <button
                   type="button"
                   onClick={() => scrollFilters("left")}
@@ -145,7 +153,7 @@ const BookshelfToolbar = ({
               </div>
             )}
             {canScrollRight && (
-              <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-gradient-to-l from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
+              <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-linear-to-l from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
                 <button
                   type="button"
                   onClick={() => scrollFilters("right")}
@@ -165,25 +173,43 @@ const BookshelfToolbar = ({
               <RiSortDesc aria-hidden="true" className="text-sm" />
               並び順
             </span>
-            <select
-              value={sortOption}
-              onChange={(event) => {
-                const option = sortOptions.find(
-                  (option) => option.value === event.target.value,
-                );
+            <div className="flex gap-2">
+              <select
+                value={sortOption}
+                onChange={(event) => {
+                  const option = sortOptions.find(
+                    (option) => option.value === event.target.value,
+                  );
 
-                if (option) {
-                  onSortChange(option.value);
+                  if (option) {
+                    onSortChange(option.value);
+                  }
+                }}
+                className="min-h-11 w-full cursor-pointer rounded-lg border border-stone-200 bg-transparent px-3 text-sm font-medium text-stone-800 outline-none transition hover:border-amber-300 hover:bg-amber-50/50 focus:border-amber-600 focus:ring-2 focus:ring-amber-200 lg:w-32"
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() =>
+                  onSortDirectionChange(
+                    sortDirection === "ASC" ? "DESC" : "ASC",
+                  )
                 }
-              }}
-              className="min-h-11 w-full cursor-pointer rounded-lg border border-stone-200 bg-transparent px-3 text-sm font-medium text-stone-800 outline-none transition hover:border-amber-300 hover:bg-amber-50/50 focus:border-amber-600 focus:ring-2 focus:ring-amber-200 lg:w-44"
-            >
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+                className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 text-sm font-semibold text-stone-700 transition hover:border-amber-300 hover:bg-amber-50/50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
+                aria-label={`並び順を${sortDirection === "ASC" ? "降順" : "昇順"}に変更`}
+              >
+                <RiSortDesc
+                  aria-hidden="true"
+                  className={sortDirection === "ASC" ? "rotate-180" : ""}
+                />
+                {sortDirection === "ASC" ? "昇順" : "降順"}
+              </button>
+            </div>
           </label>
 
           <label className="min-w-0">
