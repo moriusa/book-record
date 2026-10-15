@@ -8,10 +8,12 @@ import {
 export const useBookSearch = () => {
   const [books, setBooks] = useState<RakutenBookItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const handleSearch = async (param: RakutenBookSearchParams) => {
     try {
       setIsLoading(true);
+      setHasSearched(true);
 
       const data = await fetchRakutenBooks(param);
 
@@ -40,5 +42,5 @@ export const useBookSearch = () => {
       setIsLoading(false);
     }
   };
-  return { books, isLoading, handleSearch };
+  return { books, hasSearched, isLoading, handleSearch };
 };
