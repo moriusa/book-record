@@ -12,6 +12,8 @@ import {
 } from "react-icons/ri";
 import { useGetBooks } from "./bookshelf/hooks/useGetBooks";
 import { BookStatus } from "@/types/book";
+import { useAuth } from "@/components/providers/AuthProvider";
+import LoginButton from "@/components/ui/LoginButton";
 
 const statusCards = [
   { status: "WANT_TO_READ", label: "読みたい", icon: RiStackLine, accent: "text-amber-700", background: "bg-amber-100/70" },
@@ -27,6 +29,16 @@ const statusCards = [
 }>;
 
 export default function Home() {
+  const { user, isLoading: isAuthLoading } = useAuth();
+
+  if (isAuthLoading) {
+    return <main className="mx-auto min-h-96 max-w-6xl px-4 py-8 sm:py-12" />;
+  }
+
+  return user ? <AuthenticatedHome /> : <GuestHome />;
+}
+
+function AuthenticatedHome() {
   const { data: books, isLoading, error } = useGetBooks();
   const recentBooks = [...(books ?? [])]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -118,6 +130,52 @@ export default function Home() {
             ))}
           </div>
         )}
+      </section>
+    </main>
+  );
+}
+
+function GuestHome() {
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+      <section className="overflow-hidden rounded-3xl border border-stone-200 bg-[#fffdf9] px-6 py-10 shadow-sm sm:px-10 sm:py-16">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+          <div>
+            <p className="text-xs font-bold tracking-[0.16em] text-amber-800">YOUR READING SPACE</p>
+            <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">本と出会い、<br />本棚を育てる。</h1>
+            <p className="mt-5 max-w-xl text-sm leading-7 text-stone-600 sm:text-base">読みたい本も、読み終えた本も。あなただけの本棚に集めて、読書の記録を残しましょう。</p>
+            <div className="mt-7"><LoginButton /></div>
+          </div>
+
+          <div className="relative mx-auto flex h-60 w-full max-w-sm items-end justify-center rounded-2xl bg-amber-100/60 px-7 pb-7 pt-12 sm:h-72" aria-hidden="true">
+            <div className="absolute inset-x-7 bottom-6 h-3 rounded bg-stone-800/80" />
+            <span className="h-36 w-14 -rotate-6 rounded-t-md bg-amber-700 shadow-md" />
+            <span className="h-48 w-16 -rotate-2 rounded-t-md bg-stone-800 shadow-md" />
+            <span className="h-32 w-12 rotate-3 rounded-t-md bg-emerald-700 shadow-md" />
+            <span className="h-44 w-16 rotate-6 rounded-t-md bg-sky-700 shadow-md" />
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-12" aria-labelledby="feature-heading">
+        <p className="text-center text-xs font-bold tracking-[0.14em] text-amber-800">KEEP YOUR READING</p>
+        <h2 id="feature-heading" className="mt-2 text-center text-2xl font-bold text-stone-900">読書を、あなたらしく整理する</h2>
+        <div className="mt-7 grid gap-4 sm:grid-cols-3">
+          {[
+            [RiAddLine, "気になる本を追加", "タイトルから本を探して、いつでも本棚へ。"],
+            [RiStackLine, "読書の状態を記録", "読みたい・読んでいる・読み終わったをひと目で。"],
+            [RiBookOpenLine, "自分だけの本棚", "読書の積み重ねを、いつでも振り返れます。"],
+          ].map(([Icon, title, description]) => {
+            const FeatureIcon = Icon as typeof RiAddLine;
+            return (
+              <div key={title as string} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+                <FeatureIcon className="text-2xl text-amber-800" aria-hidden="true" />
+                <h3 className="mt-4 font-bold text-stone-900">{title as string}</h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{description as string}</p>
+              </div>
+            );
+          })}
+        </div>
       </section>
     </main>
   );
