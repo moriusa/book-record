@@ -1,4 +1,5 @@
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
+import { BookDetails, getStoredBookByIsbn } from "@/lib/getStoredBookByIsbn";
 import Image from "next/image";
 import BookShelfStatus from "./BookShelfStatus";
 
@@ -9,8 +10,8 @@ type Props = {
 const Page = async ({ params }: Props) => {
   const { isbn } = await params;
 
-  const book = await getRakutenBookByIsbn(isbn);
-  console.log(book);
+  const storedBook = await getStoredBookByIsbn(isbn);
+  const book: BookDetails | null = storedBook ?? (await getRakutenBookByIsbn(isbn));
   if (!book) return <div>データを取得できませんでした。</div>;
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -18,12 +19,18 @@ const Page = async ({ params }: Props) => {
       <div className="rounded-2xl border bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-8 sm:flex-row">
           <div className="relative mx-auto h-72 w-48 shrink-0 sm:mx-0">
-            <Image
-              src={book.largeImageUrl}
-              alt={book.title}
-              fill
-              className="object-contain"
-            />
+            {book.largeImageUrl ? (
+              <Image
+                src={book.largeImageUrl}
+                alt={book.title}
+                fill
+                className="object-contain"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center rounded-lg bg-stone-100 text-sm text-stone-500">
+                表紙画像はありません
+              </div>
+            )}
           </div>
 
           <div className="min-w-0 flex-1">

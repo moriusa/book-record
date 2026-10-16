@@ -1,4 +1,5 @@
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
+import { BookDetails, getStoredBookByIsbn } from "@/lib/getStoredBookByIsbn";
 import { AddBookForm } from "./AddBookForm";
 import Image from "next/image";
 
@@ -10,7 +11,9 @@ type Props = {
 
 const Page = async ({ params }: Props) => {
   const { isbn } = await params;
-  const book = await getRakutenBookByIsbn(isbn);
+  const storedBook = await getStoredBookByIsbn(isbn);
+  const book: BookDetails | null =
+    storedBook ?? (await getRakutenBookByIsbn(isbn));
 
   if (!book) {
     return <div>本が見つかりませんでした。</div>;
@@ -23,12 +26,18 @@ const Page = async ({ params }: Props) => {
         {/* 本の情報 */}
         <div className="flex flex-col items-center gap-5 border-b border-gray-200 pb-6 sm:flex-row sm:items-start">
           <div className="relative h-48 w-32 shrink-0 overflow-hidden rounded-lg bg-gray-50">
-            <Image
-              src={book.largeImageUrl}
-              alt={book.title}
-              fill
-              className="object-contain"
-            />
+            {book.largeImageUrl ? (
+              <Image
+                src={book.largeImageUrl}
+                alt={book.title}
+                fill
+                className="object-contain"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-center text-xs text-gray-500">
+                表紙画像はありません
+              </div>
+            )}
           </div>
 
           <div className="min-w-0 text-center sm:text-left">

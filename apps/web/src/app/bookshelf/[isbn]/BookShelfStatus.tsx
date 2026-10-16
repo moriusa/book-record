@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { RakutenBookItem } from "@/lib/fetchRakutenBooks";
 import { useGetBookByIsbn } from "../hooks/useGetBookByIsbn";
 import { AddToBookshelfButton } from "./AddToBookshelfButton";
 import { FaStar } from "react-icons/fa";
 
 type Props = {
-  bookData: RakutenBookItem;
+  bookData: {
+    isbn: string;
+  };
 };
 
 const bookStatus = {

@@ -17654,6 +17654,17 @@ var bookSelection = {
   createdAt: userBooks.createdAt,
   updatedAt: userBooks.updatedAt
 };
+var catalogBookSelection = {
+  isbn: books.isbn,
+  title: books.title,
+  author: books.author,
+  publisherName: books.publisher,
+  seriesName: books.series,
+  salesDate: books.salesDate,
+  largeImageUrl: books.imageUrl,
+  size: sql`null`,
+  itemCaption: sql`null`
+};
 var findUserBookById = async (id, userId) => {
   const result = await db.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(and(eq(userBooks.id, id), eq(userBooks.userId, userId))).limit(1);
   return result[0];
@@ -17674,6 +17685,14 @@ booksRouter.get("/", authMiddleware, async (c) => {
     isbn ? and(eq(userBooks.userId, user.id), eq(books.isbn, isbn)) : eq(userBooks.userId, user.id)
   );
   return c.json(result);
+});
+booksRouter.get("/catalog/:isbn", async (c) => {
+  const result = await db.select(catalogBookSelection).from(books).where(eq(books.isbn, c.req.param("isbn"))).limit(1);
+  const book = result[0];
+  if (!book) {
+    return c.json({ message: "Book not found" }, 404);
+  }
+  return c.json(book);
 });
 booksRouter.get("/:id", authMiddleware, async (c) => {
   const user = c.get("user");

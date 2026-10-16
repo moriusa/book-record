@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { books, userBooks } from "../db/schema.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -22,6 +22,18 @@ const bookSelection = {
   completedAt: userBooks.completedAt,
   createdAt: userBooks.createdAt,
   updatedAt: userBooks.updatedAt,
+};
+
+const catalogBookSelection = {
+  isbn: books.isbn,
+  title: books.title,
+  author: books.author,
+  publisherName: books.publisher,
+  seriesName: books.series,
+  salesDate: books.salesDate,
+  largeImageUrl: books.imageUrl,
+  size: sql<string | null>`null`,
+  itemCaption: sql<string | null>`null`,
 };
 
 const findUserBookById = async (id: string, userId: string) => {
@@ -68,6 +80,21 @@ booksRouter.get("/", authMiddleware, async (c) => {
     );
 
   return c.json(result);
+});
+
+booksRouter.get("/catalog/:isbn", async (c) => {
+  const result = await db
+    .select(catalogBookSelection)
+    .from(books)
+    .where(eq(books.isbn, c.req.param("isbn")))
+    .limit(1);
+
+  const book = result[0];
+  if (!book) {
+    return c.json({ message: "Book not found" }, 404);
+  }
+
+  return c.json(book);
 });
 
 booksRouter.get("/:id", authMiddleware, async (c) => {
