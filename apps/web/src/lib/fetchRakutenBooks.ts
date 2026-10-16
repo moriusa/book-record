@@ -51,6 +51,7 @@ export type RakutenBookSearchParams = {
   isbn?: string;
   author?: string;
   publisherName?: string;
+  page?: number;
 };
 
 export const fetchRakutenBooks = async ({
@@ -58,6 +59,7 @@ export const fetchRakutenBooks = async ({
   isbn,
   author,
   publisherName,
+  page,
 }: RakutenBookSearchParams): Promise<RakutenBooksResponse> => {
   const RAKUTEN_APP_ID = process.env.RAKUTEN_APPLICATION_ID;
   const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY;
@@ -88,6 +90,10 @@ export const fetchRakutenBooks = async ({
 
   if (publisherName) {
     params.set("publisherName", publisherName);
+  }
+
+  if (page) {
+    params.set("page", String(page));
   }
   const res = await fetcher(
     `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params}`,

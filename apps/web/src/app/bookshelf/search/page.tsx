@@ -2,10 +2,33 @@
 import Link from "next/link";
 import { SearchBox } from "./SearchBox";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { useBookSearch } from "./hooks/useBookSearch";
 
 const Page = () => {
-  const { books, hasSearched, handleSearch, isLoading } = useBookSearch();
+  const { books, hasSearched, hasMore, handleSearch, isLoading, loadMore } =
+    useBookSearch();
+  const loadMoreTargetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = loadMoreTargetRef.current;
+
+    if (!target || !hasMore || isLoading) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          void loadMore();
+        }
+      },
+      { rootMargin: "240px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, loadMore]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -26,11 +49,6 @@ const Page = () => {
       </div>
 
       <div className="mt-10">
-        {books.length > 0 && (
-          <p className="mb-4 text-sm font-semibold text-stone-700">
-            検索結果 <span className="text-amber-800">{books.length}件</span>
-          </p>
-        )}
         {hasSearched && !isLoading && books.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white/50 px-6 py-12 text-center">
             <p className="text-base font-semibold text-stone-800">
@@ -66,6 +84,18 @@ const Page = () => {
                 </p>
               </Link>
             ))}
+          </div>
+        )}
+        {books.length > 0 && (
+          <div
+            ref={loadMoreTargetRef}
+            className="flex min-h-16 items-center justify-center"
+            aria-live="polite"
+          >
+            {isLoading && <p className="text-sm text-stone-500">読み込み中…</p>}
+            {!hasMore && !isLoading && (
+              <p className="text-sm text-stone-500">すべての検索結果を表示しました</p>
+            )}
           </div>
         )}
       </div>
