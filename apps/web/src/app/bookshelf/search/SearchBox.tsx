@@ -5,10 +5,15 @@ import { RakutenBookSearchParams } from "@/lib/fetchRakutenBooks";
 type SearchBoxProps = {
   onSearch: ({ title }: RakutenBookSearchParams) => void;
   isLoading: boolean;
+  initialKeyword: string;
 };
 
-export const SearchBox = ({ onSearch, isLoading }: SearchBoxProps) => {
-  const [keyword, setKeyword] = useState("");
+export const SearchBox = ({
+  onSearch,
+  isLoading,
+  initialKeyword,
+}: SearchBoxProps) => {
+  const [keyword, setKeyword] = useState(initialKeyword);
   const handleSearch = () => {
     const trimmedKeyword = keyword.trim();
 

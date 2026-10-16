@@ -2,12 +2,19 @@
 import Link from "next/link";
 import { SearchBox } from "./SearchBox";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useBookSearch } from "./hooks/useBookSearch";
 
-const Page = () => {
-  const { books, hasSearched, hasMore, handleSearch, isLoading, loadMore } =
-    useBookSearch();
+const SearchPage = () => {
+  const {
+    books,
+    searchTitle,
+    hasSearched,
+    hasMore,
+    handleSearch,
+    isLoading,
+    loadMore,
+  } = useBookSearch();
   const loadMoreTargetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,7 +52,12 @@ const Page = () => {
       </div>
 
       <div className="mt-6 max-w-2xl">
-        <SearchBox onSearch={handleSearch} isLoading={isLoading} />
+        <SearchBox
+          key={searchTitle}
+          onSearch={handleSearch}
+          isLoading={isLoading}
+          initialKeyword={searchTitle}
+        />
       </div>
 
       <div className="mt-10">
@@ -102,5 +114,13 @@ const Page = () => {
     </main>
   );
 };
+
+const Page = () => (
+  <Suspense
+    fallback={<main className="mx-auto min-h-80 max-w-6xl px-4 py-8" />}
+  >
+    <SearchPage />
+  </Suspense>
+);
 
 export default Page;
