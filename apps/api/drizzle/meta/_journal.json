@@ -71,6 +71,13 @@
       "when": 1792088246228,
       "tag": "0009_cool_gorgon",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792124846289,
+      "tag": "0010_jittery_prodigy",
+      "breakpoints": true
     }
   ]
 }

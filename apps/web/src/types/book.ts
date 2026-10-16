@@ -14,6 +14,8 @@ export type Book = {
   series: string | null;
   salesDate: string;
   imageUrl: string | null;
+  bookFormat: string | null;
+  description: string | null;
   status: BookStatus;
   completedAt: string | null;
   rating: number | null;

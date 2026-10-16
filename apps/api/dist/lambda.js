@@ -10117,10 +10117,10 @@ var PgEnumColumn = class extends PgColumn {
 // ../../node_modules/.pnpm/drizzle-orm@0.45.3_pg@8.23.0/node_modules/drizzle-orm/subquery.js
 var Subquery = class {
   static [entityKind] = "Subquery";
-  constructor(sql2, fields, alias, isWith = false, usedTables = []) {
+  constructor(sql3, fields, alias, isWith = false, usedTables = []) {
     this._ = {
       brand: "Subquery",
-      sql: sql2,
+      sql: sql3,
       selectedFields: fields,
       alias,
       isWith,
@@ -10518,19 +10518,19 @@ function sql(strings, ...params) {
   }
   return new SQL(queryChunks);
 }
-((sql2) => {
+((sql22) => {
   function empty() {
     return new SQL([]);
   }
-  sql2.empty = empty;
+  sql22.empty = empty;
   function fromList(list) {
     return new SQL(list);
   }
-  sql2.fromList = fromList;
+  sql22.fromList = fromList;
   function raw2(str) {
     return new SQL([new StringChunk(str)]);
   }
-  sql2.raw = raw2;
+  sql22.raw = raw2;
   function join(chunks, separator) {
     const result = [];
     for (const [i, chunk] of chunks.entries()) {
@@ -10541,24 +10541,24 @@ function sql(strings, ...params) {
     }
     return new SQL(result);
   }
-  sql2.join = join;
+  sql22.join = join;
   function identifier(value) {
     return new Name(value);
   }
-  sql2.identifier = identifier;
+  sql22.identifier = identifier;
   function placeholder2(name2) {
     return new Placeholder(name2);
   }
-  sql2.placeholder = placeholder2;
+  sql22.placeholder = placeholder2;
   function param2(value, encoder) {
     return new Param(value, encoder);
   }
-  sql2.param = param2;
+  sql22.param = param2;
 })(sql || (sql = {}));
 ((SQL2) => {
   class Aliased {
-    constructor(sql2, fieldAlias) {
-      this.sql = sql2;
+    constructor(sql22, fieldAlias) {
+      this.sql = sql22;
       this.fieldAlias = fieldAlias;
     }
     static [entityKind] = "SQL.Aliased";
@@ -13322,8 +13322,8 @@ var PgDialect = class {
       return "none";
     }
   }
-  sqlToQuery(sql2, invokeSource) {
-    return sql2.toQuery({
+  sqlToQuery(sql22, invokeSource) {
+    return sql22.toQuery({
       casing: this.casing,
       escapeName: this.escapeName,
       escapeParam: this.escapeParam,
@@ -15682,10 +15682,10 @@ var PgRelationalQuery = class extends QueryPromise {
 
 // ../../node_modules/.pnpm/drizzle-orm@0.45.3_pg@8.23.0/node_modules/drizzle-orm/pg-core/query-builders/raw.js
 var PgRaw = class extends QueryPromise {
-  constructor(execute, sql2, query, mapBatchResult) {
+  constructor(execute, sql3, query, mapBatchResult) {
     super();
     this.execute = execute;
-    this.sql = sql2;
+    this.sql = sql3;
     this.query = query;
     this.mapBatchResult = mapBatchResult;
   }
@@ -16005,8 +16005,8 @@ var NoopCache = class extends Cache {
   async onMutate(_params) {
   }
 };
-async function hashQuery(sql2, params) {
-  const dataToHash = `${sql2}-${JSON.stringify(params)}`;
+async function hashQuery(sql3, params) {
+  const dataToHash = `${sql3}-${JSON.stringify(params)}`;
   const encoder = new TextEncoder();
   const data = encoder.encode(dataToHash);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -16139,8 +16139,8 @@ var PgSession = class {
     ).all();
   }
   /** @internal */
-  async count(sql2, token) {
-    const res = await this.execute(sql2, token);
+  async count(sql22, token) {
+    const res = await this.execute(sql22, token);
     return Number(
       res[0]["count"]
     );
@@ -16362,8 +16362,8 @@ var NodePgSession = class _NodePgSession extends PgSession {
       if (isPool) session.client.release();
     }
   }
-  async count(sql2) {
-    const res = await this.execute(sql2);
+  async count(sql22) {
+    const res = await this.execute(sql22);
     return Number(
       res["rows"][0]["count"]
     );
@@ -16485,7 +16485,9 @@ var books = pgTable(
     publisher: varchar("publisher", { length: 255 }),
     series: varchar("series", { length: 255 }),
     salesDate: varchar("sales_date", { length: 20 }),
-    imageUrl: varchar("image_url", { length: 255 })
+    imageUrl: varchar("image_url", { length: 255 }),
+    bookFormat: text("bookFormat"),
+    description: text("description")
   },
   (table) => [unique("books_isbn_unique").on(table.isbn)]
 );
@@ -17647,6 +17649,8 @@ var bookSelection = {
   series: books.series,
   salesDate: books.salesDate,
   imageUrl: books.imageUrl,
+  bookFormat: books.bookFormat,
+  description: books.description,
   status: userBooks.status,
   rating: userBooks.rating,
   review: userBooks.review,
@@ -17662,8 +17666,8 @@ var catalogBookSelection = {
   seriesName: books.series,
   salesDate: books.salesDate,
   largeImageUrl: books.imageUrl,
-  size: sql`null`,
-  itemCaption: sql`null`
+  size: books.bookFormat,
+  itemCaption: books.description
 };
 var findUserBookById = async (id, userId) => {
   const result = await db.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(and(eq(userBooks.id, id), eq(userBooks.userId, userId))).limit(1);
@@ -17714,7 +17718,9 @@ booksRouter.post("/", authMiddleware, async (c) => {
         publisher: body.publisherName,
         series: body.seriesName,
         salesDate: body.salesDate,
-        imageUrl: body.largeImageUrl
+        imageUrl: body.largeImageUrl,
+        bookFormat: body.size,
+        description: body.itemCaption
       }).onConflictDoNothing({ target: books.isbn }).returning({ id: books.id });
       const bookId = insertedBooks[0]?.id ?? (await tx.select({ id: books.id }).from(books).where(eq(books.isbn, body.isbn)).limit(1))[0]?.id;
       if (!bookId) {

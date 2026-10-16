@@ -16,6 +16,8 @@ const bookSelection = {
   series: books.series,
   salesDate: books.salesDate,
   imageUrl: books.imageUrl,
+  bookFormat: books.bookFormat,
+  description: books.description,
   status: userBooks.status,
   rating: userBooks.rating,
   review: userBooks.review,
@@ -32,8 +34,8 @@ const catalogBookSelection = {
   seriesName: books.series,
   salesDate: books.salesDate,
   largeImageUrl: books.imageUrl,
-  size: sql<string | null>`null`,
-  itemCaption: sql<string | null>`null`,
+  size: books.bookFormat,
+  itemCaption: books.description,
 };
 
 const findUserBookById = async (id: string, userId: string) => {
@@ -124,6 +126,8 @@ booksRouter.post("/", authMiddleware, async (c) => {
           series: body.seriesName,
           salesDate: body.salesDate,
           imageUrl: body.largeImageUrl,
+          bookFormat: body.size,
+          description: body.itemCaption,
         })
         .onConflictDoNothing({ target: books.isbn })
         .returning({ id: books.id });

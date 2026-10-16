@@ -29,6 +29,8 @@ export const books = pgTable(
     series: varchar("series", { length: 255 }),
     salesDate: varchar("sales_date", { length: 20 }),
     imageUrl: varchar("image_url", { length: 255 }),
+    bookFormat: text("bookFormat"),
+    description: text("description"),
   },
   (table) => [unique("books_isbn_unique").on(table.isbn)],
 );
