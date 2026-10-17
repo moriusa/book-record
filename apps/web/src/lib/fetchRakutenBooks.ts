@@ -64,7 +64,7 @@ export const fetchRakutenBooks = async ({
   const RAKUTEN_APP_ID = process.env.RAKUTEN_APPLICATION_ID;
   const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY;
   const itemLen = 30;
-  const REGISTERED_SITE_URL = "https://thumihon.com";
+  const REGISTERED_SITE_URL = "https://tsumihon.com";
   if (!RAKUTEN_APP_ID || !RAKUTEN_ACCESS_KEY) {
     throw new Error("楽天APIの環境変数が設定されていません");
   }
