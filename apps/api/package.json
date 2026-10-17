@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "esbuild src/lambda.ts --bundle --platform=node --target=node22 --outfile=dist/lambda.js"
+    "build": "esbuild src/lambda.ts --bundle --platform=node --target=node22 --outfile=dist/lambda.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:dev": "cross-env DRIZZLE_ENV=development drizzle-kit migrate",
+    "db:migrate:prod": "cross-env DRIZZLE_ENV=production drizzle-kit migrate"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +16,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^26.6.2",
+    "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.11",
     "esbuild": "^0.28.2",
     "tsx": "^4.23.15"

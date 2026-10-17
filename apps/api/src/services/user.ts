@@ -4,15 +4,18 @@ import { db } from "../db/index.js";
 import { users } from "../db/schema.js";
 import { CognitoJwtPayload } from "aws-jwt-verify/jwt-model";
 
+const domain = process.env.COGNITO_DOMAIN;
+
+if (!domain) {
+  throw new Error("COGNITO_DOMAIN is not configured");
+}
+
 const getCognitoUserInfo = async (token: string) => {
-  const response = await fetch(
-    "https://book-record-auth.auth.ap-northeast-1.amazoncognito.com/oauth2/userInfo",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const response = await fetch(`${domain}/oauth2/userInfo`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error(`Cognito UserInfo failed: ${response.status}`);

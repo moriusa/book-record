@@ -17585,15 +17585,16 @@ var CognitoJwtVerifier = class _CognitoJwtVerifier extends JwtVerifierBase {
 CognitoJwtVerifier.USER_POOL_ID_REGEX = /^(?<region>(?:eusc-[a-z]{2}|[a-z]{2})-(gov-)?[a-z]+-\d)_[a-zA-Z0-9]+$/;
 
 // src/services/user.ts
+var domain = process.env.COGNITO_DOMAIN;
+if (!domain) {
+  throw new Error("COGNITO_DOMAIN is not configured");
+}
 var getCognitoUserInfo = async (token) => {
-  const response = await fetch(
-    "https://book-record-auth.auth.ap-northeast-1.amazoncognito.com/oauth2/userInfo",
-    {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+  const response = await fetch(`${domain}/oauth2/userInfo`, {
+    headers: {
+      Authorization: `Bearer ${token}`
     }
-  );
+  });
   if (!response.ok) {
     throw new Error(`Cognito UserInfo failed: ${response.status}`);
   }
@@ -17797,10 +17798,11 @@ var users_default = usersRouter;
 
 // src/index.ts
 var app = new Hono2();
+var corsOrigin = process.env.CORS_ORIGIN;
 app.use(
   "*",
   cors({
-    origin: "http://localhost:3000",
+    origin: corsOrigin,
     allowHeaders: ["Authorization", "Content-Type"],
     allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
   })

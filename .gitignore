@@ -1,1 +1,12 @@
 node_modules
+
+# Environment variables and deployment secrets
+.env
+.env.*
+!.env.example
+
+# Terraform state and variable files
+terraform.tfstate
+terraform.tfstate.*
+terraform.tfvars
+*.tfvars

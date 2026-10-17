@@ -1,0 +1,7 @@
+# Copy this file to terraform.tfvars and fill in the production credentials.
+database_url         = "postgresql://..."
+google_client_id     = "...apps.googleusercontent.com"
+google_client_secret = "..."
+callback_urls        = ["https://your-production-domain.example"]
+logout_urls          = ["https://your-production-domain.example"]
+cors_origin          = "https://your-production-domain.example"

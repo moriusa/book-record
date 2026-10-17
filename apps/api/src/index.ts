@@ -7,10 +7,12 @@ import { AppEnv } from "./types/hono.js";
 
 const app = new Hono<AppEnv>();
 
+const corsOrigin = process.env.CORS_ORIGIN;
+
 app.use(
   "*",
   cors({
-    origin: "http://localhost:3000",
+    origin: corsOrigin,
     allowHeaders: ["Authorization", "Content-Type"],
     allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   }),
