@@ -6,10 +6,13 @@ import {
   GroupOption,
   SortDirection,
   SortOption,
+  ViewMode,
 } from "@/types/book";
 import {
   RiArrowRightSLine,
   RiFilter3Line,
+  RiLayoutGridLine,
+  RiListUnordered,
   RiSortDesc,
   RiStackLine,
 } from "react-icons/ri";
@@ -20,10 +23,12 @@ type Props = {
   sortOption: SortOption;
   sortDirection: SortDirection;
   groupOption: GroupOption;
+  viewMode: ViewMode;
   onFilterChange: (status: FilterStatus) => void;
   onSortChange: (option: SortOption) => void;
   onSortDirectionChange: (direction: SortDirection) => void;
   onGroupChange: (option: GroupOption) => void;
+  onViewModeChange: (mode: ViewMode) => void;
 };
 
 const filterOptions = [
@@ -56,10 +61,12 @@ const BookshelfToolbar = ({
   sortOption,
   sortDirection,
   groupOption,
+  viewMode,
   onFilterChange,
   onSortChange,
   onSortDirectionChange,
   onGroupChange,
+  onViewModeChange,
 }: Props) => {
   const filterScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -173,7 +180,7 @@ const BookshelfToolbar = ({
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:flex">
+        <div className="grid gap-3 sm:grid-cols-3 lg:flex">
           <label className="min-w-0">
             <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-stone-500">
               <RiSortDesc aria-hidden="true" className="text-sm" />
@@ -243,6 +250,40 @@ const BookshelfToolbar = ({
               ))}
             </select>
           </label>
+
+          <div className="min-w-0">
+            <span className="mb-1.5 block text-xs font-bold tracking-wide text-stone-500">
+              表示形式
+            </span>
+            <div className="flex min-h-11 rounded-lg border border-stone-200 p-1">
+              <button
+                type="button"
+                onClick={() => onViewModeChange("GRID")}
+                aria-pressed={viewMode === "GRID"}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 ${
+                  viewMode === "GRID"
+                    ? "bg-stone-900 text-amber-50 shadow-sm"
+                    : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                }`}
+              >
+                <RiLayoutGridLine aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">カード</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onViewModeChange("LIST")}
+                aria-pressed={viewMode === "LIST"}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 ${
+                  viewMode === "LIST"
+                    ? "bg-stone-900 text-amber-50 shadow-sm"
+                    : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                }`}
+              >
+                <RiListUnordered aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">リスト</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>

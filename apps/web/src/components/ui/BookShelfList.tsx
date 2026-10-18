@@ -5,6 +5,7 @@ import {
   GroupOption,
   SortDirection,
   SortOption,
+  ViewMode,
 } from "@/types/book";
 import BookshelfSection from "./BookshelfSection";
 
@@ -14,6 +15,7 @@ type Props = {
   sortOption: SortOption;
   sortDirection: SortDirection;
   groupOption: GroupOption;
+  viewMode: ViewMode;
 };
 
 const statusLabels = {
@@ -29,6 +31,7 @@ const BookshelfList = ({
   sortOption,
   sortDirection,
   groupOption,
+  viewMode,
 }: Props) => {
   // ① フィルター
   const filteredBooks =
@@ -55,13 +58,20 @@ const BookshelfList = ({
   // ③ グループなし
   if (groupOption === "NONE") {
     if (filterStatus === "ALL") {
-      return <BookshelfSection title="すべて" books={sortedBooks} />;
+      return (
+        <BookshelfSection
+          title="すべて"
+          books={sortedBooks}
+          viewMode={viewMode}
+        />
+      );
     }
 
     return (
       <BookshelfSection
         title={statusLabels[filterStatus]}
         books={sortedBooks}
+        viewMode={viewMode}
       />
     );
   }
@@ -84,7 +94,12 @@ const BookshelfList = ({
   return (
     <div>
       {[...groupedBooks.entries()].map(([groupName, books]) => (
-        <BookshelfSection key={groupName} title={groupName} books={books} />
+        <BookshelfSection
+          key={groupName}
+          title={groupName}
+          books={books}
+          viewMode={viewMode}
+        />
       ))}
     </div>
   );

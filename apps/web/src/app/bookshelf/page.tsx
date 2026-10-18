@@ -9,6 +9,7 @@ import {
   FilterStatus,
   SortDirection,
   SortOption,
+  ViewMode,
   GroupOption,
 } from "@/types/book";
 
@@ -17,6 +18,7 @@ const Page = () => {
   const [sortOption, setSortOption] = useState<SortOption>("CREATED");
   const [sortDirection, setSortDirection] = useState<SortDirection>("DESC");
   const [groupOption, setGroupOption] = useState<GroupOption>("NONE");
+  const [viewMode, setViewMode] = useState<ViewMode>("GRID");
 
   const { data, isLoading, error } = useGetBooks();
   const filteredBookCount = (data ?? []).filter(
@@ -50,10 +52,12 @@ const Page = () => {
         sortOption={sortOption}
         sortDirection={sortDirection}
         groupOption={groupOption}
+        viewMode={viewMode}
         onFilterChange={setFilterStatus}
         onSortChange={setSortOption}
         onSortDirectionChange={setSortDirection}
         onGroupChange={setGroupOption}
+        onViewModeChange={setViewMode}
       />
 
       <BookshelfList
@@ -62,6 +66,7 @@ const Page = () => {
         sortOption={sortOption}
         sortDirection={sortDirection}
         groupOption={groupOption}
+        viewMode={viewMode}
       />
     </main>
   );

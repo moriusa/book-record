@@ -4,6 +4,7 @@ export type FilterStatus = "ALL" | BookStatus;
 export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER" | "SERIES";
 export type SortOption = "CREATED" | "TITLE" | "RATING";
 export type SortDirection = "ASC" | "DESC";
+export type ViewMode = "GRID" | "LIST";
 
 export type Book = {
   id: string;
