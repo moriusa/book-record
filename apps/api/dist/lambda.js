@@ -17751,6 +17751,67 @@ booksRouter.post("/", authMiddleware, async (c) => {
     return c.json({ message: "\u672C\u306E\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
   }
 });
+booksRouter.post("/bulk", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const body = await c.req.json();
+  const requestedBooks = Array.isArray(body.books) ? body.books : [];
+  if (requestedBooks.length === 0) {
+    return c.json({ message: "\u8FFD\u52A0\u3059\u308B\u672C\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  }
+  const uniqueBooks = [
+    ...new Map(
+      requestedBooks.filter(
+        (book) => typeof book?.isbn === "string" && typeof book?.title === "string" && typeof book?.author === "string"
+      ).map((book) => [book.isbn, book])
+    ).values()
+  ];
+  if (uniqueBooks.length === 0) {
+    return c.json({ message: "\u672C\u306E\u60C5\u5831\u304C\u4E0D\u6B63\u3067\u3059" }, 400);
+  }
+  try {
+    const result = await db.transaction(async (tx) => {
+      const bookIds = [];
+      for (const book of uniqueBooks) {
+        const insertedBooks = await tx.insert(books).values({
+          isbn: book.isbn,
+          title: book.title,
+          author: book.author,
+          publisher: book.publisherName ?? null,
+          series: book.seriesName ?? null,
+          salesDate: book.salesDate ?? null,
+          imageUrl: book.largeImageUrl ?? null,
+          bookFormat: book.size ?? null,
+          description: book.itemCaption ?? null
+        }).onConflictDoNothing({ target: books.isbn }).returning({ id: books.id });
+        const bookId = insertedBooks[0]?.id ?? (await tx.select({ id: books.id }).from(books).where(eq(books.isbn, book.isbn)).limit(1))[0]?.id;
+        if (!bookId) {
+          throw new Error("Book could not be created or found");
+        }
+        bookIds.push(bookId);
+      }
+      const createdUserBooks = await tx.insert(userBooks).values(
+        bookIds.map((bookId) => ({
+          userId: user.id,
+          bookId,
+          status: "WANT_TO_READ",
+          rating: null,
+          review: null,
+          completedAt: null
+        }))
+      ).onConflictDoNothing({
+        target: [userBooks.userId, userBooks.bookId]
+      }).returning({ id: userBooks.id });
+      return {
+        added: createdUserBooks.length,
+        skipped: bookIds.length - createdUserBooks.length
+      };
+    });
+    return c.json(result, 201);
+  } catch (error) {
+    console.error(error);
+    return c.json({ message: "\u672C\u306E\u4E00\u62EC\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
 booksRouter.patch("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");
