@@ -1,12 +1,18 @@
 "use client";
 import { SearchBox } from "./SearchBox";
-import Image from "next/image";
-import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { RiAddLine, RiCheckLine } from "react-icons/ri";
 import { useBookSearch } from "./hooks/useBookSearch";
-import { useBulkCreateBooks } from "./hooks/useBulkCreateBooks";
 import { BookCard } from "./BookCard";
+import type { RakutenBookItem } from "@/lib/fetchRakutenBooks";
+import type { BookStatus } from "@/types/book";
+import { useCreateBook } from "../[isbn]/register/hooks/useCreateBook";
+
+const bookStatusOptions: { value: BookStatus; label: string }[] = [
+  { value: "WANT_TO_READ", label: "読みたい" },
+  { value: "READING", label: "読んでいる" },
+  { value: "COMPLETED", label: "読み終わった" },
+  { value: "ON_HOLD", label: "積読" },
+];
 
 const SearchPage = () => {
   const {
@@ -18,11 +24,15 @@ const SearchPage = () => {
     isLoading,
     loadMore,
   } = useBookSearch();
+  const createBookMutation = useCreateBook();
   const loadMoreTargetRef = useRef<HTMLDivElement>(null);
-  const [selectedIsbns, setSelectedIsbns] = useState<Set<string>>(new Set());
-  const [bulkMessage, setBulkMessage] = useState<string | null>(null);
-  const [bulkError, setBulkError] = useState<string | null>(null);
-  const bulkCreateBooks = useBulkCreateBooks();
+  const [registeringIsbn, setRegisteringIsbn] = useState<string | null>(null);
+  const [registeredIsbns, setRegisteredIsbns] = useState<Set<string>>(
+    new Set(),
+  );
+  const [bookToRegister, setBookToRegister] = useState<RakutenBookItem | null>(
+    null,
+  );
 
   useEffect(() => {
     const target = loadMoreTargetRef.current;
@@ -44,47 +54,27 @@ const SearchPage = () => {
     return () => observer.disconnect();
   }, [hasMore, isLoading, loadMore]);
 
-  const toggleBook = (isbn: string) => {
-    setSelectedIsbns((current) => {
-      const next = new Set(current);
-
-      if (next.has(isbn)) {
-        next.delete(isbn);
-      } else {
-        next.add(isbn);
-      }
-
-      return next;
-    });
-  };
-
   const handleSearch = (params: Parameters<typeof executeSearch>[0]) => {
-    setSelectedIsbns(new Set());
-    setBulkMessage(null);
-    setBulkError(null);
+    setRegisteredIsbns(new Set());
     executeSearch(params);
   };
 
-  const addSelectedBooks = async () => {
-    const selectedBooks = books.filter((book) => selectedIsbns.has(book.isbn));
-
-    if (selectedBooks.length === 0) {
-      return;
-    }
-
+  const registerBook = async (book: RakutenBookItem, status: BookStatus) => {
     try {
-      setBulkError(null);
-      const result = await bulkCreateBooks.mutateAsync(selectedBooks);
-      setBulkMessage(
-        result.skipped > 0
-          ? `${result.added}冊を「読みたい」に追加しました（${result.skipped}冊はすでに登録済みです）`
-          : `${result.added}冊を「読みたい」に追加しました`,
-      );
-      setSelectedIsbns(new Set());
+      setRegisteringIsbn(book.isbn);
+      await createBookMutation.mutateAsync({
+        ...book,
+        status: status,
+        rating: null,
+        review: null,
+        completedAt: null,
+      });
+      setRegisteredIsbns((current) => new Set(current).add(book.isbn));
+      setBookToRegister(null);
     } catch (error) {
-      setBulkError(
-        error instanceof Error ? error.message : "本の一括登録に失敗しました",
-      );
+      console.error(error);
+    } finally {
+      setRegisteringIsbn(null);
     }
   };
 
@@ -111,20 +101,6 @@ const SearchPage = () => {
         />
       </div>
 
-      {bulkMessage && (
-        <p
-          className="mt-4 text-sm font-semibold text-emerald-800"
-          role="status"
-        >
-          {bulkMessage}
-        </p>
-      )}
-      {bulkError && (
-        <p className="mt-4 text-sm font-semibold text-rose-700" role="alert">
-          {bulkError}
-        </p>
-      )}
-
       <div className="mt-10">
         {hasSearched && !isLoading && books.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white/50 px-6 py-12 text-center">
@@ -141,40 +117,10 @@ const SearchPage = () => {
               <BookCard
                 key={book.isbn}
                 book={book}
-                selectedIsbns={selectedIsbns}
-                toggleBook={toggleBook}
+                onRegister={setBookToRegister}
+                isRegistered={registeredIsbns.has(book.isbn)}
               />
             ))}
-          </div>
-        )}
-        {selectedIsbns.size > 0 && (
-          <div className="sticky bottom-4 z-20 mt-6 rounded-2xl border border-stone-800 bg-stone-900 p-3 text-amber-50 shadow-xl sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-4">
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              <RiCheckLine
-                className="text-lg text-amber-300"
-                aria-hidden="true"
-              />
-              {selectedIsbns.size}冊を選択中
-            </p>
-            <div className="mt-3 flex gap-2 sm:mt-0">
-              <button
-                type="button"
-                onClick={() => setSelectedIsbns(new Set())}
-                disabled={bulkCreateBooks.isPending}
-                className="min-h-10 rounded-lg px-3 text-sm font-semibold text-stone-300 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
-              >
-                選択解除
-              </button>
-              <button
-                type="button"
-                onClick={() => void addSelectedBooks()}
-                disabled={bulkCreateBooks.isPending}
-                className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-amber-300 px-3 text-sm font-bold text-stone-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <RiAddLine aria-hidden="true" />
-                {bulkCreateBooks.isPending ? "追加中…" : "「読みたい」に追加"}
-              </button>
-            </div>
           </div>
         )}
         {books.length > 0 && (
@@ -192,6 +138,52 @@ const SearchPage = () => {
           </div>
         )}
       </div>
+      {bookToRegister && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/45 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="book-status-dialog-title"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <p className="text-xs font-bold tracking-[0.14em] text-amber-800">
+              BOOKSHELF REGISTRATION
+            </p>
+            <h2
+              id="book-status-dialog-title"
+              className="mt-2 text-lg font-bold text-stone-900"
+            >
+              読書状況を選択
+            </h2>
+            <p className="mt-2 line-clamp-2 text-sm text-stone-600">
+              『{bookToRegister.title}』をどの状態で本棚に登録しますか？
+            </p>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              {bookStatusOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() =>
+                    void registerBook(bookToRegister, option.value)
+                  }
+                  disabled={registeringIsbn === bookToRegister.isbn}
+                  className="min-h-12 rounded-lg border border-stone-200 px-3 text-sm font-bold text-stone-700 transition hover:border-amber-500 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setBookToRegister(null)}
+              disabled={registeringIsbn === bookToRegister.isbn}
+              className="mt-4 w-full min-h-10 rounded-lg text-sm font-semibold text-stone-500 transition hover:bg-stone-100 disabled:opacity-50"
+            >
+              キャンセル
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

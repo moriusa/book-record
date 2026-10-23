@@ -17755,6 +17755,10 @@ booksRouter.post("/bulk", authMiddleware, async (c) => {
   const user = c.get("user");
   const body = await c.req.json();
   const requestedBooks = Array.isArray(body.books) ? body.books : [];
+  const status = body.status ?? "WANT_TO_READ";
+  if (!["WANT_TO_READ", "READING", "COMPLETED", "ON_HOLD"].includes(status)) {
+    return c.json({ message: "\u8AAD\u66F8\u72B6\u6CC1\u304C\u4E0D\u6B63\u3067\u3059" }, 400);
+  }
   if (requestedBooks.length === 0) {
     return c.json({ message: "\u8FFD\u52A0\u3059\u308B\u672C\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
   }
@@ -17793,7 +17797,7 @@ booksRouter.post("/bulk", authMiddleware, async (c) => {
         bookIds.map((bookId) => ({
           userId: user.id,
           bookId,
-          status: "WANT_TO_READ",
+          status,
           rating: null,
           review: null,
           completedAt: null
