@@ -1,11 +1,12 @@
 "use client";
 import { SearchBox } from "./SearchBox";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useBookSearch } from "./hooks/useBookSearch";
 import { BookCard } from "./BookCard";
 import type { RakutenBookItem } from "@/lib/fetchRakutenBooks";
 import type { BookStatus } from "@/types/book";
 import { useCreateBook } from "../[isbn]/register/hooks/useCreateBook";
+import { useGetBooks } from "../hooks/useGetBooks";
 
 const bookStatusOptions: { value: BookStatus; label: string }[] = [
   { value: "WANT_TO_READ", label: "読みたい" },
@@ -25,6 +26,7 @@ const SearchPage = () => {
     loadMore,
   } = useBookSearch();
   const createBookMutation = useCreateBook();
+  const { data: bookshelfBooks = [] } = useGetBooks({ enabled: hasSearched });
   const loadMoreTargetRef = useRef<HTMLDivElement>(null);
   const [registeringIsbn, setRegisteringIsbn] = useState<string | null>(null);
   const [registeredIsbns, setRegisteredIsbns] = useState<Set<string>>(
@@ -32,6 +34,10 @@ const SearchPage = () => {
   );
   const [bookToRegister, setBookToRegister] = useState<RakutenBookItem | null>(
     null,
+  );
+  const bookshelfIsbns = useMemo(
+    () => new Set(bookshelfBooks.map((book) => book.isbn)),
+    [bookshelfBooks],
   );
 
   useEffect(() => {
@@ -55,7 +61,6 @@ const SearchPage = () => {
   }, [hasMore, isLoading, loadMore]);
 
   const handleSearch = (params: Parameters<typeof executeSearch>[0]) => {
-    setRegisteredIsbns(new Set());
     executeSearch(params);
   };
 
@@ -118,7 +123,10 @@ const SearchPage = () => {
                 key={book.isbn}
                 book={book}
                 onRegister={setBookToRegister}
-                isRegistered={registeredIsbns.has(book.isbn)}
+                isRegistered={
+                  registeredIsbns.has(book.isbn) ||
+                  bookshelfIsbns.has(book.isbn)
+                }
               />
             ))}
           </div>
