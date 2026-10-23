@@ -6,6 +6,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { RiAddLine, RiCheckLine } from "react-icons/ri";
 import { useBookSearch } from "./hooks/useBookSearch";
 import { useBulkCreateBooks } from "./hooks/useBulkCreateBooks";
+import { BookCard } from "./BookCard";
 
 const SearchPage = () => {
   const {
@@ -82,9 +83,7 @@ const SearchPage = () => {
       setSelectedIsbns(new Set());
     } catch (error) {
       setBulkError(
-        error instanceof Error
-          ? error.message
-          : "本の一括登録に失敗しました",
+        error instanceof Error ? error.message : "本の一括登録に失敗しました",
       );
     }
   };
@@ -113,7 +112,10 @@ const SearchPage = () => {
       </div>
 
       {bulkMessage && (
-        <p className="mt-4 text-sm font-semibold text-emerald-800" role="status">
+        <p
+          className="mt-4 text-sm font-semibold text-emerald-800"
+          role="status"
+        >
           {bulkMessage}
         </p>
       )}
@@ -134,57 +136,24 @@ const SearchPage = () => {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-stone-200 overflow-hidden rounded-2xl border border-stone-200 bg-white/70">
+          <div className="divide-y divide-stone-200 overflow-hidden rounded-md border border-stone-200 bg-white/70">
             {books.map((book) => (
-              <article
+              <BookCard
                 key={book.isbn}
-                className="group relative transition hover:bg-amber-50/60"
-              >
-                <label className="absolute left-3 top-3 z-10 flex size-9 cursor-pointer items-center justify-center rounded-full border border-stone-200 bg-white/95 shadow-sm transition hover:border-amber-400 sm:left-5 sm:top-5">
-                  <input
-                    type="checkbox"
-                    checked={selectedIsbns.has(book.isbn)}
-                    onChange={() => toggleBook(book.isbn)}
-                    className="size-4 accent-amber-700"
-                    aria-label={`『${book.title}』を選択`}
-                  />
-                </label>
-                <Link
-                  href={`/bookshelf/${book.isbn}`}
-                  className="flex min-h-36 items-center gap-4 p-3 pl-14 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-amber-700 sm:min-h-40 sm:gap-5 sm:p-5 sm:pl-16"
-                >
-                  <div className="relative aspect-2/3 w-20 shrink-0 overflow-hidden rounded-md border border-stone-200 bg-white shadow-sm transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-md sm:w-24">
-                    <Image
-                      src={book.largeImageUrl}
-                      alt={book.title}
-                      fill
-                      sizes="(max-width: 640px) 80px, 96px"
-                      className="object-contain"
-                    />
-                  </div>
-
-                  <div className="min-w-0">
-                    <p className="line-clamp-2 text-base font-semibold leading-6 text-stone-800 group-hover:underline sm:text-lg">
-                      {book.title}
-                    </p>
-                    <p className="mt-2 truncate text-sm text-stone-600">
-                      {book.author}
-                    </p>
-                    {book.publisherName && (
-                      <p className="mt-1 truncate text-xs text-stone-400">
-                        {book.publisherName}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              </article>
+                book={book}
+                selectedIsbns={selectedIsbns}
+                toggleBook={toggleBook}
+              />
             ))}
           </div>
         )}
         {selectedIsbns.size > 0 && (
           <div className="sticky bottom-4 z-20 mt-6 rounded-2xl border border-stone-800 bg-stone-900 p-3 text-amber-50 shadow-xl sm:flex sm:items-center sm:justify-between sm:gap-4 sm:px-4">
             <p className="flex items-center gap-2 text-sm font-semibold">
-              <RiCheckLine className="text-lg text-amber-300" aria-hidden="true" />
+              <RiCheckLine
+                className="text-lg text-amber-300"
+                aria-hidden="true"
+              />
               {selectedIsbns.size}冊を選択中
             </p>
             <div className="mt-3 flex gap-2 sm:mt-0">
@@ -203,9 +172,7 @@ const SearchPage = () => {
                 className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-amber-300 px-3 text-sm font-bold text-stone-950 transition hover:bg-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <RiAddLine aria-hidden="true" />
-                {bulkCreateBooks.isPending
-                  ? "追加中…"
-                  : "「読みたい」に追加"}
+                {bulkCreateBooks.isPending ? "追加中…" : "「読みたい」に追加"}
               </button>
             </div>
           </div>
@@ -218,7 +185,9 @@ const SearchPage = () => {
           >
             {isLoading && <p className="text-sm text-stone-500">読み込み中…</p>}
             {!hasMore && !isLoading && (
-              <p className="text-sm text-stone-500">すべての検索結果を表示しました</p>
+              <p className="text-sm text-stone-500">
+                すべての検索結果を表示しました
+              </p>
             )}
           </div>
         )}
