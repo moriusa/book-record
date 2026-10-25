@@ -25,6 +25,35 @@ const statusLabels = {
   ON_HOLD: "積読",
 } satisfies Record<BookStatus, string>;
 
+const getSalesDateGroup = (salesDate: string | null | undefined) => {
+  const match = salesDate?.match(/^(\d{4})[年/-](\d{1,2})(?:[月/-](\d{1,2}))?/);
+
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3] ?? 1);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return {
+    key: `${year}-${String(month).padStart(2, "0")}`,
+    label: `${year}年${month}月`,
+    year,
+    month,
+    timestamp: date.getTime(),
+  };
+};
+
 const BookshelfList = ({
   books,
   filterStatus,
@@ -41,6 +70,22 @@ const BookshelfList = ({
 
   // ② ソート
   const sortedBooks = [...filteredBooks].sort((a, b) => {
+    if (sortOption === "SALES_DATE") {
+      const aSalesDate = getSalesDateGroup(a.salesDate);
+      const bSalesDate = getSalesDateGroup(b.salesDate);
+
+      if (!aSalesDate) {
+        return bSalesDate ? 1 : 0;
+      }
+
+      if (!bSalesDate) {
+        return -1;
+      }
+
+      const comparison = aSalesDate.timestamp - bSalesDate.timestamp;
+      return sortDirection === "ASC" ? comparison : -comparison;
+    }
+
     const comparison = (() => {
       switch (sortOption) {
         case "CREATED":
@@ -54,6 +99,33 @@ const BookshelfList = ({
 
     return sortDirection === "ASC" ? comparison : -comparison;
   });
+
+  if (sortOption === "SALES_DATE") {
+    const groupedBooks = Map.groupBy(sortedBooks, (book) => {
+      const salesDateGroup = getSalesDateGroup(book.salesDate);
+      return salesDateGroup?.key ?? "unknown";
+    });
+
+    return (
+      <div>
+        {[...groupedBooks.entries()].map(([groupKey, groupedBooks]) => {
+          const salesDateGroup = getSalesDateGroup(
+            groupedBooks[0]?.salesDate,
+          );
+
+          return (
+            <BookshelfSection
+              key={groupKey}
+              title={salesDateGroup?.label ?? "発売日不明"}
+              books={groupedBooks}
+              viewMode={viewMode}
+              salesDateGroup={salesDateGroup ?? undefined}
+            />
+          );
+        })}
+      </div>
+    );
+  }
 
   // ③ グループなし
   if (groupOption === "NONE") {

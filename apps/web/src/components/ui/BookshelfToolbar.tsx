@@ -43,6 +43,7 @@ const sortOptions = [
   { value: "CREATED", label: "登録順" },
   { value: "TITLE", label: "タイトル順" },
   { value: "RATING", label: "評価順" },
+  { value: "SALES_DATE", label: "発売日順" },
 ] satisfies { value: SortOption; label: string }[];
 
 const groupOptions = [
@@ -68,6 +69,7 @@ const BookshelfToolbar = ({
   onGroupChange,
   onViewModeChange,
 }: Props) => {
+  const isSalesDateSort = sortOption === "SALES_DATE";
   const filterScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -232,6 +234,7 @@ const BookshelfToolbar = ({
             </span>
             <select
               value={groupOption}
+              disabled={isSalesDateSort}
               onChange={(event) => {
                 const option = groupOptions.find(
                   (option) => option.value === event.target.value,
@@ -241,7 +244,7 @@ const BookshelfToolbar = ({
                   onGroupChange(option.value);
                 }
               }}
-              className="min-h-11 w-full cursor-pointer rounded-lg border border-stone-200 bg-transparent px-3 text-sm font-medium text-stone-800 outline-none transition hover:border-amber-300 hover:bg-amber-50/50 focus:border-amber-600 focus:ring-2 focus:ring-amber-200 lg:w-40"
+              className="min-h-11 w-full cursor-pointer rounded-lg border border-stone-200 bg-transparent px-3 text-sm font-medium text-stone-800 outline-none transition hover:border-amber-300 hover:bg-amber-50/50 focus:border-amber-600 focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:border-stone-100 disabled:bg-stone-100 disabled:text-stone-400 lg:w-40"
             >
               {groupOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -249,6 +252,11 @@ const BookshelfToolbar = ({
                 </option>
               ))}
             </select>
+            {isSalesDateSort && (
+              <span className="mt-1 block text-xs text-stone-500">
+                発売年月で自動グループ
+              </span>
+            )}
           </label>
 
           <div className="min-w-0">

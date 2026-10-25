@@ -2,7 +2,7 @@ export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 
 export type FilterStatus = "ALL" | BookStatus;
 export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER" | "SERIES";
-export type SortOption = "CREATED" | "TITLE" | "RATING";
+export type SortOption = "CREATED" | "TITLE" | "RATING" | "SALES_DATE";
 export type SortDirection = "ASC" | "DESC";
 export type ViewMode = "GRID" | "LIST";
 

@@ -24,6 +24,13 @@ const Page = () => {
   const filteredBookCount = (data ?? []).filter(
     (book) => filterStatus === "ALL" || book.status === filterStatus,
   ).length;
+  const handleSortChange = (option: SortOption) => {
+    setSortOption(option);
+
+    if (option === "SALES_DATE") {
+      setGroupOption("NONE");
+    }
+  };
 
   if (isLoading) {
     return <p className="p-6">読み込み中...</p>;
@@ -54,7 +61,7 @@ const Page = () => {
         groupOption={groupOption}
         viewMode={viewMode}
         onFilterChange={setFilterStatus}
-        onSortChange={setSortOption}
+        onSortChange={handleSortChange}
         onSortDirectionChange={setSortDirection}
         onGroupChange={setGroupOption}
         onViewModeChange={setViewMode}
