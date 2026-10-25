@@ -1,12 +1,15 @@
 "use client";
 import { SearchBox } from "./SearchBox";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBookSearch } from "./hooks/useBookSearch";
 import { BookCard } from "./BookCard";
+import { BarcodeScannerDialog } from "./BarcodeScannerDialog";
 import type { RakutenBookItem } from "@/lib/fetchRakutenBooks";
 import type { BookStatus } from "@/types/book";
 import { useCreateBook } from "../[isbn]/register/hooks/useCreateBook";
 import { useGetBooks } from "../hooks/useGetBooks";
+import { useRouter } from "next/navigation";
+import { RiBarcodeLine } from "react-icons/ri";
 
 const bookStatusOptions: { value: BookStatus; label: string }[] = [
   { value: "WANT_TO_READ", label: "読みたい" },
@@ -16,6 +19,7 @@ const bookStatusOptions: { value: BookStatus; label: string }[] = [
 ];
 
 const SearchPage = () => {
+  const router = useRouter();
   const {
     books,
     searchTitle,
@@ -35,6 +39,7 @@ const SearchPage = () => {
   const [bookToRegister, setBookToRegister] = useState<RakutenBookItem | null>(
     null,
   );
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const bookshelfIsbns = useMemo(
     () => new Set(bookshelfBooks.map((book) => book.isbn)),
     [bookshelfBooks],
@@ -83,6 +88,14 @@ const SearchPage = () => {
     }
   };
 
+  const handleBarcodeDetected = useCallback(
+    (isbn: string) => {
+      setIsScannerOpen(false);
+      router.push(`/bookshelf/${isbn}`);
+    },
+    [router],
+  );
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <div className="max-w-2xl">
@@ -97,13 +110,23 @@ const SearchPage = () => {
         </p>
       </div>
 
-      <div className="mt-6 max-w-2xl">
-        <SearchBox
-          key={searchTitle}
-          onSearch={handleSearch}
-          isLoading={isLoading}
-          initialKeyword={searchTitle}
-        />
+      <div className="mt-6 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="min-w-0 flex-1">
+          <SearchBox
+            key={searchTitle}
+            onSearch={handleSearch}
+            isLoading={isLoading}
+            initialKeyword={searchTitle}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsScannerOpen(true)}
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 text-sm font-bold text-stone-700 transition hover:border-amber-500 hover:bg-amber-50"
+        >
+          <RiBarcodeLine className="text-lg" aria-hidden="true" />
+          バーコードを読み取る
+        </button>
       </div>
 
       <div className="mt-10">
@@ -191,6 +214,12 @@ const SearchPage = () => {
             </button>
           </div>
         </div>
+      )}
+      {isScannerOpen && (
+        <BarcodeScannerDialog
+          onClose={() => setIsScannerOpen(false)}
+          onDetected={handleBarcodeDetected}
+        />
       )}
     </main>
   );
