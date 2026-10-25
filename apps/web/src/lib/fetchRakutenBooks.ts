@@ -54,6 +54,22 @@ export type RakutenBookSearchParams = {
   page?: number;
 };
 
+const RAKUTEN_BOOKS_BOOK_SEARCH_URL =
+  "https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404";
+const RAKUTEN_BOOKS_TOTAL_SEARCH_URL =
+  "https://openapi.rakuten.co.jp/services/api/BooksTotal/Search/20170404";
+const REGISTERED_SITE_URL = "https://tsumihon.com";
+
+const fetchRakutenApi = (url: string, params: URLSearchParams) =>
+  fetcher(`${url}?${params}`, {
+    headers: {
+      Origin: REGISTERED_SITE_URL,
+      Referer: REGISTERED_SITE_URL,
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    },
+  });
+
 export const fetchRakutenBooks = async ({
   title,
   isbn,
@@ -64,7 +80,6 @@ export const fetchRakutenBooks = async ({
   const RAKUTEN_APP_ID = process.env.RAKUTEN_APPLICATION_ID;
   const RAKUTEN_ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY;
   const itemLen = 30;
-  const REGISTERED_SITE_URL = "https://tsumihon.com";
   if (!RAKUTEN_APP_ID || !RAKUTEN_ACCESS_KEY) {
     throw new Error("楽天APIの環境変数が設定されていません");
   }
@@ -95,16 +110,32 @@ export const fetchRakutenBooks = async ({
   if (page) {
     params.set("page", String(page));
   }
-  const res = await fetcher(
-    `https://openapi.rakuten.co.jp/services/api/BooksBook/Search/20170404?${params}`,
-    {
-      headers: {
-        Origin: REGISTERED_SITE_URL,
-        Referer: REGISTERED_SITE_URL,
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    },
+  const res: RakutenBooksResponse = await fetchRakutenApi(
+    RAKUTEN_BOOKS_BOOK_SEARCH_URL,
+    params,
   );
-  return res;
+
+  const fallbackKeyword = title ?? isbn;
+
+  // 詳細検索のインデックスに未反映の新刊・予約本を補完する。
+  // Total Search API はタイトル・ISBN を keyword として受け取れる。
+  if (!fallbackKeyword || res.count > 0) {
+    return res;
+  }
+
+  const fallbackParams = new URLSearchParams({
+    applicationId: RAKUTEN_APP_ID,
+    accessKey: RAKUTEN_ACCESS_KEY,
+    keyword: fallbackKeyword,
+    hits: String(itemLen),
+    formatVersion: "2",
+    sort: "sales",
+    outOfStockFlag: "1",
+  });
+
+  if (page) {
+    fallbackParams.set("page", String(page));
+  }
+
+  return fetchRakutenApi(RAKUTEN_BOOKS_TOTAL_SEARCH_URL, fallbackParams);
 };

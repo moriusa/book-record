@@ -7,5 +7,5 @@ export const getRakutenBookByIsbn = async (
     isbn,
   });
 
-  return data.Items[0] ?? null;
+  return data.Items.find((book) => book.isbn === isbn) ?? null;
 };
