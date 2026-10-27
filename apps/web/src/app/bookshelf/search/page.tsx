@@ -22,7 +22,8 @@ const SearchPage = () => {
   const router = useRouter();
   const {
     books,
-    searchTitle,
+    searchKeyword,
+    searchField,
     hasSearched,
     hasMore,
     handleSearch: executeSearch,
@@ -106,17 +107,18 @@ const SearchPage = () => {
           追加する本を検索
         </h1>
         <p className="mt-2 text-sm leading-6 text-stone-600">
-          タイトルを入力して、登録したい本を探せます。
+          タイトル・ISBN・著者名から、登録したい本を探せます。
         </p>
       </div>
 
       <div className="mt-6 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-end">
         <div className="min-w-0 flex-1">
           <SearchBox
-            key={searchTitle}
+            key={`${searchField}-${searchKeyword}`}
             onSearch={handleSearch}
             isLoading={isLoading}
-            initialKeyword={searchTitle}
+            initialKeyword={searchKeyword}
+            initialSearchField={searchField}
           />
         </div>
         <button

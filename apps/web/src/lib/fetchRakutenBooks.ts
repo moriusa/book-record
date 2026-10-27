@@ -115,10 +115,10 @@ export const fetchRakutenBooks = async ({
     params,
   );
 
-  const fallbackKeyword = title ?? isbn;
+  const fallbackKeyword = title ?? isbn ?? author;
 
   // 詳細検索のインデックスに未反映の新刊・予約本を補完する。
-  // Total Search API はタイトル・ISBN を keyword として受け取れる。
+  // Total Search API はタイトル・ISBN・著者名を keyword として受け取れる。
   if (!fallbackKeyword || res.count > 0) {
     return res;
   }

@@ -2,50 +2,76 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   fetchRakutenBooks,
-  RakutenBookSearchParams,
 } from "@/lib/fetchRakutenBooks";
-import { rankBookSearchResults } from "@/lib/bookSearch";
+import { BookSearchField, rankBookSearchResults } from "@/lib/bookSearch";
 
 const SEARCH_CACHE_TIME = 30 * 60 * 1_000;
+const searchFields: BookSearchField[] = ["title", "isbn", "author"];
+
+export type BookSearchInput = {
+  keyword: string;
+  searchField: BookSearchField;
+};
 
 export const useBookSearch = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const title = searchParams.get("q")?.trim() ?? "";
+  const keyword = searchParams.get("q")?.trim() ?? "";
+  const requestedSearchField = searchParams.get("type");
+  const searchField = searchFields.includes(
+    requestedSearchField as BookSearchField,
+  )
+    ? (requestedSearchField as BookSearchField)
+    : "title";
+
+  const createSearchParams = (page: number) => {
+    switch (searchField) {
+      case "isbn":
+        return { isbn: keyword, page };
+      case "author":
+        return { author: keyword, page };
+      case "title":
+        return { title: keyword, page };
+    }
+  };
 
   const searchQuery = useInfiniteQuery({
-    queryKey: ["book-search", title],
-    queryFn: ({ pageParam }) => fetchRakutenBooks({ title, page: pageParam }),
+    queryKey: ["book-search", searchField, keyword],
+    queryFn: ({ pageParam }) => fetchRakutenBooks(createSearchParams(pageParam)),
     initialPageParam: 1,
     getNextPageParam: (lastPage) =>
       lastPage.page < lastPage.pageCount ? lastPage.page + 1 : undefined,
-    enabled: Boolean(title),
+    enabled: Boolean(keyword),
     staleTime: SEARCH_CACHE_TIME,
     gcTime: SEARCH_CACHE_TIME,
   });
 
   const books = rankBookSearchResults(
     searchQuery.data?.pages.flatMap((page) => page.Items) ?? [],
-    title,
+    keyword,
+    searchField,
   );
 
-  const handleSearch = ({ title: inputTitle }: RakutenBookSearchParams) => {
-    const nextTitle = inputTitle?.trim();
+  const handleSearch = ({ keyword: inputKeyword, searchField }: BookSearchInput) => {
+    const nextKeyword = inputKeyword.trim();
 
-    if (!nextTitle) {
+    if (!nextKeyword) {
       return;
     }
 
-    router.push(`/bookshelf/search?q=${encodeURIComponent(nextTitle)}`);
+    router.push(
+      `/bookshelf/search?q=${encodeURIComponent(nextKeyword)}&type=${searchField}`,
+    );
   };
 
   return {
     books,
-    searchTitle: title,
-    hasSearched: Boolean(title),
+    searchKeyword: keyword,
+    searchField,
+    hasSearched: Boolean(keyword),
     hasMore: searchQuery.hasNextPage,
     isLoading:
-      Boolean(title) &&
+      Boolean(keyword) &&
       (searchQuery.isPending || searchQuery.isFetchingNextPage),
     handleSearch,
     loadMore: searchQuery.fetchNextPage,
