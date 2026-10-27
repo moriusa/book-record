@@ -4,11 +4,13 @@
 
 ```mermaid
 erDiagram
-    USERS ||--o{ BOOKS : owns
+    USERS ||--o{ USER_BOOKS : owns
+    BOOKS ||--o{ USER_BOOKS : is_registered_as
 
     USERS {
         uuid id PK
-        string email
+        string cognito_sub UK
+        string email UK
         string name
         timestamp created_at
         timestamp updated_at
@@ -16,16 +18,25 @@ erDiagram
 
     BOOKS {
         uuid id PK
-        uuid user_id FK
-        string isbn
+        string isbn UK
         string title
         string author
         string publisher
-        string cover_image_url
+        string series
+        string sales_date
+        string image_url
+        text book_format
+        text description
+    }
+
+    USER_BOOKS {
+        uuid id PK
+        uuid user_id FK
+        uuid book_id FK
         string status
         smallint rating
         text review
-        timestamp completed_at
+        date completed_at
         timestamp created_at
         timestamp updated_at
     }
@@ -33,23 +44,27 @@ erDiagram
 
 ## テーブルの関係
 
-* `USERS` 1人に対して、`BOOKS` は複数登録できる
-* `BOOKS.user_id` が `USERS.id` を参照する
-* 1冊の本は必ず1人のユーザーに紐づく
-* ユーザーが退会した場合、そのユーザーの本をどう扱うかは別途検討する
+- USERS と BOOKS は直接つながらず、USER_BOOKS を介した多対多の関係
+- 同じ書籍カタログ情報は BOOKS に一度だけ保存する
+- ユーザーごとの読書状況・評価・レビューは USER_BOOKS に保存する
+- USER_BOOKS には (user_id, book_id) の一意制約があり、同じユーザーが同じ本を重複登録できない
 
 ## 認証
 
 ユーザー認証は AWS Cognito を使用する。
 
-`USERS.id` には Cognito User Pool の `sub` を保存する。
+- Cognito の sub は USERS.id ではなく、USERS.cognito_sub に保存する
 
 ```text
 Google
   ↓
-Cognito
+AWS Cognito
   ↓
 Cognito sub
   ↓
-USERS.id
+USERS.cognito_sub
+  ↓
+USERS.id（アプリ内のUUID）
+  ↓
+USER_BOOKS.user_id
 ```
