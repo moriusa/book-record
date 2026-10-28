@@ -15,23 +15,19 @@ type CreateBookInput = {
   completedAt: string | null;
 };
 
-async function createBook(input: CreateBookInput) {
-  return authFetcher("/books", {
+const createBook = (input: CreateBookInput) =>
+  authFetcher("/books", {
     method: "POST",
     body: JSON.stringify(input),
   });
-}
 
-export function useCreateBook() {
+export const useCreateBook = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createBook,
-
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["books"],
-      });
+      queryClient.invalidateQueries({ queryKey: ["books"] });
     },
   });
-}
+};

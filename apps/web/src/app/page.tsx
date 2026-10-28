@@ -54,7 +54,7 @@ function AuthenticatedHome() {
             <p className="mt-3 max-w-xl text-sm leading-6 text-stone-600 sm:text-base">気になる本を追加して、あなたの本棚を少しずつ育てましょう。</p>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <Link href="/bookshelf/search" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 text-sm font-semibold text-amber-50 transition hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2">
+            <Link href="/books/search" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 text-sm font-semibold text-amber-50 transition hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2">
               <RiAddLine className="text-lg" aria-hidden="true" />本を追加
             </Link>
             <Link href="/bookshelf" className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2">
@@ -115,12 +115,12 @@ function AuthenticatedHome() {
             <RiBookOpenLine className="mx-auto text-3xl text-stone-400" aria-hidden="true" />
             <p className="mt-3 font-semibold text-stone-800">まだ本棚は空です</p>
             <p className="mt-1 text-sm text-stone-600">最初の一冊を追加して、読書の記録を始めましょう。</p>
-            <Link href="/bookshelf/search" className="mt-5 inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-sm font-semibold text-amber-50 transition hover:bg-stone-800"><RiAddLine aria-hidden="true" />本を追加する</Link>
+            <Link href="/books/search" className="mt-5 inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-sm font-semibold text-amber-50 transition hover:bg-stone-800"><RiAddLine aria-hidden="true" />本を追加する</Link>
           </div>
         ) : (
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
             {recentBooks.map((book) => (
-              <Link key={book.id} href={`/bookshelf/${book.isbn}`} className="group rounded-xl p-1.5 transition hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700">
+              <Link key={book.id} href={`/books/${book.isbn}`} className="group rounded-xl p-1.5 transition hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700">
                 <div className="relative mx-auto aspect-2/3 w-full max-w-40 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-md">
                   {book.imageUrl ? <Image src={book.imageUrl} alt={book.title} fill sizes="(max-width: 640px) 45vw, 25vw" className="object-contain" /> : <RiBookOpenLine className="absolute inset-0 m-auto text-3xl text-stone-300" aria-hidden="true" />}
                 </div>

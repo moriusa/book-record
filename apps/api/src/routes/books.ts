@@ -84,6 +84,12 @@ booksRouter.get("/", authMiddleware, async (c) => {
   return c.json(result);
 });
 
+booksRouter.get("/catalog", async (c) => {
+  const result = await db.select({ isbn: books.isbn }).from(books);
+
+  return c.json(result);
+});
+
 booksRouter.get("/catalog/:isbn", async (c) => {
   const result = await db
     .select(catalogBookSelection)

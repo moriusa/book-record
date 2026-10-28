@@ -1,11 +1,13 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useCreateBook } from "./hooks/useCreateBook";
 import { useRouter } from "next/navigation";
+import LoginButton from "@/components/ui/LoginButton";
+import { useAuth } from "@/components/providers/AuthProvider";
 import BookFormFields, { BookFormValues } from "@/components/ui/BookFormFields";
+import { useCreateBook } from "./hooks/useCreateBook";
 
-export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
 type BookInfo = {
   isbn: string;
   title: string;
@@ -15,6 +17,7 @@ type BookInfo = {
   salesDate: string | null;
   largeImageUrl: string | null;
 };
+
 type Props = {
   bookData: BookInfo;
 };
@@ -31,7 +34,7 @@ const getToday = () => {
 
 export const AddBookForm = ({ bookData }: Props) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const { user, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const { control, register, watch, setValue, handleSubmit } =
     useForm<BookFormValues>({
@@ -45,7 +48,6 @@ export const AddBookForm = ({ bookData }: Props) => {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
-
   const createBookMutation = useCreateBook();
 
   useEffect(() => {
@@ -59,25 +61,34 @@ export const AddBookForm = ({ bookData }: Props) => {
 
   const onSubmit: SubmitHandler<BookFormValues> = (data) => {
     createBookMutation.mutate(
+      { ...bookData, ...data },
       {
-        ...bookData,
-        ...data,
-      },
-      {
-        onSuccess: () => {
-          router.push("/bookshelf");
-        },
-        onError: (error) => {
-          setErrorMessage(error.message);
-        },
+        onSuccess: () => router.push("/bookshelf"),
+        onError: (error) => setErrorMessage(error.message),
       },
     );
   };
 
+  if (isAuthLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return (
+      <div>
+        <p className="text-sm text-gray-600">
+          本棚へ登録するにはログインが必要です。
+        </p>
+        <div className="mt-4">
+          <LoginButton />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <BookFormFields control={control} register={register} watch={watch} />
-
       <button
         type="submit"
         disabled={createBookMutation.isPending}
@@ -85,11 +96,7 @@ export const AddBookForm = ({ bookData }: Props) => {
       >
         {createBookMutation.isPending ? "登録中..." : "本棚に追加"}
       </button>
-      {errorMessage && (
-        <p role="alert" className="text-red-700">
-          {errorMessage}
-        </p>
-      )}
+      {errorMessage && <p role="alert" className="text-red-700">{errorMessage}</p>}
     </form>
   );
 };

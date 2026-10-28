@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useGetBookByIsbn } from "../hooks/useGetBookByIsbn";
-import { AddToBookshelfButton } from "./AddToBookshelfButton";
 import { FaStar } from "react-icons/fa";
+import LoginButton from "@/components/ui/LoginButton";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { useGetBookByIsbn } from "@/app/bookshelf/hooks/useGetBookByIsbn";
+import { AddToBookshelfButton } from "./AddToBookshelfButton";
 
 type Props = {
-  bookData: {
-    isbn: string;
-  };
+  bookData: { isbn: string };
 };
 
 const bookStatus = {
@@ -19,13 +19,29 @@ const bookStatus = {
 };
 
 const BookShelfStatus = ({ bookData }: Props) => {
-  const { data: book } = useGetBookByIsbn(bookData.isbn);
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { data: book } = useGetBookByIsbn(bookData.isbn, {
+    enabled: Boolean(user),
+  });
+
+  if (isAuthLoading) {
+    return null;
+  }
 
   return (
-    <div className="mt-6 rounded-2xl border bg-white p-6 shadow-sm">
+    <section className="mt-6 rounded-2xl border bg-white p-6 shadow-sm">
       <h2 className="text-lg font-bold">あなたの本棚</h2>
 
-      {book ? (
+      {!user ? (
+        <div className="mt-5">
+          <p className="text-sm text-gray-600">
+            ログインすると、この本をあなたの本棚へ登録できます。
+          </p>
+          <div className="mt-4">
+            <LoginButton />
+          </div>
+        </div>
+      ) : book ? (
         <div className="mt-5">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-500">ステータス</span>
@@ -55,13 +71,12 @@ const BookShelfStatus = ({ bookData }: Props) => {
           <p className="text-sm text-gray-600">
             この本はまだ本棚に登録されていません。
           </p>
-
           <div className="mt-4">
             <AddToBookshelfButton isbn={bookData.isbn} />
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

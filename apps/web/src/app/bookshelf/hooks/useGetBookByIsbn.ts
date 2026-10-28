@@ -2,7 +2,10 @@ import { authFetcher } from "@/lib/fetcher";
 import { Book } from "@/types/book";
 import { useQuery } from "@tanstack/react-query";
 
-export function useGetBookByIsbn(isbn: string) {
+export function useGetBookByIsbn(
+  isbn: string,
+  { enabled = true }: { enabled?: boolean } = {},
+) {
   return useQuery({
     queryKey: ["book", "isbn", isbn],
     queryFn: async () => {
@@ -10,6 +13,7 @@ export function useGetBookByIsbn(isbn: string) {
       if (res.length === 0) return null;
       return res[0];
     },
+    enabled,
     retry: false,
   });
 }

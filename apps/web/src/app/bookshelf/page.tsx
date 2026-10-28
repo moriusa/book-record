@@ -46,7 +46,7 @@ const Page = () => {
         <h1 className="text-2xl font-bold">本棚</h1>
 
         <Link
-          href="/bookshelf/search"
+          href="/books/search"
           className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white"
         >
           本を追加

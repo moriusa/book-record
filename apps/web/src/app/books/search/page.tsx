@@ -6,8 +6,9 @@ import { BookCard } from "./BookCard";
 import { BarcodeScannerDialog } from "./BarcodeScannerDialog";
 import type { RakutenBookItem } from "@/lib/fetchRakutenBooks";
 import type { BookStatus } from "@/types/book";
-import { useCreateBook } from "../[isbn]/register/hooks/useCreateBook";
-import { useGetBooks } from "../hooks/useGetBooks";
+import { useCreateBook } from "../../books/[isbn]/register/hooks/useCreateBook";
+import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { RiBarcodeLine } from "react-icons/ri";
 
@@ -20,6 +21,7 @@ const bookStatusOptions: { value: BookStatus; label: string }[] = [
 
 const SearchPage = () => {
   const router = useRouter();
+  const { user } = useAuth();
   const {
     books,
     searchKeyword,
@@ -31,7 +33,9 @@ const SearchPage = () => {
     loadMore,
   } = useBookSearch();
   const createBookMutation = useCreateBook();
-  const { data: bookshelfBooks = [] } = useGetBooks({ enabled: hasSearched });
+  const { data: bookshelfBooks = [] } = useGetBooks({
+    enabled: hasSearched && Boolean(user),
+  });
   const loadMoreTargetRef = useRef<HTMLDivElement>(null);
   const [registeringIsbn, setRegisteringIsbn] = useState<string | null>(null);
   const [registeredIsbns, setRegisteredIsbns] = useState<Set<string>>(
@@ -92,7 +96,7 @@ const SearchPage = () => {
   const handleBarcodeDetected = useCallback(
     (isbn: string) => {
       setIsScannerOpen(false);
-      router.push(`/bookshelf/${isbn}`);
+      router.push(`/books/${isbn}`);
     },
     [router],
   );
@@ -152,6 +156,7 @@ const SearchPage = () => {
                   registeredIsbns.has(book.isbn) ||
                   bookshelfIsbns.has(book.isbn)
                 }
+                isAuthenticated={Boolean(user)}
               />
             ))}
           </div>

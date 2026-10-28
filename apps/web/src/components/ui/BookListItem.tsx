@@ -24,7 +24,7 @@ type Props = {
 const BookListItem = ({ book }: Props) => {
   return (
     <Link
-      href={`/bookshelf/${book.isbn}`}
+      href={`/books/${book.isbn}`}
       className="group flex min-h-28 items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:gap-4"
     >
       <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-md border border-stone-200 bg-stone-50">

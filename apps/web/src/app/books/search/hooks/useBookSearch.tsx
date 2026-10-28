@@ -60,7 +60,7 @@ export const useBookSearch = () => {
     }
 
     router.push(
-      `/bookshelf/search?q=${encodeURIComponent(nextKeyword)}&type=${searchField}`,
+      `/books/search?q=${encodeURIComponent(nextKeyword)}&type=${searchField}`,
     );
   };
 

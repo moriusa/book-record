@@ -11,7 +11,7 @@ type Props = {
 const BookCard = ({ isbn, title, author, imageUrl }: Props) => {
   return (
     <Link
-      href={`/bookshelf/${isbn}`}
+      href={`/books/${isbn}`}
       className="group block overflow-hidden rounded-xl border bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
     >
       <div className="relative aspect-3/4 bg-gray-100">
