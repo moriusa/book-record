@@ -10,6 +10,7 @@ import {
 } from "@/types/book";
 import {
   RiArrowRightSLine,
+  RiArrowDownSLine,
   RiFilter3Line,
   RiLayoutGridLine,
   RiListUnordered,
@@ -73,6 +74,7 @@ const BookshelfToolbar = ({
   const filterScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isDisplaySettingsOpen, setIsDisplaySettingsOpen] = useState(false);
 
   useEffect(() => {
     const scrollArea = filterScrollRef.current;
@@ -113,13 +115,16 @@ const BookshelfToolbar = ({
 
   return (
     <section
-      className="mt-6 border-y border-stone-200 py-5"
+      className="mt-6 border-t border-stone-200 py-5"
       aria-label="本棚の表示設定"
     >
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-5">
         <div className="min-w-0">
           <div className="mb-2.5 flex items-center gap-2 text-sm font-bold text-stone-800">
-            <RiFilter3Line aria-hidden="true" className="text-base text-stone-500" />
+            <RiFilter3Line
+              aria-hidden="true"
+              className="text-base text-stone-500"
+            />
             読書ステータス
             <span
               className="ml-1 rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-extrabold tabular-nums text-amber-950 shadow-sm"
@@ -182,7 +187,29 @@ const BookshelfToolbar = ({
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 lg:flex">
+        <div className="flex items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => setIsDisplaySettingsOpen((isOpen) => !isOpen)}
+            aria-expanded={isDisplaySettingsOpen}
+            aria-controls="bookshelf-display-settings"
+            className="flex min-h-10 items-center gap-2 rounded-full border border-stone-200 bg-white px-4 text-sm font-semibold text-stone-700 shadow-sm transition hover:border-amber-300 hover:bg-amber-50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
+          >
+            表示設定
+            <RiArrowDownSLine
+              aria-hidden="true"
+              className={`text-lg transition-transform ${
+                isDisplaySettingsOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+        </div>
+
+        <div
+          id="bookshelf-display-settings"
+          hidden={!isDisplaySettingsOpen}
+          className="grid gap-3 sm:grid-cols-3 lg:flex"
+        >
           <label className="min-w-0">
             <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-stone-500">
               <RiSortDesc aria-hidden="true" className="text-sm" />
