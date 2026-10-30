@@ -11,6 +11,7 @@ import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { RiBarcodeLine } from "react-icons/ri";
+import { FaSearch } from "react-icons/fa";
 
 const bookStatusOptions: { value: BookStatus; label: string }[] = [
   { value: "WANT_TO_READ", label: "読みたい" },
@@ -103,16 +104,11 @@ const SearchPage = () => {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="max-w-2xl">
-        <p className="text-xs font-bold tracking-[0.16em] text-amber-800">
-          ADD A BOOK
-        </p>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
-          追加する本を検索
-        </h1>
-        <p className="mt-2 text-sm leading-6 text-stone-600">
-          タイトル・ISBN・著者名から、登録したい本を探せます。
-        </p>
+        <div className="flex items-center gap-2.5">
+          <FaSearch size={25} className="mt-1.5"/>
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
+            追加する本を検索
+          </h1>
       </div>
 
       <div className="mt-6 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-end">
