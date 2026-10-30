@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RiAddLine, RiSearchLine } from "react-icons/ri";
+import { RiAddLine, RiBookShelfLine, RiSearchLine } from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
@@ -22,9 +22,14 @@ const Page = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("GRID");
 
   const { data, isLoading, error } = useGetBooks();
-  const filteredBookCount = (data ?? []).filter(
-    (book) => filterStatus === "ALL" || book.status === filterStatus,
-  ).length;
+  const statusCounts: Record<FilterStatus, number> = {
+    ALL: data?.length ?? 0,
+    WANT_TO_READ:
+      data?.filter((book) => book.status === "WANT_TO_READ").length ?? 0,
+    READING: data?.filter((book) => book.status === "READING").length ?? 0,
+    COMPLETED: data?.filter((book) => book.status === "COMPLETED").length ?? 0,
+    ON_HOLD: data?.filter((book) => book.status === "ON_HOLD").length ?? 0,
+  };
   const handleSortChange = (option: SortOption) => {
     setSortOption(option);
 
@@ -44,9 +49,9 @@ const Page = () => {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <div className="flex items-center justify-between gap-4">
-        <div>
+        <div className="flex items-center gap-1">
+          <RiBookShelfLine size={30}/>
           <h1 className="text-2xl font-bold text-stone-900">本棚</h1>
-          <p className="mt-1 text-sm text-stone-600">あなたの読書を、ここに並べよう。</p>
         </div>
 
         <Link
@@ -64,7 +69,7 @@ const Page = () => {
 
       <BookshelfToolbar
         filterStatus={filterStatus}
-        filteredBookCount={filteredBookCount}
+        statusCounts={statusCounts}
         sortOption={sortOption}
         sortDirection={sortDirection}
         groupOption={groupOption}

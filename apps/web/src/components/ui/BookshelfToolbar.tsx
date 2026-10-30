@@ -20,7 +20,7 @@ import {
 
 type Props = {
   filterStatus: FilterStatus;
-  filteredBookCount: number;
+  statusCounts: Record<FilterStatus, number>;
   sortOption: SortOption;
   sortDirection: SortDirection;
   groupOption: GroupOption;
@@ -59,7 +59,7 @@ const groupOptions = [
 
 const BookshelfToolbar = ({
   filterStatus,
-  filteredBookCount,
+  statusCounts,
   sortOption,
   sortDirection,
   groupOption,
@@ -126,12 +126,6 @@ const BookshelfToolbar = ({
               className="text-base text-stone-500"
             />
             読書ステータス
-            <span
-              className="ml-1 rounded-full border border-amber-200 bg-amber-100 px-3 py-1 text-sm font-extrabold tabular-nums text-amber-950 shadow-sm"
-              aria-live="polite"
-            >
-              {filteredBookCount}冊
-            </span>
           </div>
           <div className="relative">
             <div
@@ -155,7 +149,9 @@ const BookshelfToolbar = ({
                         : "border-transparent bg-transparent text-stone-600 hover:border-stone-200 hover:bg-stone-100 hover:text-stone-950"
                     }`}
                   >
-                    {option.label}
+                    <span className="">
+                      {option.label} {statusCounts[option.value]}
+                    </span>
                   </button>
                 );
               })}
