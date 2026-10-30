@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { RiArrowRightUpLine, RiBookOpenLine } from "react-icons/ri";
+import {
+  RiArrowRightUpLine,
+  RiBookOpenLine,
+  RiSearchLine,
+} from "react-icons/ri";
 import AuthButton from "../ui/AuthButton";
 
 const Header = () => {
@@ -24,10 +28,17 @@ const Header = () => {
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-5">
-          <nav aria-label="メインナビゲーション">
+          <nav aria-label="メインナビゲーション" className="flex items-center gap-1">
+            <Link
+              href="/books/search"
+              className="group flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-sm font-semibold text-stone-700 transition hover:bg-amber-100/70 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:px-3"
+            >
+              <RiSearchLine aria-hidden="true" className="text-base text-stone-500 transition group-hover:text-amber-800" />
+              <span>本を探す</span>
+            </Link>
             <Link
               href="/bookshelf"
-              className="group flex items-center gap-1 rounded-lg px-2.5 py-2 text-sm font-semibold text-stone-700 transition hover:bg-amber-100/70 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:px-3"
+              className="group hidden items-center gap-1 rounded-lg px-2.5 py-2 text-sm font-semibold text-stone-700 transition hover:bg-amber-100/70 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:flex sm:px-3"
             >
               <span>本棚</span>
               <RiArrowRightUpLine

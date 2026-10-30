@@ -144,7 +144,15 @@ function GuestHome() {
             <p className="text-xs font-bold tracking-[0.16em] text-amber-800">YOUR READING SPACE</p>
             <h1 className="mt-3 font-serif text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">本と出会い、<br />本棚を育てる。</h1>
             <p className="mt-5 max-w-xl text-sm leading-7 text-stone-600 sm:text-base">読みたい本も、読み終えた本も。あなただけの本棚に集めて、読書の記録を残しましょう。</p>
-            <div className="mt-7"><LoginButton /></div>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Link href="/books/search" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 text-sm font-semibold text-amber-50 shadow-sm transition hover:-translate-y-0.5 hover:bg-stone-800 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2">
+                <RiAddLine className="text-lg" aria-hidden="true" />本を探す
+              </Link>
+              <LoginButton
+                label="ログイン"
+                className="min-h-11 rounded-xl border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
+              />
+            </div>
           </div>
 
           <div className="relative mx-auto flex h-60 w-full max-w-sm items-end justify-center rounded-2xl bg-amber-100/60 px-7 pb-7 pt-12 sm:h-72" aria-hidden="true">
