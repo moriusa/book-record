@@ -1,21 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { RiBookOpenLine, RiStarFill } from "react-icons/ri";
-import { Book, BookStatus } from "@/types/book";
-
-const statusLabels = {
-  WANT_TO_READ: "読みたい",
-  READING: "読んでいる",
-  COMPLETED: "読み終わった",
-  ON_HOLD: "積読",
-} satisfies Record<BookStatus, string>;
-
-const statusStyles = {
-  WANT_TO_READ: "bg-amber-100 text-amber-900",
-  READING: "bg-sky-100 text-sky-900",
-  COMPLETED: "bg-emerald-100 text-emerald-900",
-  ON_HOLD: "bg-stone-200 text-stone-700",
-} satisfies Record<BookStatus, string>;
+import { Book } from "@/types/book";
 
 type Props = {
   book: Book;
@@ -25,45 +11,45 @@ const BookListItem = ({ book }: Props) => {
   return (
     <Link
       href={`/books/${book.isbn}`}
-      className="group flex min-h-28 items-center gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:gap-4"
+      className="group flex gap-5 border-b border-[#293630]/10 py-6 transition hover:bg-[#eeece5]/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:items-center sm:gap-7"
     >
-      <div className="relative h-20 w-14 shrink-0 overflow-hidden rounded-md border border-stone-200 bg-stone-50">
+      <div className="relative h-24 w-17 shrink-0 overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[4px_5px_12px_rgb(38_48_43/15%)]">
         {book.imageUrl ? (
           <Image
             src={book.imageUrl}
             alt={book.title}
             fill
-            sizes="56px"
-            className="object-contain"
+            sizes="68px"
+            className="object-cover"
           />
         ) : (
           <RiBookOpenLine
-            className="absolute inset-0 m-auto text-xl text-stone-300"
+            className="absolute inset-0 m-auto text-xl text-[#66756d]"
             aria-hidden="true"
           />
         )}
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 font-semibold leading-5 text-stone-900 group-hover:underline">
+        <p className="font-serif-jp text-base font-medium text-[#293630] group-hover:underline sm:text-lg">
           {book.title}
         </p>
-        <p className="mt-1 truncate text-sm text-stone-600">{book.author}</p>
-        <p className="mt-1 truncate text-xs text-stone-500">
-          {book.publisher || "出版社不明"}
+        <p className="mt-1 text-[11px] text-[#7c8781]">
+          {book.author} ・ {book.publisher || "出版社不明"}
         </p>
-      </div>
-
-      <div className="hidden shrink-0 items-end gap-2 sm:flex sm:flex-col">
-        <span
-          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusStyles[book.status]}`}
-        >
-          {statusLabels[book.status]}
-        </span>
-        {book.rating !== null && (
-          <span className="flex items-center gap-1 text-sm font-semibold text-amber-700">
-            <RiStarFill aria-hidden="true" />
-            {book.rating}
+        {book.review && (
+          <p className="mt-4 line-clamp-2 text-xs text-[#65736c]">
+            {book.review}
+          </p>
+        )}
+        {book.rating !== null && book.rating > 0 && (
+          <span
+            className="mt-3 flex gap-0.5 text-[10px] text-[#8c8062]"
+            aria-label={`評価 ${book.rating}点`}
+          >
+            {Array.from({ length: book.rating }, (_, index) => (
+              <RiStarFill key={index} aria-hidden="true" />
+            ))}
           </span>
         )}
       </div>

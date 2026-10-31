@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RiAddLine, RiBookShelfLine, RiSearchLine } from "react-icons/ri";
+import { RiAddLine, RiLockLine } from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
@@ -39,31 +39,31 @@ const Page = () => {
   };
 
   if (isLoading) {
-    return <p className="p-6">読み込み中...</p>;
+    return <p className="p-6 text-sm text-[#75817b]">読み込み中...</p>;
   }
 
   if (error) {
-    return <p className="p-6">本棚を取得できませんでした。</p>;
+    return <p className="p-6 text-sm text-[#75817b]">本棚を取得できませんでした。</p>;
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-1">
-          <RiBookShelfLine size={30}/>
-          <h1 className="text-2xl font-bold text-stone-900">本棚</h1>
+    <main className="mx-auto max-w-295 px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
+      <div className="flex flex-col justify-between gap-7 sm:flex-row sm:items-end">
+        <div>
+          <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
+            <RiLockLine className="text-sm" aria-hidden="true" />PRIVATE BOOKSHELF
+          </p>
+          <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:text-[40px]">わたしの本棚</h1>
+          <p className="mt-3 text-sm text-[#75817b]">気になる本と、読み終えた本。ここは自分だけの場所です。</p>
         </div>
 
         <Link
           href="/books/search"
-          className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-stone-900 py-1.5 pl-2 pr-3.5 text-sm font-semibold text-amber-50 shadow-sm transition hover:-translate-y-0.5 hover:bg-stone-800 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
+          className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
           aria-label="本を探して本棚に追加"
         >
-          <span className="flex size-8 items-center justify-center rounded-lg bg-white/12 transition group-hover:bg-white/18">
-            <RiSearchLine className="text-base" aria-hidden="true" />
-          </span>
-          <span className="hidden sm:inline">本を探す</span>
-          <RiAddLine className="text-base" aria-hidden="true" />
+          <RiAddLine className="text-lg font-light" aria-hidden="true" />
+          本を追加
         </Link>
       </div>
 

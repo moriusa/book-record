@@ -11,7 +11,6 @@ import {
 import {
   RiArrowRightSLine,
   RiArrowDownSLine,
-  RiFilter3Line,
   RiLayoutGridLine,
   RiListUnordered,
   RiSortDesc,
@@ -115,22 +114,15 @@ const BookshelfToolbar = ({
 
   return (
     <section
-      className="mt-6 border-t border-stone-200 py-5"
+      className="mt-11 border-y border-[#293630]/10 py-2"
       aria-label="本棚の表示設定"
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-3">
         <div className="min-w-0">
-          <div className="mb-2.5 flex items-center gap-2 text-sm font-bold text-stone-800">
-            <RiFilter3Line
-              aria-hidden="true"
-              className="text-base text-stone-500"
-            />
-            読書ステータス
-          </div>
           <div className="relative">
             <div
               ref={filterScrollRef}
-              className="-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 pr-10 scrollbar-none [&::-webkit-scrollbar]:hidden"
+              className="scrollbar-none -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto px-1 pr-10"
               role="group"
               aria-label="読書ステータスで絞り込む"
             >
@@ -143,14 +135,17 @@ const BookshelfToolbar = ({
                     type="button"
                     onClick={() => onFilterChange(option.value)}
                     aria-pressed={isActive}
-                    className={`min-h-11 shrink-0 snap-start rounded-full border px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2 ${
+                    className={`min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:px-5 ${
                       isActive
-                        ? "border-stone-900 bg-stone-900 text-amber-50 shadow-sm"
-                        : "border-transparent bg-transparent text-stone-600 hover:border-stone-200 hover:bg-stone-100 hover:text-stone-950"
+                        ? "border-[#40584e] font-medium text-[#293630]"
+                        : "border-transparent bg-transparent text-[#7b8680] hover:text-[#46564f]"
                     }`}
                   >
-                    <span className="">
-                      {option.label} {statusCounts[option.value]}
+                    {option.label}
+                    <span
+                      className={`ml-1.5 text-[10px] ${isActive ? "text-[#65756d]" : "text-[#9ba39f]"}`}
+                    >
+                      {statusCounts[option.value]}
                     </span>
                   </button>
                 );
@@ -183,13 +178,13 @@ const BookshelfToolbar = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="relative flex items-center justify-end gap-3 pt-3">
           <button
             type="button"
             onClick={() => setIsDisplaySettingsOpen((isOpen) => !isOpen)}
             aria-expanded={isDisplaySettingsOpen}
             aria-controls="bookshelf-display-settings"
-            className="flex min-h-10 items-center gap-2 rounded-full border border-stone-200 bg-white px-4 text-sm font-semibold text-stone-700 shadow-sm transition hover:border-amber-300 hover:bg-amber-50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
+            className={`flex min-h-10 items-center gap-2 rounded-md border px-4 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 ${isDisplaySettingsOpen ? "border-[#6c7c74] bg-[#e9e9e2] text-[#344941]" : "border-[#293630]/10 bg-[#f9f8f4] text-[#5f6d66] hover:border-[#293630]/20"}`}
           >
             表示設定
             <RiArrowDownSLine
@@ -204,7 +199,7 @@ const BookshelfToolbar = ({
         <div
           id="bookshelf-display-settings"
           hidden={!isDisplaySettingsOpen}
-          className="grid gap-3 sm:grid-cols-3 lg:flex"
+          className="grid gap-5 border-t border-[#293630]/8 bg-[#faf9f5] p-5 sm:grid-cols-3"
         >
           <label className="min-w-0">
             <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-stone-500">
