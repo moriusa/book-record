@@ -71,6 +71,15 @@ const BookShelfStatus = ({ bookData }: Props) => {
             </div>
           )}
 
+          {book.review && (
+            <div className="mt-6">
+              <p className="text-[11px] font-medium text-[#5f6e66]">メモ</p>
+              <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#526159]">
+                {book.review}
+              </p>
+            </div>
+          )}
+
           <div className="mt-7 border-t border-[#293630]/10 pt-5">
             <Link
               href={`/bookshelf/edit/${book.id}`}
