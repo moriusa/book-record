@@ -7,6 +7,7 @@ import AmplifyProvider from "@/components/providers/AmplifyProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import GoogleAnalyticsPageView from "@/components/analytics/GoogleAnalyticsPageView";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -84,9 +85,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AuthProvider>
           <QueryProvider>
             {googleAnalyticsMeasurementId && (
-              <GoogleAnalyticsPageView
-                measurementId={googleAnalyticsMeasurementId}
-              />
+              <Suspense fallback={null}>
+                <GoogleAnalyticsPageView
+                  measurementId={googleAnalyticsMeasurementId}
+                />
+              </Suspense>
             )}
             <Header />
             <main className="flex-1 bg-[#f7f5f0]">
