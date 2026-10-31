@@ -18,7 +18,6 @@ import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { RiBarcodeLine } from "react-icons/ri";
-import { FaSearch } from "react-icons/fa";
 
 const bookStatusOptions: { value: BookStatus; label: string }[] = [
   { value: "WANT_TO_READ", label: "読みたい" },
@@ -110,16 +109,23 @@ const SearchPage = () => {
   );
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex items-center gap-2.5">
-        <FaSearch size={25} className="mt-1.5" />
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
-          追加する本を検索
+    <main className="mx-auto max-w-265 px-5 pb-24 pt-12 text-[#293630] sm:px-8 sm:pt-16">
+      <div className="max-w-162.5">
+        <p className="text-[10px] tracking-[0.18em] text-[#7b8781]">
+          FIND YOUR NEXT BOOK
+        </p>
+        <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] sm:text-[42px]">
+          本を探す
         </h1>
+        <p className="mt-4 text-sm leading-7 text-[#748078]">
+          気になっていた一冊を、あなたの本棚へ。
+          <br className="hidden sm:block" />
+          タイトルや著者名から静かに探せます。
+        </p>
       </div>
 
-      <div className="mt-6 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-end">
-        <div className="min-w-0 flex-1">
+      <section className="mt-10 border border-[#293630]/10 bg-[#eeece5] p-4 sm:p-6">
+        <div className="max-w-190">
           <SearchBox
             key={`${searchField}-${searchKeyword}`}
             onSearch={handleSearch}
@@ -127,29 +133,29 @@ const SearchPage = () => {
             initialKeyword={searchKeyword}
             initialSearchField={searchField}
           />
+          <button
+            type="button"
+            onClick={() => setIsScannerOpen(true)}
+            className="mt-3 inline-flex items-center gap-2 text-[11px] text-[#66756d] transition-colors hover:text-[#344941]"
+          >
+            <RiBarcodeLine className="text-base" aria-hidden="true" />
+            バーコードから探す
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => setIsScannerOpen(true)}
-          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-stone-300 bg-white px-4 text-sm font-bold text-stone-700 transition hover:border-amber-500 hover:bg-amber-50"
-        >
-          <RiBarcodeLine className="text-lg" aria-hidden="true" />
-          バーコードを読み取る
-        </button>
-      </div>
+      </section>
 
-      <div className="mt-10">
+      <section className="mt-14">
         {hasSearched && !isLoading && books.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-stone-300 bg-white/50 px-6 py-12 text-center">
-            <p className="text-base font-semibold text-stone-800">
+          <div className="border-b border-[#293630]/10 py-20 text-center">
+            <p className="font-serif-jp text-lg font-medium text-[#293630]">
               該当する本が見つかりませんでした
             </p>
-            <p className="mt-2 text-sm text-stone-600">
+            <p className="mt-3 text-xs leading-6 text-[#849089]">
               タイトルの一部や、表記を変えてもう一度検索してみてください。
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-stone-200 overflow-hidden rounded-md border border-stone-200 bg-white/70">
+          <div className="grid md:grid-cols-2 md:gap-x-10">
             {books.map((book) => (
               <BookCard
                 key={book.isbn}
@@ -170,15 +176,15 @@ const SearchPage = () => {
             className="flex min-h-16 items-center justify-center"
             aria-live="polite"
           >
-            {isLoading && <p className="text-sm text-stone-500">読み込み中…</p>}
+            {isLoading && <p className="text-sm text-[#75817b]">読み込み中…</p>}
             {!hasMore && !isLoading && (
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-[#75817b]">
                 すべての検索結果を表示しました
               </p>
             )}
           </div>
         )}
-      </div>
+      </section>
       {bookToRegister && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/45 p-4"
@@ -186,17 +192,14 @@ const SearchPage = () => {
           aria-modal="true"
           aria-labelledby="book-status-dialog-title"
         >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <p className="text-xs font-bold tracking-[0.14em] text-amber-800">
-              BOOKSHELF REGISTRATION
-            </p>
+          <div className="w-full max-w-md bg-[#faf9f5] p-6 shadow-2xl">
             <h2
               id="book-status-dialog-title"
-              className="mt-2 text-lg font-bold text-stone-900"
+              className="font-serif-jp text-xl font-medium text-[#293630]"
             >
               読書状況を選択
             </h2>
-            <p className="mt-2 line-clamp-2 text-sm text-stone-600">
+            <p className="mt-3 line-clamp-2 text-sm text-[#748078]">
               『{bookToRegister.title}』をどの状態で本棚に登録しますか？
             </p>
             <div className="mt-5 grid grid-cols-2 gap-2">
@@ -208,7 +211,7 @@ const SearchPage = () => {
                     void registerBook(bookToRegister, option.value)
                   }
                   disabled={registeringIsbn === bookToRegister.isbn}
-                  className="min-h-12 rounded-lg border border-stone-200 px-3 text-sm font-bold text-stone-700 transition hover:border-amber-500 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="min-h-12 rounded-md border border-[#293630]/12 bg-white px-3 text-xs text-[#69766f] transition hover:border-[#60736a] hover:bg-[#e7e9e4] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {option.label}
                 </button>
@@ -218,7 +221,7 @@ const SearchPage = () => {
               type="button"
               onClick={() => setBookToRegister(null)}
               disabled={registeringIsbn === bookToRegister.isbn}
-              className="mt-4 w-full min-h-10 rounded-lg text-sm font-semibold text-stone-500 transition hover:bg-stone-100 disabled:opacity-50"
+              className="mt-4 min-h-10 w-full rounded-md text-xs text-[#748078] transition hover:bg-[#eeece5] disabled:opacity-50"
             >
               キャンセル
             </button>
