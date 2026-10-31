@@ -3,7 +3,7 @@
 import type { IScannerControls } from "@zxing/browser";
 import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 import { useEffect, useRef, useState } from "react";
-import { RiCloseLine } from "react-icons/ri";
+import { RiBarcodeLine, RiCloseLine } from "react-icons/ri";
 
 type Props = {
   onClose: () => void;
@@ -103,63 +103,64 @@ export const BarcodeScannerDialog = ({ onClose, onDetected }: Props) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1e2b26]/45 p-5 backdrop-blur-[3px]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="barcode-scanner-title"
     >
-      <div className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-start justify-between gap-4 p-5 pb-4">
+      <div className="w-full max-w-lg overflow-hidden border border-[#293630]/10 bg-[#faf9f5] shadow-[0_24px_60px_rgb(43_56_50/20%)]">
+        <div className="flex items-start justify-between gap-4 p-6 pb-5 sm:p-7 sm:pb-5">
           <div>
-            <p className="text-xs font-bold tracking-[0.14em] text-amber-800">
-              BARCODE SCANNER
-            </p>
             <h2
               id="barcode-scanner-title"
-              className="mt-1 text-lg font-bold text-stone-900"
+              className="font-serif-jp text-xl font-medium text-[#293630]"
             >
               本のバーコードを読み取る
             </h2>
+            <p className="mt-2 text-[11px] text-[#748078]">
+              カメラをISBNバーコードに向けてください。
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex size-10 items-center justify-center rounded-lg text-stone-500 transition hover:bg-stone-100 hover:text-stone-900"
+            className="inline-flex size-9 items-center justify-center rounded-md text-[#748078] transition hover:bg-[#eeece5] hover:text-[#293630]"
             aria-label="スキャナーを閉じる"
           >
             <RiCloseLine className="text-xl" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="relative mx-5 aspect-4/3 overflow-hidden rounded-xl bg-stone-950">
+        <div className="relative mx-6 aspect-4/3 overflow-hidden bg-[#293630] sm:mx-7">
           <video
             ref={videoRef}
             className="size-full object-cover"
             muted
             playsInline
           />
-          <div className="pointer-events-none absolute inset-x-[12%] top-1/2 h-[38%] -translate-y-1/2 rounded-lg border-2 border-amber-300 shadow-[0_0_0_9999px_rgb(0_0_0/0.25)]" />
+          <div className="pointer-events-none absolute inset-x-[12%] top-1/2 h-[38%] -translate-y-1/2 border-2 border-[#d4c56d] shadow-[0_0_0_9999px_rgb(0_0_0/35%)]" />
           {isStarting && !errorMessage && (
-            <p className="absolute inset-0 flex items-center justify-center bg-stone-950/60 text-sm font-semibold text-white">
+            <p className="absolute inset-0 flex items-center justify-center gap-2 bg-[#1e2b26]/65 text-xs text-white">
+              <RiBarcodeLine aria-hidden="true" />
               カメラを起動しています…
             </p>
           )}
         </div>
 
-        <div className="p-5 pt-4">
+        <div className="p-6 pt-5 sm:p-7 sm:pt-5">
           {errorMessage ? (
-            <p role="alert" className="text-sm leading-6 text-rose-700">
+            <p role="alert" className="text-xs leading-6 text-rose-700">
               {errorMessage}
             </p>
           ) : (
-            <p className="text-sm leading-6 text-stone-600">
+            <p className="text-xs leading-6 text-[#66736c]">
               本の裏表紙にあるバーコードを枠内に合わせてください。
             </p>
           )}
           <button
             type="button"
             onClick={onClose}
-            className="mt-4 min-h-10 w-full rounded-lg border border-stone-200 text-sm font-semibold text-stone-700 transition hover:bg-stone-50"
+            className="mt-5 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white text-xs text-[#526159] transition hover:border-[#60736a] hover:bg-[#f3f1eb]"
           >
             閉じる
           </button>
