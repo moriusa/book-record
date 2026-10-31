@@ -1,6 +1,13 @@
 "use client";
 import { SearchBox } from "./SearchBox";
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useBookSearch } from "./hooks/useBookSearch";
 import { BookCard } from "./BookCard";
 import { BarcodeScannerDialog } from "./BarcodeScannerDialog";
@@ -104,11 +111,11 @@ const SearchPage = () => {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-        <div className="flex items-center gap-2.5">
-          <FaSearch size={25} className="mt-1.5"/>
-          <h1 className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
-            追加する本を検索
-          </h1>
+      <div className="flex items-center gap-2.5">
+        <FaSearch size={25} className="mt-1.5" />
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl">
+          追加する本を検索
+        </h1>
       </div>
 
       <div className="mt-6 flex max-w-2xl flex-col gap-3 sm:flex-row sm:items-end">

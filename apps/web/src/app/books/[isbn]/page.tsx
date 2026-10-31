@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { RiBook3Line } from "react-icons/ri";
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
 import { BookDetails, getStoredBookByIsbn } from "@/lib/getStoredBookByIsbn";
 import BookShelfStatus from "./BookShelfStatus";
@@ -14,7 +15,9 @@ const getBook = async (isbn: string): Promise<BookDetails | null> => {
   return storedBook ?? (await getRakutenBookByIsbn(isbn));
 };
 
-export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
   const { isbn } = await params;
   const book = await getBook(isbn);
 
@@ -54,59 +57,70 @@ const Page = async ({ params }: Props) => {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <div className="rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-8 sm:flex-row">
-          <div className="relative mx-auto h-72 w-48 shrink-0 sm:mx-0">
-            {book.largeImageUrl ? (
-              <Image
-                src={book.largeImageUrl}
-                alt={book.title}
-                fill
-                className="object-contain"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center rounded-lg bg-stone-100 text-sm text-stone-500">
-                表紙画像はありません
+    <main className="text-[#293630]">
+      <section className="border-b border-[#293630]/8">
+        <div className="mx-auto max-w-270 px-5 pb-16 pt-7 sm:px-8 sm:pb-24 sm:pt-10">
+          <div className="grid gap-12 sm:grid-cols-[220px_1fr] sm:gap-14 lg:grid-cols-[260px_1fr] lg:gap-20">
+            <div className="mx-auto w-47.5 sm:w-full">
+              <div className="relative aspect-2/3 w-full overflow-hidden rounded-r-sm rounded-l-xs border-l-[5px] border-black/10 bg-[#d9d4c5] shadow-[10px_14px_28px_rgb(38_48_43/18%)]">
+                {book.largeImageUrl ? (
+                  <Image
+                    src={book.largeImageUrl}
+                    alt={book.title}
+                    fill
+                    sizes="(max-width: 640px) 190px, (max-width: 1024px) 220px, 260px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-[#66756d]">
+                    <RiBook3Line className="text-4xl" aria-hidden="true" />
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
 
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold leading-relaxed">{book.title}</h1>
-            <p className="mt-3 text-base text-gray-600">{book.author}</p>
-
-            <dl className="mt-8 space-y-3 text-sm">
-              <div className="flex">
-                <dt className="w-20 shrink-0 text-gray-500">出版社</dt>
-                <dd>{book.publisherName || "-"}</dd>
-              </div>
-              <div className="flex">
-                <dt className="w-20 shrink-0 text-gray-500">シリーズ</dt>
-                <dd>{book.seriesName || "-"}</dd>
-              </div>
-              <div className="flex">
-                <dt className="w-20 shrink-0 text-gray-500">発売日</dt>
-                <dd>{book.salesDate || "-"}</dd>
-              </div>
-              <div className="flex">
-                <dt className="w-20 shrink-0 text-gray-500">ジャンル</dt>
-                <dd>{book.size || "-"}</dd>
-              </div>
-            </dl>
+            <div className="min-w-0 flex-1">
+              <h1 className="font-serif-jp text-4xl font-medium tracking-[-0.045em] text-[#293630] sm:text-5xl">
+                {book.title}
+              </h1>
+              <p className="mt-4 text-base text-[#65726b]">{book.author}</p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <BookShelfStatus bookData={book} />
+      <section className="mx-auto grid max-w-270 gap-14 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_360px] lg:gap-20">
+        <article>
+          <h2 className="font-serif-jp text-2xl font-medium">作品紹介</h2>
+          <p className="mt-6 max-w-162.5 whitespace-pre-wrap text-sm leading-8 text-[#637069]">
+            {book.itemCaption || "作品紹介はありません。"}
+          </p>
 
-      <div className="mt-6 rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-bold">作品紹介</h2>
-        <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-gray-700">
-          {book.itemCaption || "作品紹介はありません。"}
-        </p>
-      </div>
-    </div>
+          <div className="mt-14 border-t border-[#293630]/10 pt-10">
+            <h2 className="font-serif-jp text-xl font-medium">書籍情報</h2>
+            <dl className="mt-6 divide-y divide-[#293630]/8 border-y border-[#293630]/8">
+              {[
+                ["出版社", book.publisherName || "-"],
+                ["発売日", book.salesDate || "-"],
+                ["シリーズ", book.seriesName || "-"],
+                ["形式", book.size || "-"],
+                ["ISBN", book.isbn],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="grid grid-cols-[100px_1fr] py-4 text-xs"
+                >
+                  <dt className="text-[#909994]">{label}</dt>
+                  <dd className="text-[#4b5b53]">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </article>
+
+        <BookShelfStatus bookData={book} />
+      </section>
+    </main>
   );
 };
 
