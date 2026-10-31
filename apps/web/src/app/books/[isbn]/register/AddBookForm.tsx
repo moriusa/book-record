@@ -75,12 +75,15 @@ export const AddBookForm = ({ bookData }: Props) => {
 
   if (!user) {
     return (
-      <div>
-        <p className="text-sm text-gray-600">
+      <div className="text-center">
+        <p className="text-sm text-[#748078]">
           本棚へ登録するにはログインが必要です。
         </p>
         <div className="mt-4">
-          <LoginButton />
+          <LoginButton
+            label="Googleでログイン"
+            className="rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+          />
         </div>
       </div>
     );
@@ -92,11 +95,15 @@ export const AddBookForm = ({ bookData }: Props) => {
       <button
         type="submit"
         disabled={createBookMutation.isPending}
-        className="mt-6 w-full rounded-lg bg-black px-4 py-3 font-medium text-white disabled:opacity-50"
+        className="mt-10 w-full rounded-md bg-[#344941] px-5 py-3.5 text-xs font-medium text-white transition-colors hover:bg-[#263a33] disabled:opacity-50"
       >
         {createBookMutation.isPending ? "登録中..." : "本棚に追加"}
       </button>
-      {errorMessage && <p role="alert" className="text-red-700">{errorMessage}</p>}
+      {errorMessage && (
+        <p role="alert" className="mt-3 text-xs text-red-700">
+          {errorMessage}
+        </p>
+      )}
     </form>
   );
 };
