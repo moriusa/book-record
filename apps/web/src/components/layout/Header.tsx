@@ -1,56 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import { RiBookOpenLine, RiBookShelfLine } from "react-icons/ri";
+import { usePathname } from "next/navigation";
+import { RiBookShelfLine, RiSearchLine } from "react-icons/ri";
+import Image from "next/image";
 import AuthButton from "../ui/AuthButton";
 import { useAuth } from "../providers/AuthProvider";
-import { FaSearch } from "react-icons/fa";
 
 const Header = () => {
   const { user } = useAuth();
+  const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-[#fffdf9]/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:h-18 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full border-b border-[#293630]/8 bg-[#f5f3ed]/95 backdrop-blur-md">
+      <div className="mx-auto flex h-17 max-w-295 items-center justify-between px-5 sm:px-8">
         <Link
           href="/"
-          className="group flex items-center gap-2 rounded-lg outline-none transition focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-4"
+          className="group flex items-center gap-2 outline-none transition focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-4"
         >
-          <span className="flex size-9 items-center justify-center rounded-xl bg-stone-900 text-lg text-amber-100 shadow-sm transition-transform group-hover:-rotate-6">
-            <RiBookOpenLine aria-hidden="true" />
-          </span>
+          <Image src={"/logo.png"} alt={""} width={28} height={20} />
           <span className="flex-col leading-none">
-            <span className="font-serif text-xl font-bold tracking-[0.08em] text-stone-900">
+            <span className="text-[17px] font-medium tracking-[0.12em] text-[#293630]">
               つみほん
             </span>
           </span>
         </Link>
 
-        <div className="flex items-center gap-1 sm:gap-5">
+        <div className="flex items-center gap-1">
           <nav
             aria-label="メインナビゲーション"
-            className="flex items-center gap-0.5 sm:gap-1"
+            className="flex items-center gap-1"
           >
             <Link
               href="/books/search"
-              className="group flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-semibold text-stone-700 transition hover:bg-amber-100/70 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:gap-1.5 sm:px-3"
+              className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/books/search") ? "bg-[#e7e5de] font-medium text-[#293630]" : "text-[#526159] hover:bg-[#e7e5de]"}`}
             >
-              <FaSearch size={15} />
+              <RiSearchLine className="text-base" aria-hidden="true" />
               <span className="sm:hidden">探す</span>
               <span className="hidden sm:inline">本を探す</span>
             </Link>
             {user && (
               <Link
                 href="/bookshelf"
-                className="group flex items-center gap-1 rounded-lg px-2 py-2 text-sm font-semibold text-stone-700 transition hover:bg-amber-100/70 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 sm:px-3"
+                className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/bookshelf") ? "bg-[#e7e5de] font-medium text-[#293630]" : "text-[#526159] hover:bg-[#e7e5de]"}`}
               >
-                <RiBookShelfLine size={20} />
+                <RiBookShelfLine className="text-base" aria-hidden="true" />
                 <span>本棚</span>
               </Link>
             )}
           </nav>
 
-          <span className="h-5 w-px bg-stone-200" aria-hidden="true" />
+          <span
+            className="ml-1 mr-3 h-5 w-px bg-[#293630]/10"
+            aria-hidden="true"
+          />
           <AuthButton compact />
         </div>
       </div>
