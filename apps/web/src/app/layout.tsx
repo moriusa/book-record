@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AmplifyProvider from "@/components/providers/AmplifyProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import GoogleAnalyticsPageView from "@/components/analytics/GoogleAnalyticsPageView";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,6 +25,7 @@ const siteUrl = new URL(
 const siteTitle = "つみほん｜あなただけの本棚";
 const siteDescription =
   "読みたい本、読んでいる本、読み終えた本を記録して、あなただけの本棚を育てる読書記録サービスです。";
+const googleAnalyticsMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -66,9 +69,25 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-dvh flex-col bg-[#f7f5f0] text-stone-900">
+        {googleAnalyticsMeasurementId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsMeasurementId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} window.gtag = window.gtag || gtag; window.gtag('js', new Date());`}
+            </Script>
+          </>
+        )}
         <AmplifyProvider />
         <AuthProvider>
           <QueryProvider>
+            {googleAnalyticsMeasurementId && (
+              <GoogleAnalyticsPageView
+                measurementId={googleAnalyticsMeasurementId}
+              />
+            )}
             <Header />
             <main className="flex-1 bg-[#f7f5f0]">
               <div className="p-3">{children}</div>
