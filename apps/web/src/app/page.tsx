@@ -88,7 +88,7 @@ function AuthenticatedHome() {
             おかえりなさい。
           </h1>
           <p className="mt-3 text-sm text-[#748078]">
-            今日も、読みたい本がここにあります。
+            今日も、気になる本を少しずつ。
           </p>
         </div>
         <Link
@@ -339,12 +339,12 @@ function GuestHome() {
             <h1 className="font-serif-jp text-[clamp(2.7rem,5.8vw,4.8rem)] font-medium leading-tight tracking-[-0.055em] text-[#26342e]">
               読みたい本を、
               <br />
-              静かに積んでおく。
+              静かに積む。
             </h1>
             <p className="mt-8 max-w-117.5 text-[15px] leading-8 text-[#647069] sm:text-base">
               誰かに見せるためではなく、自分が読むために。
               <br className="hidden sm:block" />
-              気になる本をそっと置いておける、シンプルな読書管理アプリです。
+              SNS機能のない、シンプルな読書管理アプリです。
             </p>
             <div className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
               <LoginButton
@@ -385,9 +385,9 @@ function GuestHome() {
             id="feature-heading"
             className="mt-5 font-serif-jp text-3xl font-medium leading-snug tracking-[-0.04em] sm:text-[42px]"
           >
-            本と自分だけの時間を、
+            読みたい気持ちを、
             <br />
-            邪魔しないこと。
+            置き去りにしないこと。
           </h2>
           <div className="mt-14 grid border-t border-[#293630]/12 md:grid-cols-3">
             {[
@@ -434,62 +434,29 @@ function GuestHome() {
 }
 
 function BookshelfPreview() {
-  const books = [
-    ["暇と退屈の倫理学", "bg-[#687b70] text-white", "h-46 w-[17%]"],
-    ["夜と霧", "bg-[#d9d4c5] text-[#35423c]", "h-52 w-[14%]"],
-    ["思考の整理学", "bg-[#a77e68] text-white", "h-48 w-[16%]"],
-    ["羊と鋼の森", "bg-[#465c55] text-white", "h-56 w-[18%]"],
-    ["日日是好日", "bg-[#c4b69b] text-[#35423c]", "h-50 w-[15%]"],
-  ];
-
   return (
-    <div className="relative mx-auto w-full max-w-142.5">
-      <div
-        className="border border-[#293630]/10 bg-[#ebe8df] p-5 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:p-8"
-        aria-label="本棚画面のプレビュー"
-      >
-        <div className="flex items-center justify-between border-b border-[#293630]/10 pb-5">
-          <div>
-            <p className="text-[10px] tracking-[0.18em] text-[#869089]">
-              MY BOOKSHELF
-            </p>
-            <p className="mt-1.5 font-serif-jp text-xl font-medium">
-              読みたい本{" "}
-              <span className="ml-1 text-sm text-[#768179]">12冊</span>
-            </p>
-          </div>
-          <span className="flex items-center gap-1.5 rounded-full bg-[#dfe5e0] px-3 py-1.5 text-[10px] text-[#50645b]">
-            <RiLockLine aria-hidden="true" />
-            非公開
-          </span>
-        </div>
-        <div className="mt-9 overflow-hidden">
-          <div className="flex h-58.75 items-end justify-center gap-2 px-2 sm:gap-3">
-            {books.map(([title, color, size]) => (
-              <div
-                key={title}
-                className={`book-title-vertical relative flex shrink-0 items-center justify-center rounded-t-sm border-l border-white/10 shadow-[4px_3px_8px_rgba(42,51,46,0.12)] transition-transform hover:-translate-y-2 ${color} ${size}`}
-              >
-                <p className="text-[10px] font-medium tracking-[0.08em]">
-                  {title}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="h-3 border-t border-[#6e6758]/25 bg-[#d4cdbd] shadow-[0_5px_10px_rgba(54,51,44,0.08)]" />
-        </div>
-        <div className="mt-7 flex items-center gap-3 border border-[#293630]/10 bg-[#f7f5ef] px-4 py-3.5 text-[#7c8781]">
-          <RiSearchLine className="shrink-0 text-base" aria-hidden="true" />
-          <span className="flex-1 text-xs">タイトル・著者名で本を探す</span>
-          <span className="text-lg font-light text-[#4f675d]">＋</span>
-        </div>
-      </div>
-      <div className="absolute -bottom-5 -right-3 hidden border border-[#293630]/10 bg-[#f8f7f2] px-4 py-3 shadow-[0_10px_30px_rgba(43,56,50,0.08)] sm:block">
-        <p className="flex items-center gap-2 text-[11px] text-[#53655d]">
-          <RiCheckLine aria-hidden="true" />
-          1冊、本棚に追加しました
-        </p>
-      </div>
+    <div
+      className="mx-auto w-full max-w-142.5"
+      aria-label="本棚画面のプレビュー"
+    >
+      <Image
+        src="/bookshelf_pc.png"
+        alt="つみほんの本棚画面"
+        width={796}
+        height={457}
+        priority
+        sizes="(max-width: 639px) 0px, (max-width: 1023px) 80vw, 796px"
+        className="hidden h-auto w-full border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:block"
+      />
+      <Image
+        src="/bookshelf_sp.png"
+        alt="つみほんの本棚画面"
+        width={361}
+        height={674}
+        priority
+        sizes="(max-width: 639px) min(88vw, 361px), 0px"
+        className="mx-auto h-auto w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:hidden"
+      />
     </div>
   );
 }

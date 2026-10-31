@@ -114,7 +114,7 @@ const BookshelfToolbar = ({
 
   return (
     <section
-      className="relative mt-11 border-y border-[#293630]/10 py-2"
+      className="relative mt-11 border-t border-[#293630]/10 py-2"
       aria-label="本棚の表示設定"
     >
       <div className="flex flex-col gap-3">
@@ -143,7 +143,7 @@ const BookshelfToolbar = ({
                   >
                     {option.label}
                     <span
-                      className={`ml-1.5 text-[10px] ${isActive ? "text-[#65756d]" : "text-[#9ba39f]"}`}
+                      className={`ml-1 ${isActive ? "text-[#65756d]" : "text-[#9ba39f]"}`}
                     >
                       {statusCounts[option.value]}
                     </span>

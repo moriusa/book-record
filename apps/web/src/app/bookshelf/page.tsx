@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RiAddLine, RiLockLine } from "react-icons/ri";
+import { RiAddLine, RiBookShelfLine } from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
@@ -51,10 +51,10 @@ const Page = () => {
       <div className="flex flex-col justify-between gap-7 sm:flex-row sm:items-end">
         <div>
           <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
-            <RiLockLine className="text-sm" aria-hidden="true" />PRIVATE BOOKSHELF
+            <RiBookShelfLine className="text-sm" aria-hidden="true" />MY BOOKSHELF
           </p>
           <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:text-[40px]">わたしの本棚</h1>
-          <p className="mt-3 text-sm text-[#75817b]">気になる本と、読み終えた本。ここは自分だけの場所です。</p>
+          <p className="mt-3 text-sm text-[#75817b]">読みたい気持ちも、読んだ思い出も。</p>
         </div>
 
         <Link
