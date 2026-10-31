@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import AmplifyProvider from "@/components/providers/AmplifyProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="flex-1 bg-[#f7f5f0]">
               <div className="p-3">{children}</div>
             </main>
+            <Footer />
           </QueryProvider>
         </AuthProvider>
         {googleAnalyticsMeasurementId && (
