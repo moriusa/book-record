@@ -71,179 +71,226 @@ function AuthenticatedHome() {
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
-    .slice(0, 4);
+    .slice(0, 5);
+  const readingBook = books?.find((book) => book.status === "READING");
+  const wantToReadBooks = (books ?? []).filter(
+    (book) => book.status === "WANT_TO_READ" || book.status === "ON_HOLD",
+  );
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
-      <section className="overflow-hidden rounded-3xl border border-stone-200 bg-[#fffdf9] px-6 py-8 shadow-sm sm:px-10 sm:py-10">
-        <p className="text-xs font-bold tracking-[0.16em] text-amber-800">
-          YOUR READING SPACE
-        </p>
-        <div className="mt-3 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-              本と過ごす時間を、ここに。
-            </h1>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-stone-600 sm:text-base">
-              気になる本を追加して、あなたの本棚を少しずつ育てましょう。
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-3">
-            <Link
-              href="/books/search"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-stone-900 px-4 text-sm font-semibold text-amber-50 transition hover:bg-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
-            >
-              <RiAddLine className="text-lg" aria-hidden="true" />
-              本を追加
-            </Link>
-            <Link
-              href="/bookshelf"
-              className="inline-flex min-h-11 items-center justify-center gap-1 rounded-xl border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2"
-            >
-              本棚を見る
-              <RiArrowRightLine className="text-lg" aria-hidden="true" />
-            </Link>
-          </div>
+    <main className="mx-auto max-w-270 px-5 pb-24 pt-12 text-[#293630] sm:px-8 sm:pt-16">
+      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-[10px] tracking-[0.18em] text-[#7d8982]">
+            YOUR READING SPACE
+          </p>
+          <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] sm:text-[42px]">
+            おかえりなさい。
+          </h1>
+          <p className="mt-3 text-sm text-[#748078]">
+            今日も、読みたい本がここにあります。
+          </p>
         </div>
-      </section>
+        <Link
+          href="/books/search"
+          className="flex w-fit items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+        >
+          <RiAddLine aria-hidden="true" />
+          本を探す
+        </Link>
+      </div>
 
-      <section className="mt-10" aria-labelledby="reading-summary-heading">
-        <div className="flex items-baseline justify-between">
-          <div>
-            <p className="text-xs font-bold tracking-[0.14em] text-amber-800">
-              READING RECORD
-            </p>
-            <h2
-              id="reading-summary-heading"
-              className="mt-1 text-xl font-bold text-stone-900"
-            >
-              読書の記録
-            </h2>
-          </div>
-          <Link
-            href="/bookshelf"
-            className="text-sm font-semibold text-stone-600 transition hover:text-amber-800"
+      <section
+        className="mt-11 grid border-y border-[#293630]/10 lg:grid-cols-[1.55fr_0.8fr]"
+        aria-labelledby="current-reading-heading"
+      >
+        <div className="py-9 lg:border-r lg:border-[#293630]/10 lg:pr-12">
+          <p className="text-[10px] tracking-[0.16em] text-[#839089]">
+            CURRENTLY READING
+          </p>
+          <h2
+            id="current-reading-heading"
+            className="mt-2 font-serif-jp text-xl font-medium"
           >
-            本棚へ
-          </Link>
-        </div>
-
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {statusCards.map(
-            ({ status, label, icon: Icon, accent, background }) => {
-              const count =
-                books?.filter((book) => book.status === status).length ?? 0;
-              return (
-                <div
-                  key={status}
-                  className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm"
-                >
-                  <span
-                    className={`flex size-9 items-center justify-center rounded-xl ${background} ${accent}`}
+            今、読んでいる本
+          </h2>
+          {readingBook ? (
+            <div className="mt-8 grid grid-cols-[105px_1fr] gap-6 sm:grid-cols-[150px_1fr] sm:gap-9">
+              <Link
+                href={`/books/${readingBook.isbn}`}
+                className="relative aspect-2/3 w-full self-start overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)]"
+              >
+                {readingBook.imageUrl ? (
+                  <Image
+                    src={readingBook.imageUrl}
+                    alt={readingBook.title}
+                    fill
+                    sizes="(max-width: 640px) 105px, 150px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <RiBookOpenLine
+                    className="absolute inset-0 m-auto text-3xl text-[#75817b]"
+                    aria-hidden="true"
+                  />
+                )}
+              </Link>
+              <div className="flex min-w-0 flex-col py-1">
+                <Link href={`/books/${readingBook.isbn}`}>
+                  <h3 className="font-serif-jp text-2xl font-medium sm:text-3xl">
+                    {readingBook.title}
+                  </h3>
+                  <p className="mt-2 text-xs text-[#748078]">
+                    {readingBook.author}
+                  </p>
+                </Link>
+                {readingBook.review && (
+                  <div className="mt-6 border-l-2 border-[#aab6af] pl-4">
+                    <p className="text-[10px] text-[#929b96]">自分のメモ</p>
+                    <p className="mt-2 line-clamp-3 text-xs leading-6 text-[#607068]">
+                      {readingBook.review}
+                    </p>
+                  </div>
+                )}
+                <div className="mt-auto flex flex-wrap gap-2 pt-7">
+                  <Link
+                    href={`/bookshelf/edit/${readingBook.id}`}
+                    className="rounded-md bg-[#40584e] px-4 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#30483e]"
                   >
-                    <Icon className="text-lg" aria-hidden="true" />
-                  </span>
-                  <p className="mt-4 text-sm font-medium text-stone-600">
-                    {label}
-                  </p>
-                  <p className="mt-1 text-3xl font-bold tracking-tight text-stone-900">
-                    {isLoading ? "–" : count}
-                    <span className="ml-1 text-sm font-medium text-stone-500">
-                      冊
-                    </span>
-                  </p>
+                    記録を書く
+                  </Link>
+                  <Link
+                    href={`/books/${readingBook.isbn}`}
+                    className="flex items-center gap-2 rounded-md border border-[#293630]/12 px-4 py-2.5 text-xs text-[#65736c] transition-colors hover:border-[#718078]"
+                  >
+                    詳細を見る
+                    <RiArrowRightLine aria-hidden="true" />
+                  </Link>
                 </div>
-              );
-            },
+              </div>
+            </div>
+          ) : (
+            <p className="mt-8 text-sm text-[#75817b]">
+              読んでいる本はまだありません。
+            </p>
           )}
         </div>
+        <aside className="py-9 lg:pl-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] tracking-[0.16em] text-[#839089]">
+                MY BOOKSHELF
+              </p>
+              <h2 className="mt-2 font-serif-jp text-xl font-medium">
+                本棚の様子
+              </h2>
+            </div>
+            <Link
+              href="/bookshelf"
+              className="flex items-center gap-1.5 text-[10px] text-[#69766f]"
+            >
+              本棚へ
+              <RiArrowRightLine aria-hidden="true" />
+            </Link>
+          </div>
+          <div className="mt-7 divide-y divide-[#293630]/8 border-y border-[#293630]/8">
+            {statusCards.map(({ status, label }) => (
+              <Link
+                key={status}
+                href="/bookshelf"
+                className="flex items-center justify-between py-4"
+              >
+                <span className="flex items-center gap-2.5 text-xs text-[#647169]">
+                  <span
+                    className={`size-1.5 rounded-full ${status === "READING" ? "bg-[#5d7c6e]" : "bg-[#b4b9b3]"}`}
+                  />
+                  {label}
+                </span>
+                <span className="font-serif-jp text-lg text-[#3d4d45]">
+                  {isLoading
+                    ? "–"
+                    : (books?.filter((book) => book.status === status).length ??
+                      0)}
+                  <small className="ml-1 font-sans text-[9px] text-[#89938e]">
+                    冊
+                  </small>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </aside>
       </section>
 
-      <section className="mt-10" aria-labelledby="recent-books-heading">
-        <div className="flex items-end justify-between">
+      <section className="mt-16" aria-labelledby="recent-books-heading">
+        <div className="flex items-end justify-between border-b border-[#293630]/10 pb-4">
           <div>
-            <p className="text-xs font-bold tracking-[0.14em] text-amber-800">
+            <p className="text-[10px] tracking-[0.16em] text-[#839089]">
               RECENTLY ADDED
             </p>
             <h2
               id="recent-books-heading"
-              className="mt-1 text-xl font-bold text-stone-900"
+              className="mt-2 font-serif-jp text-xl font-medium"
             >
-              最近追加した本
+              最近、本棚に加えた本
             </h2>
           </div>
-          {recentBooks.length > 0 && (
-            <Link
-              href="/bookshelf"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-stone-600 transition hover:text-amber-800"
-            >
-              すべて見る
-              <RiArrowRightLine aria-hidden="true" />
-            </Link>
-          )}
+          <Link
+            href="/bookshelf"
+            className="flex items-center gap-1.5 text-[10px] text-[#69766f]"
+          >
+            すべて見る
+            <RiArrowRightLine aria-hidden="true" />
+          </Link>
         </div>
-
         {isLoading ? (
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-            {[...Array(4)].map((_, index) => (
-              <div key={index} className="animate-pulse">
-                <div className="aspect-2/3 rounded-xl bg-stone-200" />
-                <div className="mt-3 h-4 rounded bg-stone-200" />
-              </div>
+          <div className="mt-7 grid grid-cols-3 gap-5 sm:grid-cols-5 sm:gap-7">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className="aspect-2/3 animate-pulse bg-[#e4e2db]"
+              />
             ))}
           </div>
         ) : error ? (
-          <div className="mt-4 rounded-2xl border border-dashed border-stone-300 bg-white/50 px-6 py-10 text-center text-sm text-stone-600">
-            本棚を読み込めませんでした。時間をおいて再度お試しください。
-          </div>
+          <p className="py-12 text-sm text-[#75817b]">
+            本棚を読み込めませんでした。
+          </p>
         ) : recentBooks.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-dashed border-stone-300 bg-white/50 px-6 py-10 text-center">
-            <RiBookOpenLine
-              className="mx-auto text-3xl text-stone-400"
-              aria-hidden="true"
-            />
-            <p className="mt-3 font-semibold text-stone-800">
-              まだ本棚は空です
-            </p>
-            <p className="mt-1 text-sm text-stone-600">
-              最初の一冊を追加して、読書の記録を始めましょう。
-            </p>
+          <div className="py-16 text-center">
+            <RiBookOpenLine className="mx-auto text-3xl text-[#9ba49f]" />
+            <p className="mt-4 font-serif-jp text-lg">まだ本棚は空です</p>
             <Link
               href="/books/search"
-              className="mt-5 inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-stone-900 px-3.5 text-sm font-semibold text-amber-50 transition hover:bg-stone-800"
+              className="mt-5 inline-flex text-xs text-[#50665c] underline underline-offset-4"
             >
-              <RiAddLine aria-hidden="true" />
-              本を追加する
+              本を探しにいく
             </Link>
           </div>
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
+          <div className="scrollbar-none -mx-5 flex gap-5 overflow-x-auto px-5 pb-4 pt-7 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-7 sm:px-0">
             {recentBooks.map((book) => (
               <Link
                 key={book.id}
                 href={`/books/${book.isbn}`}
-                className="group rounded-xl p-1.5 transition hover:bg-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
+                className="group w-28 shrink-0 text-left sm:w-auto"
               >
-                <div className="relative mx-auto aspect-2/3 w-full max-w-40 overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition duration-200 group-hover:-translate-y-1 group-hover:shadow-md">
+                <div className="relative aspect-2/3 w-full overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)] transition-transform group-hover:-translate-y-1">
                   {book.imageUrl ? (
                     <Image
                       src={book.imageUrl}
                       alt={book.title}
                       fill
-                      sizes="(max-width: 640px) 45vw, 25vw"
-                      className="object-contain"
+                      sizes="(max-width: 640px) 112px, 20vw"
+                      className="object-cover"
                     />
                   ) : (
-                    <RiBookOpenLine
-                      className="absolute inset-0 m-auto text-3xl text-stone-300"
-                      aria-hidden="true"
-                    />
+                    <RiBookOpenLine className="absolute inset-0 m-auto text-2xl text-[#75817b]" />
                   )}
                 </div>
-                <p className="mt-3 line-clamp-2 text-sm font-semibold leading-5 text-stone-800 group-hover:underline">
+                <h3 className="mt-4 truncate font-serif-jp text-xs font-medium">
                   {book.title}
-                </p>
-                <p className="mt-1 truncate text-xs text-stone-500">
+                </h3>
+                <p className="mt-1 truncate text-[9px] text-[#87918c]">
                   {book.author}
                 </p>
               </Link>
@@ -251,6 +298,30 @@ function AuthenticatedHome() {
           </div>
         )}
       </section>
+
+      {wantToReadBooks.length > 0 && (
+        <section className="mt-16 border border-[#293630]/10 bg-[#eeece5] px-6 py-8 sm:px-9">
+          <div className="grid gap-7 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <p className="text-[10px] tracking-[0.16em] text-[#839089]">
+                READ NEXT
+              </p>
+              <h2 className="mt-2 font-serif-jp text-xl font-medium">
+                次は、どの本を読みましょう。
+              </h2>
+              <p className="mt-3 text-xs leading-6 text-[#75817b]">
+                読みたい本と積読の中から、今の気分に合う一冊を選べます。
+              </p>
+            </div>
+            <Link
+              href="/bookshelf"
+              className="w-fit rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-xs text-[#58685f] transition-colors hover:border-[#718078]"
+            >
+              本棚から選ぶ
+            </Link>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
