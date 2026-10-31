@@ -114,7 +114,7 @@ const BookshelfToolbar = ({
 
   return (
     <section
-      className="mt-11 border-y border-[#293630]/10 py-2"
+      className="relative mt-11 border-y border-[#293630]/10 py-2"
       aria-label="本棚の表示設定"
     >
       <div className="flex flex-col gap-3">
@@ -152,11 +152,11 @@ const BookshelfToolbar = ({
               })}
             </div>
             {canScrollLeft && (
-              <div className="absolute inset-y-0 left-0 flex w-14 items-center bg-linear-to-r from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
+              <div className="absolute inset-y-0 left-0 flex w-14 items-center bg-linear-to-r from-[#f5f3ed] via-[#f5f3ed]/85 to-transparent sm:hidden">
                 <button
                   type="button"
                   onClick={() => scrollFilters("left")}
-                  className="flex size-7 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-stone-500 shadow-sm transition hover:border-amber-300 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
+                  className="flex size-7 items-center justify-center rounded-full border border-[#293630]/10 bg-[#faf9f5]/90 text-[#66756d] shadow-sm transition hover:border-[#60736a] hover:text-[#293630] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a]"
                   aria-label="前のステータスを表示"
                 >
                   <RiArrowRightSLine className="rotate-180 text-lg" />
@@ -164,11 +164,11 @@ const BookshelfToolbar = ({
               </div>
             )}
             {canScrollRight && (
-              <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-linear-to-l from-[#f7f5f0] via-[#f7f5f0]/85 to-transparent sm:hidden">
+              <div className="absolute inset-y-0 right-0 flex w-14 items-center justify-end bg-linear-to-l from-[#f5f3ed] via-[#f5f3ed]/85 to-transparent sm:hidden">
                 <button
                   type="button"
                   onClick={() => scrollFilters("right")}
-                  className="flex size-7 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-stone-500 shadow-sm transition hover:border-amber-300 hover:text-stone-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
+                  className="flex size-7 items-center justify-center rounded-full border border-[#293630]/10 bg-[#faf9f5]/90 text-[#66756d] shadow-sm transition hover:border-[#60736a] hover:text-[#293630] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a]"
                   aria-label="次のステータスを表示"
                 >
                   <RiArrowRightSLine className="text-lg" />
@@ -199,10 +199,10 @@ const BookshelfToolbar = ({
         <div
           id="bookshelf-display-settings"
           hidden={!isDisplaySettingsOpen}
-          className="grid gap-5 border-t border-[#293630]/8 bg-[#faf9f5] p-5 sm:grid-cols-3"
+          className="absolute right-0 top-full z-20 mt-2 grid w-full max-w-155 gap-5 border border-[#293630]/10 bg-[#faf9f5] p-5 shadow-[0_18px_50px_rgb(43_56_50/13%)] sm:grid-cols-3"
         >
           <label className="min-w-0">
-            <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-stone-500">
+            <span className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[#65736c]">
               <RiSortDesc aria-hidden="true" className="text-sm" />
               並び順
             </span>
@@ -218,7 +218,7 @@ const BookshelfToolbar = ({
                     onSortChange(option.value);
                   }
                 }}
-                className="min-h-11 w-full cursor-pointer rounded-lg border border-stone-200 bg-transparent px-3 text-sm font-medium text-stone-800 outline-none transition hover:border-amber-300 hover:bg-amber-50/50 focus:border-amber-600 focus:ring-2 focus:ring-amber-200 lg:w-32"
+                className="min-h-11 w-full cursor-pointer rounded-md border border-[#293630]/12 bg-white px-3 text-xs text-[#34443d] outline-none transition hover:border-[#60736a] focus:border-[#60736a] focus:ring-2 focus:ring-[#dfe5e0]"
               >
                 {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -233,7 +233,7 @@ const BookshelfToolbar = ({
                     sortDirection === "ASC" ? "DESC" : "ASC",
                   )
                 }
-                className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-stone-200 px-3 text-sm font-semibold text-stone-700 transition hover:border-amber-300 hover:bg-amber-50/50 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
+                className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-md border border-[#293630]/12 bg-white px-3 text-xs text-[#526159] transition hover:border-[#60736a] hover:bg-[#f3f1eb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a]"
                 aria-label={`並び順を${sortDirection === "ASC" ? "降順" : "昇順"}に変更`}
               >
                 <RiSortDesc
@@ -246,7 +246,7 @@ const BookshelfToolbar = ({
           </label>
 
           <label className="min-w-0">
-            <span className="mb-1.5 flex items-center gap-1.5 text-xs font-bold tracking-wide text-stone-500">
+            <span className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[#65736c]">
               <RiStackLine aria-hidden="true" className="text-sm" />
               まとめ方
             </span>
@@ -262,7 +262,7 @@ const BookshelfToolbar = ({
                   onGroupChange(option.value);
                 }
               }}
-              className="min-h-11 w-full cursor-pointer rounded-lg border border-stone-200 bg-transparent px-3 text-sm font-medium text-stone-800 outline-none transition hover:border-amber-300 hover:bg-amber-50/50 focus:border-amber-600 focus:ring-2 focus:ring-amber-200 disabled:cursor-not-allowed disabled:border-stone-100 disabled:bg-stone-100 disabled:text-stone-400 lg:w-40"
+              className="min-h-11 w-full cursor-pointer rounded-md border border-[#293630]/12 bg-white px-3 text-xs text-[#34443d] outline-none transition hover:border-[#60736a] focus:border-[#60736a] focus:ring-2 focus:ring-[#dfe5e0] disabled:cursor-not-allowed disabled:border-[#293630]/8 disabled:bg-[#eeece5] disabled:text-[#9ba39f]"
             >
               {groupOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -271,25 +271,25 @@ const BookshelfToolbar = ({
               ))}
             </select>
             {isSalesDateSort && (
-              <span className="mt-1 block text-xs text-stone-500">
+              <span className="mt-1 block text-[10px] text-[#7d8982]">
                 発売年月で自動グループ
               </span>
             )}
           </label>
 
           <div className="min-w-0">
-            <span className="mb-1.5 block text-xs font-bold tracking-wide text-stone-500">
+            <span className="mb-2 block text-[11px] font-medium text-[#65736c]">
               表示形式
             </span>
-            <div className="flex min-h-11 rounded-lg border border-stone-200 p-1">
+            <div className="flex min-h-11 rounded-md border border-[#293630]/12 bg-white p-1">
               <button
                 type="button"
                 onClick={() => onViewModeChange("GRID")}
                 aria-pressed={viewMode === "GRID"}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded px-2.5 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
                   viewMode === "GRID"
-                    ? "bg-stone-900 text-amber-50 shadow-sm"
-                    : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                    ? "bg-[#e4e7e2] text-[#344941]"
+                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
                 }`}
               >
                 <RiLayoutGridLine aria-hidden="true" />
@@ -299,10 +299,10 @@ const BookshelfToolbar = ({
                 type="button"
                 onClick={() => onViewModeChange("LIST")}
                 aria-pressed={viewMode === "LIST"}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 ${
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded px-2.5 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
                   viewMode === "LIST"
-                    ? "bg-stone-900 text-amber-50 shadow-sm"
-                    : "text-stone-500 hover:bg-stone-100 hover:text-stone-900"
+                    ? "bg-[#e4e7e2] text-[#344941]"
+                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
                 }`}
               >
                 <RiListUnordered aria-hidden="true" />
