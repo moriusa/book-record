@@ -1,4 +1,5 @@
 import { authFetcher } from "@/lib/fetcher";
+import { sendGAEvent } from "@next/third-parties/google";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type CreateBookInput = {
@@ -28,6 +29,7 @@ export const useCreateBook = () => {
     mutationFn: createBook,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["books"] });
+      sendGAEvent("event", "add_book");
     },
   });
 };

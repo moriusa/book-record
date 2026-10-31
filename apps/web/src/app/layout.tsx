@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import AmplifyProvider from "@/components/providers/AmplifyProvider";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
-import GoogleAnalyticsPageView from "@/components/analytics/GoogleAnalyticsPageView";
-import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,33 +68,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-dvh flex-col bg-[#f7f5f0] text-stone-900">
-        {googleAnalyticsMeasurementId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsMeasurementId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics-init" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} window.gtag = window.gtag || gtag; window.gtag('js', new Date());`}
-            </Script>
-          </>
-        )}
         <AmplifyProvider />
         <AuthProvider>
           <QueryProvider>
-            {googleAnalyticsMeasurementId && (
-              <Suspense fallback={null}>
-                <GoogleAnalyticsPageView
-                  measurementId={googleAnalyticsMeasurementId}
-                />
-              </Suspense>
-            )}
             <Header />
             <main className="flex-1 bg-[#f7f5f0]">
               <div className="p-3">{children}</div>
             </main>
           </QueryProvider>
         </AuthProvider>
+        {googleAnalyticsMeasurementId && (
+          <GoogleAnalytics gaId={googleAnalyticsMeasurementId} />
+        )}
       </body>
     </html>
   );
