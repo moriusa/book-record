@@ -4,6 +4,7 @@ import LegalPageLayout from "@/components/legal/LegalPageLayout";
 export const metadata: Metadata = {
   title: "利用規約",
   description: "つみほんの利用規約です。",
+  alternates: { canonical: "/terms" },
 };
 
 const sections = [

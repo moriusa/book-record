@@ -4,6 +4,7 @@ import LegalPageLayout from "@/components/legal/LegalPageLayout";
 export const metadata: Metadata = {
   title: "プライバシーポリシー",
   description: "つみほんのプライバシーポリシーです。",
+  alternates: { canonical: "/privacy" },
 };
 
 const sections = [

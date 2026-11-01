@@ -58,7 +58,9 @@ export default function Home() {
   const { user, isLoading: isAuthLoading } = useAuth();
 
   if (isAuthLoading) {
-    return <main className="mx-auto min-h-96 max-w-6xl px-4 py-8 sm:py-12" />;
+    // 認証状態の確定前にも、公開用の紹介コンテンツをHTMLとして返す。
+    // これによりクローラーと初回訪問者のどちらにもサービス概要が伝わる。
+    return <GuestHome />;
   }
 
   return user ? <AuthenticatedHome /> : <GuestHome />;

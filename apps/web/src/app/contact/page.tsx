@@ -5,6 +5,7 @@ import LegalPageLayout from "@/components/legal/LegalPageLayout";
 export const metadata: Metadata = {
   title: "お問い合わせ",
   description: "つみほんへのお問い合わせ窓口です。",
+  alternates: { canonical: "/contact" },
 };
 
 const googleFormEmbedUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_EMBED_URL;

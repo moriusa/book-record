@@ -26,6 +26,14 @@ const siteTitle = "つみほん｜あなただけの本棚";
 const siteDescription =
   "読みたい本、読んでいる本、読み終えた本を記録して、あなただけの本棚を育てる読書記録サービスです。";
 const googleAnalyticsMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const websiteStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "つみほん",
+  url: siteUrl.toString(),
+  description: siteDescription,
+  inLanguage: "ja",
+};
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -69,6 +77,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-dvh flex-col bg-[#f7f5f0] text-stone-900">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteStructuredData).replace(
+              /</g,
+              "\\u003c",
+            ),
+          }}
+        />
         <AmplifyProvider />
         <AuthProvider>
           <QueryProvider>
