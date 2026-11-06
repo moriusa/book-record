@@ -72,14 +72,14 @@ const BookFormFields = ({ control, register, watch }: Props) => {
         <section className="mt-7 border-t border-[#293630]/9 pt-7">
           <label
             htmlFor="completedAt"
-            className="text-[11px] font-medium text-[#5f6e66]"
+            className="block w-full min-w-0 text-[11px] font-medium text-[#5f6e66]"
           >
             読み終わった日
             <input
               id="completedAt"
               type="date"
               {...register("completedAt")}
-              className="mt-2 block w-full rounded-md border border-[#293630]/12 bg-white px-4 py-3 text-xs text-[#526159] outline-none focus:border-[#60736a] sm:max-w-55"
+              className="mt-2 block w-52 max-w-full min-w-0 box-border appearance-none rounded-md border border-[#293630]/12 bg-white px-4 py-3 text-base text-[#526159] outline-none focus:border-[#60736a] sm:w-55 sm:text-xs"
             />
           </label>
         </section>
