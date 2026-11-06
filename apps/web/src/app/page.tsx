@@ -437,28 +437,17 @@ function GuestHome() {
 
 function BookshelfPreview() {
   return (
-    <div
-      className="mx-auto w-full max-w-142.5"
-      aria-label="本棚画面のプレビュー"
+    <video
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-label="つみほんの本棚画面の紹介動画"
+      className="mx-auto h-auto w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:max-w-142.5"
     >
-      <Image
-        src="/bookshelf_pc.png"
-        alt="つみほんの本棚画面"
-        width={796}
-        height={457}
-        priority
-        sizes="(max-width: 639px) 0px, (max-width: 1023px) 80vw, 796px"
-        className="hidden h-auto w-full border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:block"
-      />
-      <Image
-        src="/bookshelf_sp.png"
-        alt="つみほんの本棚画面"
-        width={361}
-        height={674}
-        priority
-        sizes="(max-width: 639px) min(88vw, 361px), 0px"
-        className="mx-auto h-auto w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:hidden"
-      />
-    </div>
+      <source src="/videos/introduction.mp4" type="video/mp4" />
+      お使いのブラウザは動画の再生に対応していません。
+    </video>
   );
 }
