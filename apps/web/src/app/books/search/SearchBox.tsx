@@ -47,7 +47,7 @@ export const SearchBox = ({
         e.preventDefault();
         handleSearch();
       }}
-      className="transition"
+      className="w-full min-w-0 transition"
     >
       <div
         className="flex gap-1 overflow-x-auto"
@@ -75,13 +75,13 @@ export const SearchBox = ({
         })}
       </div>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <div className="flex min-h-14 flex-1 items-center gap-3 rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 focus-within:border-[#60736a]">
+        <div className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 focus-within:border-[#60736a]">
           <FaSearch className="shrink-0 text-[#7f8a84]" aria-hidden="true" />
           <input
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            className="min-w-0 flex-1 bg-transparent py-4 text-sm text-[#35463e] outline-none placeholder:text-[#9ca49f]"
+            className="min-w-0 flex-1 bg-transparent py-4 text-base text-[#35463e] outline-none placeholder:text-[#9ca49f] sm:text-sm"
             placeholder={activeSearchField?.placeholder}
             aria-label={`${activeSearchField?.label}を検索`}
           />
