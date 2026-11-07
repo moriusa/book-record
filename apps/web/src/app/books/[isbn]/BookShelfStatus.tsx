@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import LoginButton from "@/components/ui/LoginButton";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useGetBookByIsbn } from "@/app/bookshelf/hooks/useGetBookByIsbn";
+import { useDeleteBook } from "@/app/bookshelf/hooks/useDeleteBook";
 import { AddToBookshelfButton } from "./AddToBookshelfButton";
 
 type Props = {
@@ -20,9 +22,12 @@ const bookStatus = {
 
 const BookShelfStatus = ({ bookData }: Props) => {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
   const { data: book } = useGetBookByIsbn(bookData.isbn, {
     enabled: Boolean(user),
   });
+  const deleteBookMutation = useDeleteBook();
 
   if (isAuthLoading) {
     return null;
@@ -87,6 +92,52 @@ const BookShelfStatus = ({ bookData }: Props) => {
             >
               本棚の内容を編集
             </Link>
+          </div>
+
+          <div className="mt-7 border-t border-[#293630]/10 pt-5">
+            {isDeleteConfirmationOpen ? (
+              <div className="rounded-md border border-[#a56b62]/30 bg-[#fbf5f2] p-4">
+                <p className="text-xs leading-6 text-[#73534d]">
+                  本棚から削除しますか？ 読書ステータス・評価・メモも削除されます。
+                </p>
+                {deleteBookMutation.error && (
+                  <p className="mt-3 text-xs text-[#a04438]" role="alert">
+                    削除に失敗しました。時間をおいてもう一度お試しください。
+                  </p>
+                )}
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      deleteBookMutation.mutate({
+                        id: book.id,
+                        isbn: book.isbn,
+                      })
+                    }
+                    disabled={deleteBookMutation.isPending}
+                    className="rounded-md bg-[#9b554a] px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#82473e] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {deleteBookMutation.isPending ? "削除中…" : "削除する"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteConfirmationOpen(false)}
+                    disabled={deleteBookMutation.isPending}
+                    className="rounded-md border border-[#293630]/12 bg-white px-3 py-2.5 text-xs font-medium text-[#526159] transition-colors hover:border-[#60736a] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirmationOpen(true)}
+                className="w-full rounded-md px-4 py-2.5 text-xs text-[#986157] transition-colors hover:bg-[#f7ece8] hover:text-[#82473e]"
+              >
+                本棚から削除
+              </button>
+            )}
           </div>
         </div>
       ) : (
