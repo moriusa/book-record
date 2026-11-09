@@ -16520,13 +16520,9 @@ var bookCollections = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
     title: varchar("title", { length: 100 }).notNull().default("\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078"),
-    visibility: varchar("visibility", { length: 20 }).notNull().default("private"),
-    shareSlug: varchar("share_slug", { length: 32 }),
-    publishedAt: timestamp("published_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
-  },
-  (table) => [unique("book_collections_share_slug_unique").on(table.shareSlug)]
+  }
 );
 var bookCollectionItems = pgTable(
   "book_collection_items",

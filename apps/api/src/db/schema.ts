@@ -72,15 +72,9 @@ export const bookCollections = pgTable(
     title: varchar("title", { length: 100 })
       .notNull()
       .default("名刺代わりの本10選"),
-    visibility: varchar("visibility", { length: 20 })
-      .notNull()
-      .default("private"),
-    shareSlug: varchar("share_slug", { length: 32 }),
-    publishedAt: timestamp("published_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => [unique("book_collections_share_slug_unique").on(table.shareSlug)],
 );
 
 export const bookCollectionItems = pgTable(
