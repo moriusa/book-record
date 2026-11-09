@@ -6,6 +6,7 @@ import {
   uuid,
   varchar,
   date,
+  primaryKey,
   unique,
 } from "drizzle-orm/pg-core";
 
@@ -58,5 +59,46 @@ export const userBooks = pgTable(
   },
   (table) => [
     unique("user_books_user_id_book_id_unique").on(table.userId, table.bookId),
+  ],
+);
+
+export const bookCollections = pgTable(
+  "book_collections",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: varchar("title", { length: 100 })
+      .notNull()
+      .default("名刺代わりの本10選"),
+    visibility: varchar("visibility", { length: 20 })
+      .notNull()
+      .default("private"),
+    shareSlug: varchar("share_slug", { length: 32 }),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [unique("book_collections_share_slug_unique").on(table.shareSlug)],
+);
+
+export const bookCollectionItems = pgTable(
+  "book_collection_items",
+  {
+    collectionId: uuid("collection_id")
+      .notNull()
+      .references(() => bookCollections.id, { onDelete: "cascade" }),
+    userBookId: uuid("user_book_id")
+      .notNull()
+      .references(() => userBooks.id, { onDelete: "cascade" }),
+    position: smallint("position").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.collectionId, table.userBookId] }),
+    unique("book_collection_items_collection_position_unique").on(
+      table.collectionId,
+      table.position,
+    ),
   ],
 );

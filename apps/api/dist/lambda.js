@@ -12374,6 +12374,12 @@ var pgTable = (name, columns, extraConfig) => {
 };
 
 // ../../node_modules/.pnpm/drizzle-orm@0.45.3_pg@8.23.0/node_modules/drizzle-orm/pg-core/primary-keys.js
+function primaryKey(...config) {
+  if (config[0].columns) {
+    return new PrimaryKeyBuilder(config[0].columns, config[0].name);
+  }
+  return new PrimaryKeyBuilder(config);
+}
 var PrimaryKeyBuilder = class {
   static [entityKind] = "PgPrimaryKeyBuilder";
   /** @internal */
@@ -12653,19 +12659,19 @@ function extractTablesRelationalConfig(schema, configHelpers) {
       const relations2 = value.config(
         configHelpers(value.table)
       );
-      let primaryKey;
+      let primaryKey2;
       for (const [relationName, relation] of Object.entries(relations2)) {
         if (tableName) {
           const tableConfig = tablesConfig[tableName];
           tableConfig.relations[relationName] = relation;
-          if (primaryKey) {
-            tableConfig.primaryKey.push(...primaryKey);
+          if (primaryKey2) {
+            tableConfig.primaryKey.push(...primaryKey2);
           }
         } else {
           if (!(dbName in relationsBuffer)) {
             relationsBuffer[dbName] = {
               relations: {},
-              primaryKey
+              primaryKey: primaryKey2
             };
           }
           relationsBuffer[dbName].relations[relationName] = relation;
@@ -16508,6 +16514,35 @@ var userBooks = pgTable(
     unique("user_books_user_id_book_id_unique").on(table.userId, table.bookId)
   ]
 );
+var bookCollections = pgTable(
+  "book_collections",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    title: varchar("title", { length: 100 }).notNull().default("\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078"),
+    visibility: varchar("visibility", { length: 20 }).notNull().default("private"),
+    shareSlug: varchar("share_slug", { length: 32 }),
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull()
+  },
+  (table) => [unique("book_collections_share_slug_unique").on(table.shareSlug)]
+);
+var bookCollectionItems = pgTable(
+  "book_collection_items",
+  {
+    collectionId: uuid("collection_id").notNull().references(() => bookCollections.id, { onDelete: "cascade" }),
+    userBookId: uuid("user_book_id").notNull().references(() => userBooks.id, { onDelete: "cascade" }),
+    position: smallint("position").notNull()
+  },
+  (table) => [
+    primaryKey({ columns: [table.collectionId, table.userBookId] }),
+    unique("book_collection_items_collection_position_unique").on(
+      table.collectionId,
+      table.position
+    )
+  ]
+);
 
 // ../../node_modules/.pnpm/aws-jwt-verify@5.2.1/node_modules/aws-jwt-verify/dist/esm/error.js
 var JwtBaseError = class extends Error {
@@ -17783,6 +17818,198 @@ booksRouter.delete("/:id", authMiddleware, async (c) => {
 });
 var books_default = booksRouter;
 
+// src/routes/collections.ts
+var COLLECTION_SIZE = 10;
+var DEFAULT_COLLECTION_TITLE = "\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078";
+var collectionItemSelection = {
+  id: userBooks.id,
+  isbn: books.isbn,
+  title: books.title,
+  author: books.author,
+  imageUrl: books.imageUrl,
+  position: bookCollectionItems.position
+};
+var parseTitle = (value) => {
+  if (value === void 0) {
+    return void 0;
+  }
+  if (typeof value !== "string") {
+    return null;
+  }
+  const title = value.trim();
+  if (title.length === 0 || title.length > 100) {
+    return null;
+  }
+  return title;
+};
+var parseUserBookIds = (value) => {
+  if (!Array.isArray(value) || value.length !== COLLECTION_SIZE || value.some((id) => typeof id !== "string" || id.length === 0)) {
+    return null;
+  }
+  const ids = value;
+  return new Set(ids).size === COLLECTION_SIZE ? ids : null;
+};
+var parseCollectionInput = (body) => {
+  if (typeof body !== "object" || body === null) {
+    return null;
+  }
+  const { title, userBookIds } = body;
+  const parsedTitle = parseTitle(title);
+  const parsedUserBookIds = parseUserBookIds(userBookIds);
+  if (parsedTitle === null || parsedUserBookIds === null) {
+    return null;
+  }
+  return { title: parsedTitle, userBookIds: parsedUserBookIds };
+};
+var parseCollectionUpdateInput = (body) => {
+  if (typeof body !== "object" || body === null) {
+    return null;
+  }
+  const { title, userBookIds } = body;
+  const includesTitle = title !== void 0;
+  const includesUserBookIds = userBookIds !== void 0;
+  if (!includesTitle && !includesUserBookIds) {
+    return null;
+  }
+  const parsedTitle = parseTitle(title);
+  const parsedUserBookIds = includesUserBookIds ? parseUserBookIds(userBookIds) : void 0;
+  if (parsedTitle === null || parsedUserBookIds === null) {
+    return null;
+  }
+  return { title: parsedTitle, userBookIds: parsedUserBookIds };
+};
+var getCollectionItems = async (collectionId) => db.select(collectionItemSelection).from(bookCollectionItems).innerJoin(userBooks, eq(bookCollectionItems.userBookId, userBooks.id)).innerJoin(books, eq(userBooks.bookId, books.id)).where(eq(bookCollectionItems.collectionId, collectionId)).orderBy(asc(bookCollectionItems.position));
+var getCollectionForUser = async (collectionId, userId) => {
+  const collection = await db.select().from(bookCollections).where(
+    and(
+      eq(bookCollections.id, collectionId),
+      eq(bookCollections.userId, userId)
+    )
+  ).limit(1);
+  if (!collection[0]) {
+    return null;
+  }
+  return {
+    ...collection[0],
+    items: await getCollectionItems(collectionId)
+  };
+};
+var validateUserBooks = async (userId, userBookIds) => {
+  const ownedBooks = await db.select({ id: userBooks.id }).from(userBooks).where(
+    and(eq(userBooks.userId, userId), inArray(userBooks.id, userBookIds))
+  );
+  return ownedBooks.length === userBookIds.length;
+};
+var collectionsRouter = new Hono2();
+collectionsRouter.get("/", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const collections = await db.select().from(bookCollections).where(eq(bookCollections.userId, user.id)).orderBy(asc(bookCollections.createdAt));
+  const result = await Promise.all(
+    collections.map(async (collection) => ({
+      ...collection,
+      items: await getCollectionItems(collection.id)
+    }))
+  );
+  return c.json(result);
+});
+collectionsRouter.get("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const collection = await getCollectionForUser(c.req.param("id"), user.id);
+  if (!collection) {
+    return c.json({ message: "Collection not found" }, 404);
+  }
+  return c.json(collection);
+});
+collectionsRouter.post("/", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const input = parseCollectionInput(await c.req.json());
+  if (!input) {
+    return c.json(
+      {
+        message: "\u30BF\u30A4\u30C8\u30EB\u3068\u3001\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
+      },
+      400
+    );
+  }
+  if (!await validateUserBooks(user.id, input.userBookIds)) {
+    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3060\u3051\u3092\u9078\u629E\u3067\u304D\u307E\u3059" }, 400);
+  }
+  const collection = await db.transaction(async (tx) => {
+    const created = await tx.insert(bookCollections).values({
+      userId: user.id,
+      title: input.title ?? DEFAULT_COLLECTION_TITLE
+    }).returning();
+    const createdCollection = created[0];
+    if (!createdCollection) {
+      throw new Error("Collection could not be created");
+    }
+    await tx.insert(bookCollectionItems).values(
+      input.userBookIds.map((userBookId, index) => ({
+        collectionId: createdCollection.id,
+        userBookId,
+        position: index + 1
+      }))
+    );
+    return createdCollection;
+  });
+  return c.json(
+    { ...collection, items: await getCollectionItems(collection.id) },
+    201
+  );
+});
+collectionsRouter.patch("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const collectionId = c.req.param("id");
+  const input = parseCollectionUpdateInput(await c.req.json());
+  if (!input) {
+    return c.json(
+      {
+        message: "\u5909\u66F4\u3059\u308B\u30BF\u30A4\u30C8\u30EB\u3001\u307E\u305F\u306F\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
+      },
+      400
+    );
+  }
+  if (input.userBookIds && !await validateUserBooks(user.id, input.userBookIds)) {
+    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3060\u3051\u3092\u9078\u629E\u3067\u304D\u307E\u3059" }, 400);
+  }
+  const existing = await getCollectionForUser(collectionId, user.id);
+  if (!existing) {
+    return c.json({ message: "Collection not found" }, 404);
+  }
+  await db.transaction(async (tx) => {
+    await tx.update(bookCollections).set({
+      ...input.title ? { title: input.title } : {},
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq(bookCollections.id, collectionId));
+    if (input.userBookIds) {
+      await tx.delete(bookCollectionItems).where(eq(bookCollectionItems.collectionId, collectionId));
+      await tx.insert(bookCollectionItems).values(
+        input.userBookIds.map((userBookId, index) => ({
+          collectionId,
+          userBookId,
+          position: index + 1
+        }))
+      );
+    }
+  });
+  const updated = await getCollectionForUser(collectionId, user.id);
+  return c.json(updated);
+});
+collectionsRouter.delete("/:id", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const result = await db.delete(bookCollections).where(
+    and(
+      eq(bookCollections.id, c.req.param("id")),
+      eq(bookCollections.userId, user.id)
+    )
+  ).returning({ id: bookCollections.id });
+  if (!result[0]) {
+    return c.json({ message: "Collection not found" }, 404);
+  }
+  return c.json(result[0]);
+});
+var collections_default = collectionsRouter;
+
 // src/routes/users.ts
 var usersRouter = new Hono2();
 usersRouter.get("/:id", async (c) => {
@@ -17813,6 +18040,7 @@ app.use(
 );
 app.route("/users", users_default);
 app.route("/books", books_default);
+app.route("/collections", collections_default);
 serve({
   fetch: app.fetch,
   port: 3001
