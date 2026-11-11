@@ -142,7 +142,6 @@ export default function BookTenCollectionEditor({ collection }: Props) {
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-start">
       <div>
-
         <div className="mt-10 flex items-end justify-between border-b border-[#293630]/10 pb-4">
           <div>
             <p className="text-[10px] tracking-[0.16em] text-[#839089]">
@@ -210,7 +209,7 @@ export default function BookTenCollectionEditor({ collection }: Props) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-3 line-clamp-2 font-serif-jp text-xs font-medium text-[#344941]">
+                  <p className="mt-3 min-h-8 line-clamp-2 font-serif-jp text-xs font-medium leading-4 text-[#344941]">
                     {book.title}
                   </p>
                   <p className="mt-1 truncate text-[10px] text-[#7b8781]">
