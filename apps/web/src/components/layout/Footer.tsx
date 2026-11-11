@@ -23,8 +23,8 @@ export default function Footer() {
             </span>
           </Link>
 
-          <nav aria-label="フッターナビゲーション">
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-3 sm:justify-end">
+          <nav aria-label="フッターナビゲーション" className="w-full sm:w-auto">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-end">
               <ul className="flex flex-wrap gap-x-5 gap-y-3 text-xs">
                 {footerLinks.map(({ href, label }) => (
                   <li key={href}>
@@ -37,7 +37,7 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
-              <div className="flex items-center gap-3 border-l border-[#293630]/10 pl-5">
+              <div className="flex w-full items-center gap-3 border-t border-[#293630]/10 pt-4 sm:w-auto sm:border-t-0 sm:border-l sm:pl-5 sm:pt-0">
                 <a
                   href="https://x.com/tsumihon_dev"
                   target="_blank"
@@ -60,8 +60,7 @@ export default function Footer() {
             </div>
           </nav>
         </div>
-        <div className="h-px bg-[#293630]/10" />
-        <p className="text-[11px] tracking-[0.08em] text-[#839087]">
+        <p className="text-[11px] tracking-[0.08em] text-[#839087] text-center sm:mt-10">
           © {new Date().getFullYear()} つみほん
         </p>
       </div>
