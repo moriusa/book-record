@@ -17816,6 +17816,13 @@ var books_default = booksRouter;
 
 // src/routes/collections.ts
 var COLLECTION_SIZE = 10;
+var parseUserBookId = (body) => {
+  if (typeof body !== "object" || body === null) {
+    return null;
+  }
+  const { userBookId } = body;
+  return typeof userBookId === "string" && userBookId.length > 0 ? userBookId : null;
+};
 var collectionItemSelection = {
   id: userBooks.id,
   isbn: books.isbn,
@@ -17823,39 +17830,6 @@ var collectionItemSelection = {
   author: books.author,
   imageUrl: books.imageUrl,
   position: bookCollectionItems.position
-};
-var parseUserBookIds = (value) => {
-  if (!Array.isArray(value) || value.length !== COLLECTION_SIZE || value.some((id) => typeof id !== "string" || id.length === 0)) {
-    return null;
-  }
-  const ids = value;
-  return new Set(ids).size === COLLECTION_SIZE ? ids : null;
-};
-var parseCollectionInput = (body) => {
-  if (typeof body !== "object" || body === null) {
-    return null;
-  }
-  const { userBookIds } = body;
-  const parsedUserBookIds = parseUserBookIds(userBookIds);
-  if (parsedUserBookIds === null) {
-    return null;
-  }
-  return { userBookIds: parsedUserBookIds };
-};
-var parseCollectionUpdateInput = (body) => {
-  if (typeof body !== "object" || body === null) {
-    return null;
-  }
-  const { userBookIds } = body;
-  const includesUserBookIds = userBookIds !== void 0;
-  if (!includesUserBookIds) {
-    return null;
-  }
-  const parsedUserBookIds = parseUserBookIds(userBookIds);
-  if (parsedUserBookIds === null) {
-    return null;
-  }
-  return { userBookIds: parsedUserBookIds };
 };
 var getCollectionItems = async (collectionId) => db.select(collectionItemSelection).from(bookCollectionItems).innerJoin(userBooks, eq(bookCollectionItems.userBookId, userBooks.id)).innerJoin(books, eq(userBooks.bookId, books.id)).where(eq(bookCollectionItems.collectionId, collectionId)).orderBy(asc(bookCollectionItems.position));
 var getCollectionForUser = async (collectionId, userId) => {
@@ -17873,123 +17847,92 @@ var getCollectionForUser = async (collectionId, userId) => {
     items: await getCollectionItems(collectionId)
   };
 };
-var validateUserBooks = async (userId, userBookIds) => {
-  const ownedBooks = await db.select({ id: userBooks.id }).from(userBooks).where(
-    and(eq(userBooks.userId, userId), inArray(userBooks.id, userBookIds))
-  );
-  return ownedBooks.length === userBookIds.length;
-};
 var collectionsRouter = new Hono2();
 collectionsRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
-  const collections = await db.select().from(bookCollections).where(eq(bookCollections.userId, user.id)).orderBy(asc(bookCollections.createdAt));
-  const result = await Promise.all(
-    collections.map(async (collection) => ({
-      ...collection,
-      items: await getCollectionItems(collection.id)
-    }))
-  );
-  return c.json(result);
-});
-collectionsRouter.get("/:id", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const collection = await getCollectionForUser(c.req.param("id"), user.id);
-  if (!collection) {
-    return c.json({ message: "Collection not found" }, 404);
+  const collection = await db.select().from(bookCollections).where(eq(bookCollections.userId, user.id)).limit(1);
+  if (!collection[0]) {
+    return c.json([]);
   }
-  return c.json(collection);
-});
-collectionsRouter.post("/", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const input = parseCollectionInput(await c.req.json());
-  if (!input) {
-    return c.json(
-      {
-        message: "\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
-      },
-      400
-    );
-  }
-  if (!await validateUserBooks(user.id, input.userBookIds)) {
-    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3060\u3051\u3092\u9078\u629E\u3067\u304D\u307E\u3059" }, 400);
-  }
-  const collection = await db.transaction(async (tx) => {
-    const created = await tx.insert(bookCollections).values({
-      userId: user.id
-    }).onConflictDoNothing({ target: bookCollections.userId }).returning();
-    const createdCollection = created[0];
-    if (!createdCollection) {
-      return null;
+  return c.json([
+    {
+      ...collection[0],
+      items: await getCollectionItems(collection[0].id)
     }
-    await tx.insert(bookCollectionItems).values(
-      input.userBookIds.map((userBookId, index) => ({
-        collectionId: createdCollection.id,
-        userBookId,
-        position: index + 1
-      }))
-    );
-    return createdCollection;
-  });
-  if (!collection) {
-    return c.json(
-      { message: "\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078\u306F\u3059\u3067\u306B\u4F5C\u6210\u3055\u308C\u3066\u3044\u307E\u3059" },
-      409
-    );
-  }
-  return c.json(
-    { ...collection, items: await getCollectionItems(collection.id) },
-    201
-  );
+  ]);
 });
-collectionsRouter.patch("/:id", authMiddleware, async (c) => {
+collectionsRouter.post("/items", authMiddleware, async (c) => {
   const user = c.get("user");
-  const collectionId = c.req.param("id");
-  const input = parseCollectionUpdateInput(await c.req.json());
-  if (!input) {
-    return c.json(
-      {
-        message: "\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
-      },
-      400
-    );
+  const userBookId = parseUserBookId(await c.req.json());
+  if (!userBookId) {
+    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
   }
-  if (input.userBookIds && !await validateUserBooks(user.id, input.userBookIds)) {
-    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3060\u3051\u3092\u9078\u629E\u3067\u304D\u307E\u3059" }, 400);
-  }
-  const existing = await getCollectionForUser(collectionId, user.id);
-  if (!existing) {
-    return c.json({ message: "Collection not found" }, 404);
-  }
-  await db.transaction(async (tx) => {
-    await tx.update(bookCollections).set({
-      updatedAt: /* @__PURE__ */ new Date()
-    }).where(eq(bookCollections.id, collectionId));
-    if (input.userBookIds) {
-      await tx.delete(bookCollectionItems).where(eq(bookCollectionItems.collectionId, collectionId));
-      await tx.insert(bookCollectionItems).values(
-        input.userBookIds.map((userBookId, index) => ({
-          collectionId,
-          userBookId,
-          position: index + 1
-        }))
-      );
+  const result = await db.transaction(async (tx) => {
+    const ownedBook = await tx.select({ id: userBooks.id }).from(userBooks).where(and(eq(userBooks.id, userBookId), eq(userBooks.userId, user.id))).limit(1);
+    if (!ownedBook[0]) {
+      return { error: "not-owned" };
     }
+    const existingCollection = await tx.select().from(bookCollections).where(eq(bookCollections.userId, user.id)).limit(1);
+    const collection = existingCollection[0] ?? (await tx.insert(bookCollections).values({ userId: user.id }).returning())[0];
+    if (!collection) {
+      return { error: "collection" };
+    }
+    const existingItems = await tx.select({
+      userBookId: bookCollectionItems.userBookId,
+      position: bookCollectionItems.position
+    }).from(bookCollectionItems).where(eq(bookCollectionItems.collectionId, collection.id));
+    if (existingItems.some((item) => item.userBookId === userBookId)) {
+      return { error: "already-added" };
+    }
+    if (existingItems.length >= COLLECTION_SIZE) {
+      return { error: "full" };
+    }
+    await tx.insert(bookCollectionItems).values({
+      collectionId: collection.id,
+      userBookId,
+      position: Math.max(0, ...existingItems.map((item) => item.position)) + 1
+    });
+    await tx.update(bookCollections).set({ updatedAt: /* @__PURE__ */ new Date() }).where(eq(bookCollections.id, collection.id));
+    return { collection };
   });
-  const updated = await getCollectionForUser(collectionId, user.id);
-  return c.json(updated);
+  if ("error" in result) {
+    const messages = {
+      "not-owned": "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3060\u3051\u3092\u8FFD\u52A0\u3067\u304D\u307E\u3059",
+      "already-added": "\u3053\u306E\u672C\u306F\u3059\u3067\u306B10\u9078\u306B\u8FFD\u52A0\u3055\u308C\u3066\u3044\u307E\u3059",
+      full: "\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078\u306F10\u518A\u307E\u3067\u3067\u3059",
+      collection: "10\u9078\u3092\u4F5C\u6210\u3067\u304D\u307E\u305B\u3093\u3067\u3057\u305F"
+    };
+    const error = result.error;
+    return c.json(
+      { message: messages[error] },
+      error === "not-owned" ? 400 : 409
+    );
+  }
+  return c.json(await getCollectionForUser(result.collection.id, user.id), 201);
 });
-collectionsRouter.delete("/:id", authMiddleware, async (c) => {
+collectionsRouter.delete("/items/:userBookId", authMiddleware, async (c) => {
   const user = c.get("user");
-  const result = await db.delete(bookCollections).where(
+  const collection = await db.select().from(bookCollections).where(eq(bookCollections.userId, user.id)).limit(1);
+  if (!collection[0]) {
+    return c.json({ message: "10\u9078\u306B\u767B\u9332\u3055\u308C\u3066\u3044\u307E\u305B\u3093" }, 404);
+  }
+  const collectionId = collection[0].id;
+  const deleted = await db.delete(bookCollectionItems).where(
     and(
-      eq(bookCollections.id, c.req.param("id")),
-      eq(bookCollections.userId, user.id)
+      eq(bookCollectionItems.collectionId, collectionId),
+      eq(bookCollectionItems.userBookId, c.req.param("userBookId"))
     )
-  ).returning({ id: bookCollections.id });
-  if (!result[0]) {
-    return c.json({ message: "Collection not found" }, 404);
+  ).returning({ userBookId: bookCollectionItems.userBookId });
+  if (!deleted[0]) {
+    return c.json({ message: "\u3053\u306E\u672C\u306F10\u9078\u306B\u767B\u9332\u3055\u308C\u3066\u3044\u307E\u305B\u3093" }, 404);
   }
-  return c.json(result[0]);
+  const remainingItems = await db.select({ userBookId: bookCollectionItems.userBookId }).from(bookCollectionItems).where(eq(bookCollectionItems.collectionId, collectionId));
+  if (remainingItems.length === 0) {
+    await db.delete(bookCollections).where(eq(bookCollections.id, collectionId));
+    return c.json(null);
+  }
+  await db.update(bookCollections).set({ updatedAt: /* @__PURE__ */ new Date() }).where(eq(bookCollections.id, collectionId));
+  return c.json(await getCollectionForUser(collectionId, user.id));
 });
 var collections_default = collectionsRouter;
 

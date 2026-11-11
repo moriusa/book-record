@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { db } from "../db/index.js";
 import {
@@ -12,12 +12,15 @@ import type { AppEnv } from "../types/hono.js";
 
 const COLLECTION_SIZE = 10;
 
-type CollectionInput = {
-  userBookIds: string[];
-};
+const parseUserBookId = (body: unknown) => {
+  if (typeof body !== "object" || body === null) {
+    return null;
+  }
 
-type CollectionUpdateInput = {
-  userBookIds?: string[];
+  const { userBookId } = body as Record<string, unknown>;
+  return typeof userBookId === "string" && userBookId.length > 0
+    ? userBookId
+    : null;
 };
 
 const collectionItemSelection = {
@@ -27,57 +30,6 @@ const collectionItemSelection = {
   author: books.author,
   imageUrl: books.imageUrl,
   position: bookCollectionItems.position,
-};
-
-const parseUserBookIds = (value: unknown) => {
-  if (
-    !Array.isArray(value) ||
-    value.length !== COLLECTION_SIZE ||
-    value.some((id) => typeof id !== "string" || id.length === 0)
-  ) {
-    return null;
-  }
-
-  const ids = value as string[];
-  return new Set(ids).size === COLLECTION_SIZE ? ids : null;
-};
-
-const parseCollectionInput = (body: unknown): CollectionInput | null => {
-  if (typeof body !== "object" || body === null) {
-    return null;
-  }
-
-  const { userBookIds } = body as Record<string, unknown>;
-  const parsedUserBookIds = parseUserBookIds(userBookIds);
-
-  if (parsedUserBookIds === null) {
-    return null;
-  }
-
-  return { userBookIds: parsedUserBookIds };
-};
-
-const parseCollectionUpdateInput = (
-  body: unknown,
-): CollectionUpdateInput | null => {
-  if (typeof body !== "object" || body === null) {
-    return null;
-  }
-
-  const { userBookIds } = body as Record<string, unknown>;
-  const includesUserBookIds = userBookIds !== undefined;
-
-  if (!includesUserBookIds) {
-    return null;
-  }
-
-  const parsedUserBookIds = parseUserBookIds(userBookIds);
-
-  if (parsedUserBookIds === null) {
-    return null;
-  }
-
-  return { userBookIds: parsedUserBookIds };
 };
 
 const getCollectionItems = async (collectionId: string) =>
@@ -111,172 +63,153 @@ const getCollectionForUser = async (collectionId: string, userId: string) => {
   };
 };
 
-const validateUserBooks = async (userId: string, userBookIds: string[]) => {
-  const ownedBooks = await db
-    .select({ id: userBooks.id })
-    .from(userBooks)
-    .where(
-      and(eq(userBooks.userId, userId), inArray(userBooks.id, userBookIds)),
-    );
-
-  return ownedBooks.length === userBookIds.length;
-};
-
 const collectionsRouter = new Hono<AppEnv>();
 
 collectionsRouter.get("/", authMiddleware, async (c) => {
   const user = c.get("user");
-  const collections = await db
+  const collection = await db
     .select()
     .from(bookCollections)
     .where(eq(bookCollections.userId, user.id))
-    .orderBy(asc(bookCollections.createdAt));
+    .limit(1);
 
-  const result = await Promise.all(
-    collections.map(async (collection) => ({
-      ...collection,
-      items: await getCollectionItems(collection.id),
-    })),
-  );
+  if (!collection[0]) {
+    return c.json([]);
+  }
 
-  return c.json(result);
+  return c.json([
+    {
+      ...collection[0],
+      items: await getCollectionItems(collection[0].id),
+    },
+  ]);
 });
 
-collectionsRouter.get("/:id", authMiddleware, async (c) => {
+collectionsRouter.post("/items", authMiddleware, async (c) => {
   const user = c.get("user");
-  const collection = await getCollectionForUser(c.req.param("id"), user.id);
+  const userBookId = parseUserBookId(await c.req.json());
 
-  if (!collection) {
-    return c.json({ message: "Collection not found" }, 404);
+  if (!userBookId) {
+    return c.json({ message: "本棚に登録済みの本を指定してください" }, 400);
   }
 
-  return c.json(collection);
-});
+  const result = await db.transaction(async (tx) => {
+    const ownedBook = await tx
+      .select({ id: userBooks.id })
+      .from(userBooks)
+      .where(and(eq(userBooks.id, userBookId), eq(userBooks.userId, user.id)))
+      .limit(1);
 
-collectionsRouter.post("/", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const input = parseCollectionInput(await c.req.json());
-
-  if (!input) {
-    return c.json(
-      {
-        message: "重複のない本棚登録済みの本10冊を指定してください",
-      },
-      400,
-    );
-  }
-
-  if (!(await validateUserBooks(user.id, input.userBookIds))) {
-    return c.json({ message: "本棚に登録済みの本だけを選択できます" }, 400);
-  }
-
-  const collection = await db.transaction(async (tx) => {
-    const created = await tx
-      .insert(bookCollections)
-      .values({
-        userId: user.id,
-      })
-      .onConflictDoNothing({ target: bookCollections.userId })
-      .returning();
-
-    const createdCollection = created[0];
-    if (!createdCollection) {
-      return null;
+    if (!ownedBook[0]) {
+      return { error: "not-owned" as const };
     }
 
-    await tx.insert(bookCollectionItems).values(
-      input.userBookIds.map((userBookId, index) => ({
-        collectionId: createdCollection.id,
-        userBookId,
-        position: index + 1,
-      })),
-    );
+    const existingCollection = await tx
+      .select()
+      .from(bookCollections)
+      .where(eq(bookCollections.userId, user.id))
+      .limit(1);
+    const collection =
+      existingCollection[0] ??
+      (
+        await tx.insert(bookCollections).values({ userId: user.id }).returning()
+      )[0];
 
-    return createdCollection;
-  });
+    if (!collection) {
+      return { error: "collection" as const };
+    }
 
-  if (!collection) {
-    return c.json(
-      { message: "名刺代わりの本10選はすでに作成されています" },
-      409,
-    );
-  }
+    const existingItems = await tx
+      .select({
+        userBookId: bookCollectionItems.userBookId,
+        position: bookCollectionItems.position,
+      })
+      .from(bookCollectionItems)
+      .where(eq(bookCollectionItems.collectionId, collection.id));
 
-  return c.json(
-    { ...collection, items: await getCollectionItems(collection.id) },
-    201,
-  );
-});
+    if (existingItems.some((item) => item.userBookId === userBookId)) {
+      return { error: "already-added" as const };
+    }
 
-collectionsRouter.patch("/:id", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const collectionId = c.req.param("id");
-  const input = parseCollectionUpdateInput(await c.req.json());
+    if (existingItems.length >= COLLECTION_SIZE) {
+      return { error: "full" as const };
+    }
 
-  if (!input) {
-    return c.json(
-      {
-        message: "重複のない本棚登録済みの本10冊を指定してください",
-      },
-      400,
-    );
-  }
-
-  if (
-    input.userBookIds &&
-    !(await validateUserBooks(user.id, input.userBookIds))
-  ) {
-    return c.json({ message: "本棚に登録済みの本だけを選択できます" }, 400);
-  }
-
-  const existing = await getCollectionForUser(collectionId, user.id);
-  if (!existing) {
-    return c.json({ message: "Collection not found" }, 404);
-  }
-
-  await db.transaction(async (tx) => {
+    await tx.insert(bookCollectionItems).values({
+      collectionId: collection.id,
+      userBookId,
+      position: Math.max(0, ...existingItems.map((item) => item.position)) + 1,
+    });
     await tx
       .update(bookCollections)
-      .set({
-        updatedAt: new Date(),
-      })
-      .where(eq(bookCollections.id, collectionId));
+      .set({ updatedAt: new Date() })
+      .where(eq(bookCollections.id, collection.id));
 
-    if (input.userBookIds) {
-      await tx
-        .delete(bookCollectionItems)
-        .where(eq(bookCollectionItems.collectionId, collectionId));
-      await tx.insert(bookCollectionItems).values(
-        input.userBookIds.map((userBookId, index) => ({
-          collectionId,
-          userBookId,
-          position: index + 1,
-        })),
-      );
-    }
+    return { collection };
   });
 
-  const updated = await getCollectionForUser(collectionId, user.id);
-  return c.json(updated);
-});
-
-collectionsRouter.delete("/:id", authMiddleware, async (c) => {
-  const user = c.get("user");
-  const result = await db
-    .delete(bookCollections)
-    .where(
-      and(
-        eq(bookCollections.id, c.req.param("id")),
-        eq(bookCollections.userId, user.id),
-      ),
-    )
-    .returning({ id: bookCollections.id });
-
-  if (!result[0]) {
-    return c.json({ message: "Collection not found" }, 404);
+  if ("error" in result) {
+    const messages = {
+      "not-owned": "本棚に登録済みの本だけを追加できます",
+      "already-added": "この本はすでに10選に追加されています",
+      full: "名刺代わりの本10選は10冊までです",
+      collection: "10選を作成できませんでした",
+    };
+    const error = result.error as keyof typeof messages;
+    return c.json(
+      { message: messages[error] },
+      error === "not-owned" ? 400 : 409,
+    );
   }
 
-  return c.json(result[0]);
+  return c.json(await getCollectionForUser(result.collection.id, user.id), 201);
+});
+
+collectionsRouter.delete("/items/:userBookId", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const collection = await db
+    .select()
+    .from(bookCollections)
+    .where(eq(bookCollections.userId, user.id))
+    .limit(1);
+
+  if (!collection[0]) {
+    return c.json({ message: "10選に登録されていません" }, 404);
+  }
+
+  const collectionId = collection[0].id;
+  const deleted = await db
+    .delete(bookCollectionItems)
+    .where(
+      and(
+        eq(bookCollectionItems.collectionId, collectionId),
+        eq(bookCollectionItems.userBookId, c.req.param("userBookId")),
+      ),
+    )
+    .returning({ userBookId: bookCollectionItems.userBookId });
+
+  if (!deleted[0]) {
+    return c.json({ message: "この本は10選に登録されていません" }, 404);
+  }
+
+  const remainingItems = await db
+    .select({ userBookId: bookCollectionItems.userBookId })
+    .from(bookCollectionItems)
+    .where(eq(bookCollectionItems.collectionId, collectionId));
+
+  if (remainingItems.length === 0) {
+    await db
+      .delete(bookCollections)
+      .where(eq(bookCollections.id, collectionId));
+    return c.json(null);
+  }
+
+  await db
+    .update(bookCollections)
+    .set({ updatedAt: new Date() })
+    .where(eq(bookCollections.id, collectionId));
+
+  return c.json(await getCollectionForUser(collectionId, user.id));
 });
 
 export default collectionsRouter;

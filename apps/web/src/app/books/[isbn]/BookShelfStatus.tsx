@@ -8,6 +8,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { useGetBookByIsbn } from "@/app/bookshelf/hooks/useGetBookByIsbn";
 import { useDeleteBook } from "@/app/bookshelf/hooks/useDeleteBook";
 import { AddToBookshelfButton } from "./AddToBookshelfButton";
+import BookTenToggleButton from "./BookTenToggleButton";
 
 type Props = {
   bookData: { isbn: string };
@@ -34,123 +35,132 @@ const BookShelfStatus = ({ bookData }: Props) => {
   }
 
   return (
-    <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7 lg:sticky lg:top-24">
-      <div>
-        <h2 className="font-serif-jp text-xl font-medium">自分の記録</h2>
-      </div>
-
-      {!user ? (
-        <div className="mt-7 border-t border-[#293630]/10 pt-6">
-          <p className="text-[11px] leading-5 text-[#7c8781]">
-            ログインすると、この本をあなたの本棚へ登録できます。
-          </p>
-          <div className="mt-4">
-            <LoginButton
-              label="Googleでログイン"
-              className="w-full rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
-            />
-          </div>
+    <div className="space-y-6 lg:sticky lg:top-24">
+      <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
+        <div>
+          <h2 className="font-serif-jp text-xl font-medium">自分の記録</h2>
         </div>
-      ) : book ? (
-        <div className="mt-7 border-t border-[#293630]/10 pt-6">
-          <p className="text-[11px] font-medium text-[#5f6e66]">
-            読書ステータス
-          </p>
-          <p className="mt-2 font-serif-jp text-lg text-[#344941]">
-            {bookStatus[book.status]}
-          </p>
 
-          {book.rating !== null && book.rating > 0 && (
-            <div className="mt-6">
-              <p className="text-[11px] font-medium text-[#5f6e66]">
-                この本の評価
-              </p>
-              <span
-                className="mt-3 flex gap-1 text-sm text-[#8c7951]"
-                aria-label={`評価 ${book.rating}点`}
-              >
-                {Array.from({ length: book.rating }, (_, index) => (
-                  <FaStar key={index} aria-hidden="true" />
-                ))}
-              </span>
+        {!user ? (
+          <div className="mt-7 border-t border-[#293630]/10 pt-6">
+            <p className="text-[11px] leading-5 text-[#7c8781]">
+              ログインすると、この本をあなたの本棚へ登録できます。
+            </p>
+            <div className="mt-4">
+              <LoginButton
+                label="Googleでログイン"
+                className="w-full rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+              />
             </div>
-          )}
-
-          {book.review && (
-            <div className="mt-6">
-              <p className="text-[11px] font-medium text-[#5f6e66]">メモ</p>
-              <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#526159]">
-                {book.review}
-              </p>
-            </div>
-          )}
-
-          <div className="mt-7 border-t border-[#293630]/10 pt-5">
-            <Link
-              href={`/bookshelf/edit/${book.id}`}
-              className="block rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-center text-xs font-medium text-[#526159] transition hover:border-[#60736a] hover:bg-white"
-            >
-              本棚の内容を編集
-            </Link>
           </div>
+        ) : book ? (
+          <div className="mt-7 border-t border-[#293630]/10 pt-6">
+            <p className="text-[11px] font-medium text-[#5f6e66]">
+              読書ステータス
+            </p>
+            <p className="mt-2 font-serif-jp text-lg text-[#344941]">
+              {bookStatus[book.status]}
+            </p>
 
-          <div className="mt-7 border-t border-[#293630]/10 pt-5">
-            {isDeleteConfirmationOpen ? (
-              <div className="rounded-md border border-[#a56b62]/30 bg-[#fbf5f2] p-4">
-                <p className="text-xs leading-6 text-[#73534d]">
-                  本棚から削除しますか？ 読書ステータス・評価・メモも削除されます。
+            {book.rating !== null && book.rating > 0 && (
+              <div className="mt-6">
+                <p className="text-[11px] font-medium text-[#5f6e66]">
+                  この本の評価
                 </p>
-                {deleteBookMutation.error && (
-                  <p className="mt-3 text-xs text-[#a04438]" role="alert">
-                    削除に失敗しました。時間をおいてもう一度お試しください。
-                  </p>
-                )}
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      deleteBookMutation.mutate({
-                        id: book.id,
-                        isbn: book.isbn,
-                      })
-                    }
-                    disabled={deleteBookMutation.isPending}
-                    className="rounded-md bg-[#9b554a] px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#82473e] disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {deleteBookMutation.isPending ? "削除中…" : "削除する"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsDeleteConfirmationOpen(false)}
-                    disabled={deleteBookMutation.isPending}
-                    className="rounded-md border border-[#293630]/12 bg-white px-3 py-2.5 text-xs font-medium text-[#526159] transition-colors hover:border-[#60736a] disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    キャンセル
-                  </button>
-                </div>
+                <span
+                  className="mt-3 flex gap-1 text-sm text-[#8c7951]"
+                  aria-label={`評価 ${book.rating}点`}
+                >
+                  {Array.from({ length: book.rating }, (_, index) => (
+                    <FaStar key={index} aria-hidden="true" />
+                  ))}
+                </span>
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsDeleteConfirmationOpen(true)}
-                className="w-full rounded-md px-4 py-2.5 text-xs text-[#986157] transition-colors hover:bg-[#f7ece8] hover:text-[#82473e]"
-              >
-                本棚から削除
-              </button>
             )}
+
+            {book.review && (
+              <div className="mt-6">
+                <p className="text-[11px] font-medium text-[#5f6e66]">メモ</p>
+                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#526159]">
+                  {book.review}
+                </p>
+              </div>
+            )}
+
+            <div className="mt-7 border-t border-[#293630]/10 pt-5">
+              <Link
+                href={`/bookshelf/edit/${book.id}`}
+                className="block rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-center text-xs font-medium text-[#526159] transition hover:border-[#60736a] hover:bg-white"
+              >
+                本棚の内容を編集
+              </Link>
+            </div>
+
+            <div className="mt-7 border-t border-[#293630]/10 pt-5">
+              {isDeleteConfirmationOpen ? (
+                <div className="rounded-md border border-[#a56b62]/30 bg-[#fbf5f2] p-4">
+                  <p className="text-xs leading-6 text-[#73534d]">
+                    本棚から削除しますか？
+                    読書ステータス・評価・メモも削除されます。
+                  </p>
+                  {deleteBookMutation.error && (
+                    <p className="mt-3 text-xs text-[#a04438]" role="alert">
+                      削除に失敗しました。時間をおいてもう一度お試しください。
+                    </p>
+                  )}
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        deleteBookMutation.mutate({
+                          id: book.id,
+                          isbn: book.isbn,
+                        })
+                      }
+                      disabled={deleteBookMutation.isPending}
+                      className="rounded-md bg-[#9b554a] px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#82473e] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deleteBookMutation.isPending ? "削除中…" : "削除する"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsDeleteConfirmationOpen(false)}
+                      disabled={deleteBookMutation.isPending}
+                      className="rounded-md border border-[#293630]/12 bg-white px-3 py-2.5 text-xs font-medium text-[#526159] transition-colors hover:border-[#60736a] disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      キャンセル
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteConfirmationOpen(true)}
+                  className="w-full rounded-md px-4 py-2.5 text-xs text-[#986157] transition-colors hover:bg-[#f7ece8] hover:text-[#82473e]"
+                >
+                  本棚から削除
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="mt-7 border-t border-[#293630]/10 pt-6">
-          <p className="text-[11px] leading-5 text-[#7c8781]">
-            この本はまだ本棚に登録されていません。
-          </p>
-          <div className="mt-4">
-            <AddToBookshelfButton isbn={bookData.isbn} />
+        ) : (
+          <div className="mt-7 border-t border-[#293630]/10 pt-6">
+            <p className="text-[11px] leading-5 text-[#7c8781]">
+              この本はまだ本棚に登録されていません。
+            </p>
+            <div className="mt-4">
+              <AddToBookshelfButton isbn={bookData.isbn} />
+            </div>
           </div>
-        </div>
+        )}
+      </aside>
+
+      {user && book && (
+        <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
+          <BookTenToggleButton userBookId={book.id} />
+        </aside>
       )}
-    </aside>
+    </div>
   );
 };
 

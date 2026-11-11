@@ -76,7 +76,6 @@ const drawBookCover = (
     context.font = '500 13px "Noto Serif JP", serif';
     context.fillText("表紙なし", x + 27, y + 101);
   }
-
 };
 
 const createShareCard = async (collection: BookCollection) => {
@@ -152,6 +151,7 @@ const downloadCard = (blob: Blob) => {
 export default function BookTenShareActions({ collection }: Props) {
   const [message, setMessage] = useState<string | null>(null);
   const [isCreatingCard, setIsCreatingCard] = useState(false);
+  const isComplete = collection.items.length === 10;
 
   const saveCard = async () => {
     setMessage(null);
@@ -181,17 +181,21 @@ export default function BookTenShareActions({ collection }: Props) {
             10選を画像として保存
           </h2>
           <p className="mt-2 text-xs leading-6 text-[#75817b]">
-            選んだ10冊の表紙を、画像として保存できます。
+            10冊そろうと、選んだ本の表紙を画像として保存できます。
           </p>
         </div>
         <button
           type="button"
           onClick={saveCard}
-          disabled={isCreatingCard}
+          disabled={!isComplete || isCreatingCard}
           className="inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33] disabled:opacity-50"
         >
           <RiDownloadLine aria-hidden="true" />
-          {isCreatingCard ? "画像を作成中…" : "画像を保存"}
+          {isCreatingCard
+            ? "画像を作成中…"
+            : isComplete
+              ? "画像を保存"
+              : `あと${10 - collection.items.length}冊選ぶ`}
         </button>
       </div>
 
