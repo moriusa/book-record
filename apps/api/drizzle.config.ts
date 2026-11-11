@@ -1,6 +1,5 @@
 /// <reference types="node" />
 
-import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 import { config } from "dotenv";
 
@@ -12,6 +11,7 @@ if (!["development", "production"].includes(env)) {
 
 config({
   path: env === "production" ? ".env.production" : ".env",
+  override: env === "production",
 });
 
 const databaseUrl = process.env.DATABASE_URL;
