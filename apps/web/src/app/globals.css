@@ -2,10 +2,6 @@
 @import "tailwindcss";
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
     min-width: 320px;
     background: #f5f3ed;
