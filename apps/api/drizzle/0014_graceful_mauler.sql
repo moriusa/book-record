@@ -1,0 +1,1 @@
+ALTER TABLE "book_collections" DROP COLUMN "title";

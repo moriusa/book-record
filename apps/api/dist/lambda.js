@@ -16519,10 +16519,10 @@ var bookCollections = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-    title: varchar("title", { length: 100 }).notNull().default("\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
-  }
+  },
+  (table) => [unique("book_collections_user_id_unique").on(table.userId)]
 );
 var bookCollectionItems = pgTable(
   "book_collection_items",
@@ -17816,7 +17816,6 @@ var books_default = booksRouter;
 
 // src/routes/collections.ts
 var COLLECTION_SIZE = 10;
-var DEFAULT_COLLECTION_TITLE = "\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078";
 var collectionItemSelection = {
   id: userBooks.id,
   isbn: books.isbn,
@@ -17824,19 +17823,6 @@ var collectionItemSelection = {
   author: books.author,
   imageUrl: books.imageUrl,
   position: bookCollectionItems.position
-};
-var parseTitle = (value) => {
-  if (value === void 0) {
-    return void 0;
-  }
-  if (typeof value !== "string") {
-    return null;
-  }
-  const title = value.trim();
-  if (title.length === 0 || title.length > 100) {
-    return null;
-  }
-  return title;
 };
 var parseUserBookIds = (value) => {
   if (!Array.isArray(value) || value.length !== COLLECTION_SIZE || value.some((id) => typeof id !== "string" || id.length === 0)) {
@@ -17849,30 +17835,27 @@ var parseCollectionInput = (body) => {
   if (typeof body !== "object" || body === null) {
     return null;
   }
-  const { title, userBookIds } = body;
-  const parsedTitle = parseTitle(title);
+  const { userBookIds } = body;
   const parsedUserBookIds = parseUserBookIds(userBookIds);
-  if (parsedTitle === null || parsedUserBookIds === null) {
+  if (parsedUserBookIds === null) {
     return null;
   }
-  return { title: parsedTitle, userBookIds: parsedUserBookIds };
+  return { userBookIds: parsedUserBookIds };
 };
 var parseCollectionUpdateInput = (body) => {
   if (typeof body !== "object" || body === null) {
     return null;
   }
-  const { title, userBookIds } = body;
-  const includesTitle = title !== void 0;
+  const { userBookIds } = body;
   const includesUserBookIds = userBookIds !== void 0;
-  if (!includesTitle && !includesUserBookIds) {
+  if (!includesUserBookIds) {
     return null;
   }
-  const parsedTitle = parseTitle(title);
-  const parsedUserBookIds = includesUserBookIds ? parseUserBookIds(userBookIds) : void 0;
-  if (parsedTitle === null || parsedUserBookIds === null) {
+  const parsedUserBookIds = parseUserBookIds(userBookIds);
+  if (parsedUserBookIds === null) {
     return null;
   }
-  return { title: parsedTitle, userBookIds: parsedUserBookIds };
+  return { userBookIds: parsedUserBookIds };
 };
 var getCollectionItems = async (collectionId) => db.select(collectionItemSelection).from(bookCollectionItems).innerJoin(userBooks, eq(bookCollectionItems.userBookId, userBooks.id)).innerJoin(books, eq(userBooks.bookId, books.id)).where(eq(bookCollectionItems.collectionId, collectionId)).orderBy(asc(bookCollectionItems.position));
 var getCollectionForUser = async (collectionId, userId) => {
@@ -17922,7 +17905,7 @@ collectionsRouter.post("/", authMiddleware, async (c) => {
   if (!input) {
     return c.json(
       {
-        message: "\u30BF\u30A4\u30C8\u30EB\u3068\u3001\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
+        message: "\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
       },
       400
     );
@@ -17932,12 +17915,11 @@ collectionsRouter.post("/", authMiddleware, async (c) => {
   }
   const collection = await db.transaction(async (tx) => {
     const created = await tx.insert(bookCollections).values({
-      userId: user.id,
-      title: input.title ?? DEFAULT_COLLECTION_TITLE
-    }).returning();
+      userId: user.id
+    }).onConflictDoNothing({ target: bookCollections.userId }).returning();
     const createdCollection = created[0];
     if (!createdCollection) {
-      throw new Error("Collection could not be created");
+      return null;
     }
     await tx.insert(bookCollectionItems).values(
       input.userBookIds.map((userBookId, index) => ({
@@ -17948,6 +17930,12 @@ collectionsRouter.post("/", authMiddleware, async (c) => {
     );
     return createdCollection;
   });
+  if (!collection) {
+    return c.json(
+      { message: "\u540D\u523A\u4EE3\u308F\u308A\u306E\u672C10\u9078\u306F\u3059\u3067\u306B\u4F5C\u6210\u3055\u308C\u3066\u3044\u307E\u3059" },
+      409
+    );
+  }
   return c.json(
     { ...collection, items: await getCollectionItems(collection.id) },
     201
@@ -17960,7 +17948,7 @@ collectionsRouter.patch("/:id", authMiddleware, async (c) => {
   if (!input) {
     return c.json(
       {
-        message: "\u5909\u66F4\u3059\u308B\u30BF\u30A4\u30C8\u30EB\u3001\u307E\u305F\u306F\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
+        message: "\u91CD\u8907\u306E\u306A\u3044\u672C\u68DA\u767B\u9332\u6E08\u307F\u306E\u672C10\u518A\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044"
       },
       400
     );
@@ -17974,7 +17962,6 @@ collectionsRouter.patch("/:id", authMiddleware, async (c) => {
   }
   await db.transaction(async (tx) => {
     await tx.update(bookCollections).set({
-      ...input.title ? { title: input.title } : {},
       updatedAt: /* @__PURE__ */ new Date()
     }).where(eq(bookCollections.id, collectionId));
     if (input.userBookIds) {

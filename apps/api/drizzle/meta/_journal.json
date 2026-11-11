@@ -92,6 +92,20 @@
       "when": 1794213240979,
       "tag": "0012_naive_screwball",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794214564472,
+      "tag": "0013_wise_liz_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794314896893,
+      "tag": "0014_graceful_mauler",
+      "breakpoints": true
     }
   ]
 }

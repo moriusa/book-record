@@ -11,15 +11,12 @@ import { authMiddleware } from "../middleware/auth.js";
 import type { AppEnv } from "../types/hono.js";
 
 const COLLECTION_SIZE = 10;
-const DEFAULT_COLLECTION_TITLE = "名刺代わりの本10選";
 
 type CollectionInput = {
-  title?: string;
   userBookIds: string[];
 };
 
 type CollectionUpdateInput = {
-  title?: string;
   userBookIds?: string[];
 };
 
@@ -30,23 +27,6 @@ const collectionItemSelection = {
   author: books.author,
   imageUrl: books.imageUrl,
   position: bookCollectionItems.position,
-};
-
-const parseTitle = (value: unknown) => {
-  if (value === undefined) {
-    return undefined;
-  }
-
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const title = value.trim();
-  if (title.length === 0 || title.length > 100) {
-    return null;
-  }
-
-  return title;
 };
 
 const parseUserBookIds = (value: unknown) => {
@@ -67,15 +47,14 @@ const parseCollectionInput = (body: unknown): CollectionInput | null => {
     return null;
   }
 
-  const { title, userBookIds } = body as Record<string, unknown>;
-  const parsedTitle = parseTitle(title);
+  const { userBookIds } = body as Record<string, unknown>;
   const parsedUserBookIds = parseUserBookIds(userBookIds);
 
-  if (parsedTitle === null || parsedUserBookIds === null) {
+  if (parsedUserBookIds === null) {
     return null;
   }
 
-  return { title: parsedTitle, userBookIds: parsedUserBookIds };
+  return { userBookIds: parsedUserBookIds };
 };
 
 const parseCollectionUpdateInput = (
@@ -85,24 +64,20 @@ const parseCollectionUpdateInput = (
     return null;
   }
 
-  const { title, userBookIds } = body as Record<string, unknown>;
-  const includesTitle = title !== undefined;
+  const { userBookIds } = body as Record<string, unknown>;
   const includesUserBookIds = userBookIds !== undefined;
 
-  if (!includesTitle && !includesUserBookIds) {
+  if (!includesUserBookIds) {
     return null;
   }
 
-  const parsedTitle = parseTitle(title);
-  const parsedUserBookIds = includesUserBookIds
-    ? parseUserBookIds(userBookIds)
-    : undefined;
+  const parsedUserBookIds = parseUserBookIds(userBookIds);
 
-  if (parsedTitle === null || parsedUserBookIds === null) {
+  if (parsedUserBookIds === null) {
     return null;
   }
 
-  return { title: parsedTitle, userBookIds: parsedUserBookIds };
+  return { userBookIds: parsedUserBookIds };
 };
 
 const getCollectionItems = async (collectionId: string) =>
@@ -185,7 +160,7 @@ collectionsRouter.post("/", authMiddleware, async (c) => {
   if (!input) {
     return c.json(
       {
-        message: "タイトルと、重複のない本棚登録済みの本10冊を指定してください",
+        message: "重複のない本棚登録済みの本10冊を指定してください",
       },
       400,
     );
@@ -200,13 +175,13 @@ collectionsRouter.post("/", authMiddleware, async (c) => {
       .insert(bookCollections)
       .values({
         userId: user.id,
-        title: input.title ?? DEFAULT_COLLECTION_TITLE,
       })
+      .onConflictDoNothing({ target: bookCollections.userId })
       .returning();
 
     const createdCollection = created[0];
     if (!createdCollection) {
-      throw new Error("Collection could not be created");
+      return null;
     }
 
     await tx.insert(bookCollectionItems).values(
@@ -219,6 +194,13 @@ collectionsRouter.post("/", authMiddleware, async (c) => {
 
     return createdCollection;
   });
+
+  if (!collection) {
+    return c.json(
+      { message: "名刺代わりの本10選はすでに作成されています" },
+      409,
+    );
+  }
 
   return c.json(
     { ...collection, items: await getCollectionItems(collection.id) },
@@ -234,8 +216,7 @@ collectionsRouter.patch("/:id", authMiddleware, async (c) => {
   if (!input) {
     return c.json(
       {
-        message:
-          "変更するタイトル、または重複のない本棚登録済みの本10冊を指定してください",
+        message: "重複のない本棚登録済みの本10冊を指定してください",
       },
       400,
     );
@@ -257,7 +238,6 @@ collectionsRouter.patch("/:id", authMiddleware, async (c) => {
     await tx
       .update(bookCollections)
       .set({
-        ...(input.title ? { title: input.title } : {}),
         updatedAt: new Date(),
       })
       .where(eq(bookCollections.id, collectionId));

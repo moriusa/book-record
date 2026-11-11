@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { RiAddLine, RiBookShelfLine } from "react-icons/ri";
+import { RiAddLine, RiBookShelfLine, RiBookmark3Line } from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
@@ -43,7 +43,9 @@ const Page = () => {
   }
 
   if (error) {
-    return <p className="p-6 text-sm text-[#75817b]">本棚を取得できませんでした。</p>;
+    return (
+      <p className="p-6 text-sm text-[#75817b]">本棚を取得できませんでした。</p>
+    );
   }
 
   return (
@@ -51,20 +53,34 @@ const Page = () => {
       <div className="flex flex-col justify-between gap-7 sm:flex-row sm:items-end">
         <div>
           <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
-            <RiBookShelfLine className="text-sm" aria-hidden="true" />MY BOOKSHELF
+            <RiBookShelfLine className="text-sm" aria-hidden="true" />
+            MY BOOKSHELF
           </p>
-          <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:text-[40px]">わたしの本棚</h1>
-          <p className="mt-3 text-sm text-[#75817b]">読みたい気持ちも、読んだ思い出も。</p>
+          <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:text-[40px]">
+            わたしの本棚
+          </h1>
+          <p className="mt-3 text-sm text-[#75817b]">
+            読みたい気持ちも、読んだ思い出も。
+          </p>
         </div>
 
-        <Link
-          href="/books/search"
-          className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
-          aria-label="本を探して本棚に追加"
-        >
-          <RiAddLine className="text-lg font-light" aria-hidden="true" />
-          本を追加
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/bookshelf/collections"
+            className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 py-3 text-sm font-medium text-[#40584e] transition-colors hover:border-[#718078]"
+          >
+            <RiBookmark3Line className="text-lg" aria-hidden="true" />
+            本10選
+          </Link>
+          <Link
+            href="/books/search"
+            className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
+            aria-label="本を探して本棚に追加"
+          >
+            <RiAddLine className="text-lg font-light" aria-hidden="true" />
+            本を追加
+          </Link>
+        </div>
       </div>
 
       <BookshelfToolbar
