@@ -16,6 +16,7 @@ import { useGetBooks } from "./bookshelf/hooks/useGetBooks";
 import { BookStatus } from "@/types/book";
 import { useAuth } from "@/components/providers/AuthProvider";
 import LoginButton from "@/components/ui/LoginButton";
+import updates from "@/data/updates.json";
 
 const statusCards = [
   {
@@ -53,6 +54,8 @@ const statusCards = [
   accent: string;
   background: string;
 }>;
+
+const latestUpdate = updates[0];
 
 export default function Home() {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -102,8 +105,10 @@ function AuthenticatedHome() {
         </Link>
       </div>
 
+      <LatestUpdateLink className="mt-8" />
+
       <section
-        className="mt-11 grid border-y border-[#293630]/10 lg:grid-cols-[1.55fr_0.8fr]"
+        className="mt-11 grid lg:grid-cols-[1.55fr_0.8fr]"
         aria-labelledby="current-reading-heading"
       >
         <div className="py-9 lg:border-r lg:border-[#293630]/10 lg:pr-12">
@@ -369,6 +374,7 @@ function GuestHome() {
               <RiLockLine className="text-sm" aria-hidden="true" />
               本棚はあなたにしか見えません
             </p>
+            <LatestUpdateLink className="mt-8" />
           </div>
 
           <BookshelfPreview />
@@ -432,6 +438,33 @@ function GuestHome() {
         </div>
       </section>
     </main>
+  );
+}
+
+function LatestUpdateLink({ className = "" }: { className?: string }) {
+  if (!latestUpdate) {
+    return null;
+  }
+
+  return (
+    <Link
+      href="/updates"
+      aria-label={`最新の更新: ${latestUpdate.title}`}
+      className={`group flex items-center justify-between gap-5 border-y border-[#293630]/10 py-4 transition-colors hover:border-[#60736a] ${className}`}
+    >
+      <div className="min-w-0">
+        <p className="text-[10px] tracking-widest text-[#7b8781]">
+          {latestUpdate.version} · {latestUpdate.date}
+        </p>
+        <p className="mt-1 truncate font-serif-jp text-sm font-medium text-[#40584e] sm:text-base">
+          {latestUpdate.title}
+        </p>
+      </div>
+      <RiArrowRightLine
+        className="shrink-0 text-[#718078] transition-transform group-hover:translate-x-0.5"
+        aria-hidden="true"
+      />
+    </Link>
   );
 }
 
