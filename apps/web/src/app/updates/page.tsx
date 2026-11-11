@@ -61,10 +61,10 @@ export default function UpdatesPage() {
                   {update.changes.map((change) => (
                     <li
                       key={change.text}
-                      className="flex gap-3 text-sm leading-7 text-[#506058]"
+                      className="flex gap-3 text-xs leading-6 text-[#506058] sm:text-sm sm:leading-7"
                     >
                       <span
-                        className={`mt-1.5 h-fit shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium leading-4 ${kindClassNames[change.kind]}`}
+                        className={`mt-1 h-fit w-11 shrink-0 rounded-full px-1 py-0.5 text-center text-[10px] font-medium leading-4 ${kindClassNames[change.kind]}`}
                       >
                         {change.kind}
                       </span>
