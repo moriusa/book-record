@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RiBook3Line } from "react-icons/ri";
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
@@ -112,7 +113,12 @@ const Page = async ({ params }: Props) => {
                 <h1 className="font-serif-jp text-4xl font-medium tracking-[-0.045em] text-[#293630] sm:text-5xl">
                   {book.title}
                 </h1>
-                <p className="mt-4 text-base text-[#65726b]">{book.author}</p>
+                <Link
+                  href={`/books/search?q=${encodeURIComponent(book.author)}&type=author`}
+                  className="mt-4 inline-flex text-base text-[#65726b] underline decoration-[#aeb7b1] underline-offset-4 transition-colors hover:text-[#344941] hover:decoration-[#60736a]"
+                >
+                  {book.author}
+                </Link>
               </div>
             </div>
           </div>
