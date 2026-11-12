@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
+import { RiExternalLinkLine } from "react-icons/ri";
 import LoginButton from "@/components/ui/LoginButton";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useGetBookByIsbn } from "@/app/bookshelf/hooks/useGetBookByIsbn";
@@ -12,6 +13,8 @@ import BookTenToggleButton from "./BookTenToggleButton";
 
 type Props = {
   bookData: { isbn: string };
+  amazonBookUrl: string;
+  isAmazonAffiliate: boolean;
 };
 
 const bookStatus = {
@@ -21,7 +24,11 @@ const bookStatus = {
   ON_HOLD: "積読",
 };
 
-const BookShelfStatus = ({ bookData }: Props) => {
+const BookShelfStatus = ({
+  bookData,
+  amazonBookUrl,
+  isAmazonAffiliate,
+}: Props) => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
@@ -36,6 +43,32 @@ const BookShelfStatus = ({ bookData }: Props) => {
 
   return (
     <div className="space-y-6 lg:sticky lg:top-24">
+      <aside className="border border-[#293630]/10 bg-[#faf9f5] p-6 sm:p-7">
+        <p className="text-[10px] tracking-[0.16em] text-[#7c8881]">
+          BUY THIS BOOK
+        </p>
+        <h2 className="mt-3 font-serif-jp text-xl font-medium text-[#293630]">
+          Amazonでこの本を探す
+        </h2>
+        <p className="mt-3 text-[11px] leading-5 text-[#718078]">
+          Amazonの商品検索ページへ移動します。
+        </p>
+        <a
+          href={amazonBookUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+        >
+          Amazonで探す
+          <RiExternalLinkLine className="text-sm" aria-hidden="true" />
+        </a>
+        {isAmazonAffiliate && (
+          <p className="mt-4 text-[10px] leading-5 text-[#87918b]">
+            Amazonのアソシエイトとして、つみほんは適格販売により収入を得ています。
+          </p>
+        )}
+      </aside>
+
       <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
         <div>
           <h2 className="font-serif-jp text-xl font-medium">自分の記録</h2>

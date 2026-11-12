@@ -3,6 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RiBook3Line } from "react-icons/ri";
+import {
+  getAmazonBookUrl,
+  isAmazonAffiliateEnabled,
+} from "@/lib/getAmazonBookUrl";
 import { getRakutenBookByIsbn } from "@/lib/getRakutenBookByIsbn";
 import { BookDetails, getStoredBookByIsbn } from "@/lib/getStoredBookByIsbn";
 import BookShelfStatus from "./BookShelfStatus";
@@ -62,6 +66,9 @@ const Page = async ({ params }: Props) => {
   if (!book) {
     notFound();
   }
+
+  const amazonBookUrl = getAmazonBookUrl(book.isbn);
+  const isAmazonAffiliate = isAmazonAffiliateEnabled();
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -153,7 +160,11 @@ const Page = async ({ params }: Props) => {
             </div>
           </article>
 
-          <BookShelfStatus bookData={book} />
+          <BookShelfStatus
+            bookData={book}
+            amazonBookUrl={amazonBookUrl}
+            isAmazonAffiliate={isAmazonAffiliate}
+          />
         </section>
       </main>
     </>
