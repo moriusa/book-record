@@ -145,7 +145,26 @@ const downloadCard = (blob: Blob) => {
   link.href = url;
   link.download = `${CARD_TITLE}.png`;
   link.click();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+};
+
+const isIOS = () =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1);
+
+const saveOrShareCard = async (blob: Blob) => {
+  const file = new File([blob], `${CARD_TITLE}.png`, { type: "image/png" });
+
+  if (isIOS() && navigator.canShare?.({ files: [file] })) {
+    await navigator.share({
+      files: [file],
+      title: CARD_TITLE,
+    });
+    return "shared" as const;
+  }
+
+  downloadCard(blob);
+  return "downloaded" as const;
 };
 
 export default function BookTenShareActions({ collection }: Props) {
@@ -159,9 +178,17 @@ export default function BookTenShareActions({ collection }: Props) {
 
     try {
       const card = await createShareCard(collection);
-      downloadCard(card);
-      setMessage("画像を保存しました。");
+      const saveMethod = await saveOrShareCard(card);
+      setMessage(
+        saveMethod === "shared"
+          ? "共有メニューから「画像を保存」を選ぶと、写真アプリに保存できます。"
+          : "画像をダウンロードしました。",
+      );
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+
       setMessage(
         error instanceof Error ? error.message : "画像を作成できませんでした。",
       );
@@ -178,10 +205,13 @@ export default function BookTenShareActions({ collection }: Props) {
             SAVE AS IMAGE
           </p>
           <h2 className="mt-2 font-serif-jp text-xl font-medium">
-            10選を画像として保存
+            10選を画像として保存・共有
           </h2>
           <p className="mt-2 text-xs leading-6 text-[#75817b]">
             10冊そろうと、選んだ本の表紙を画像として保存できます。
+          </p>
+          <p className="mt-1 text-xs leading-6 text-[#75817b]">
+            iPhoneでは、共有メニューの「画像を保存」から写真アプリに保存できます。
           </p>
         </div>
         <button
@@ -194,7 +224,7 @@ export default function BookTenShareActions({ collection }: Props) {
           {isCreatingCard
             ? "画像を作成中…"
             : isComplete
-              ? "画像を保存"
+              ? "画像を保存・共有"
               : `あと${10 - collection.items.length}冊選ぶ`}
         </button>
       </div>
