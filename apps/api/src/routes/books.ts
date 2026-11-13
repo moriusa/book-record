@@ -38,6 +38,35 @@ const catalogBookSelection = {
   itemCaption: books.description,
 };
 
+type BulkBookPayload = Record<string, unknown> & {
+  isbn: string;
+  title: string;
+  author: string;
+};
+
+type BulkBooksRequest = {
+  books: unknown[];
+};
+
+const isBulkBooksRequest = (body: unknown): body is BulkBooksRequest =>
+  typeof body === "object" &&
+  body !== null &&
+  "books" in body &&
+  Array.isArray(body.books);
+
+const isBulkBookPayload = (book: unknown): book is BulkBookPayload =>
+  typeof book === "object" &&
+  book !== null &&
+  "isbn" in book &&
+  typeof book.isbn === "string" &&
+  "title" in book &&
+  typeof book.title === "string" &&
+  "author" in book &&
+  typeof book.author === "string";
+
+const getOptionalString = (value: unknown) =>
+  typeof value === "string" ? value : null;
+
 const findUserBookById = async (id: string, userId: string) => {
   const result = await db
     .select(bookSelection)
@@ -103,6 +132,96 @@ booksRouter.get("/catalog/:isbn", async (c) => {
   }
 
   return c.json(book);
+});
+
+booksRouter.post("/bulk", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const body: unknown = await c.req.json();
+
+  if (!isBulkBooksRequest(body) || body.books.length === 0) {
+    return c.json({ message: "登録する本を選択してください" }, 400);
+  }
+
+  if (body.books.length > 30) {
+    return c.json({ message: "一度に登録できるのは30冊までです" }, 400);
+  }
+
+  const uniqueBooks = Array.from(
+    new Map(
+      body.books.filter(isBulkBookPayload).map((book) => [book.isbn, book]),
+    ).values(),
+  );
+
+  if (uniqueBooks.length === 0) {
+    return c.json({ message: "有効な書籍情報がありません" }, 400);
+  }
+
+  try {
+    const result = await db.transaction(async (tx) => {
+      const createdIsbns: string[] = [];
+      const skippedIsbns: string[] = [];
+
+      for (const book of uniqueBooks) {
+        const insertedBooks = await tx
+          .insert(books)
+          .values({
+            isbn: book.isbn,
+            title: book.title,
+            author: book.author,
+            publisher: getOptionalString(book.publisherName),
+            series: getOptionalString(book.seriesName),
+            salesDate: getOptionalString(book.salesDate),
+            imageUrl: getOptionalString(book.largeImageUrl),
+            bookFormat: getOptionalString(book.size),
+            description: getOptionalString(book.itemCaption),
+          })
+          .onConflictDoNothing({ target: books.isbn })
+          .returning({ id: books.id });
+
+        const bookId =
+          insertedBooks[0]?.id ??
+          (
+            await tx
+              .select({ id: books.id })
+              .from(books)
+              .where(eq(books.isbn, book.isbn))
+              .limit(1)
+          )[0]?.id;
+
+        if (!bookId) {
+          throw new Error("Book could not be created or found");
+        }
+
+        const createdUserBook = await tx
+          .insert(userBooks)
+          .values({
+            userId: user.id,
+            bookId,
+            status: getOptionalString(book.status) ?? "WANT_TO_READ",
+            rating: null,
+            review: null,
+            completedAt: null,
+          })
+          .onConflictDoNothing({
+            target: [userBooks.userId, userBooks.bookId],
+          })
+          .returning({ id: userBooks.id });
+
+        if (createdUserBook.length > 0) {
+          createdIsbns.push(book.isbn);
+        } else {
+          skippedIsbns.push(book.isbn);
+        }
+      }
+
+      return { createdIsbns, skippedIsbns };
+    });
+
+    return c.json(result, 201);
+  } catch (error) {
+    console.error(error);
+    return c.json({ message: "本の一括登録に失敗しました" }, 500);
+  }
 });
 
 booksRouter.get("/:id", authMiddleware, async (c) => {
@@ -190,8 +309,6 @@ booksRouter.post("/", authMiddleware, async (c) => {
     return c.json({ message: "本の登録に失敗しました" }, 500);
   }
 });
-
-
 booksRouter.patch("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
   const id = c.req.param("id");

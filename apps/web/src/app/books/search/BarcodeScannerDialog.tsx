@@ -8,6 +8,8 @@ import { RiBarcodeLine, RiCloseLine } from "react-icons/ri";
 type Props = {
   onClose: () => void;
   onDetected: (isbn: string) => void;
+  onComplete: () => void;
+  scannedCount: number;
 };
 
 const getScannerErrorMessage = (error: unknown) => {
@@ -22,9 +24,15 @@ const getScannerErrorMessage = (error: unknown) => {
   return "カメラを開始できませんでした。ISBNを入力して検索してください。";
 };
 
-export const BarcodeScannerDialog = ({ onClose, onDetected }: Props) => {
+export const BarcodeScannerDialog = ({
+  onClose,
+  onDetected,
+  onComplete,
+  scannedCount,
+}: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
+  const scannedIsbnsRef = useRef(new Set<string>());
   const [isStarting, setIsStarting] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -66,11 +74,15 @@ export const BarcodeScannerDialog = ({ onClose, onDetected }: Props) => {
 
             const isbn = result.getText().replaceAll(/\D/g, "");
 
-            if (isbn.length !== 13 && isbn.length !== 8) {
+            if (
+              isbn.length !== 13 ||
+              (!isbn.startsWith("978") && !isbn.startsWith("979")) ||
+              scannedIsbnsRef.current.has(isbn)
+            ) {
               return;
             }
 
-            controlsRef.current?.stop();
+            scannedIsbnsRef.current.add(isbn);
             onDetected(isbn);
           },
         );
@@ -118,7 +130,7 @@ export const BarcodeScannerDialog = ({ onClose, onDetected }: Props) => {
               本のバーコードを読み取る
             </h2>
             <p className="mt-2 text-[11px] text-[#748078]">
-              カメラをISBNバーコードに向けてください。
+              続けて複数冊を読み取れます。読み終えたら登録へ進みます。
             </p>
           </div>
           <button
@@ -154,13 +166,26 @@ export const BarcodeScannerDialog = ({ onClose, onDetected }: Props) => {
             </p>
           ) : (
             <p className="text-xs leading-6 text-[#66736c]">
-              本の裏表紙にあるバーコードを枠内に合わせてください。
+              本の裏表紙にあるISBNバーコードを枠内に合わせてください。
             </p>
           )}
+          <p className="mt-3 text-[11px] text-[#748078]" aria-live="polite">
+            読み取り済み: {scannedCount}冊
+          </p>
+          <button
+            type="button"
+            onClick={onComplete}
+            disabled={scannedCount === 0}
+            className="mt-5 min-h-11 w-full rounded-md bg-[#344941] text-xs font-medium text-white transition hover:bg-[#263a33] disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {scannedCount > 0
+              ? `${scannedCount}冊の登録へ進む`
+              : "本を読み取ってください"}
+          </button>
           <button
             type="button"
             onClick={onClose}
-            className="mt-5 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white text-xs text-[#526159] transition hover:border-[#60736a] hover:bg-[#f3f1eb]"
+            className="mt-3 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white text-xs text-[#526159] transition hover:border-[#60736a] hover:bg-[#f3f1eb]"
           >
             閉じる
           </button>

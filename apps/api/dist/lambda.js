@@ -17701,6 +17701,9 @@ var catalogBookSelection = {
   size: books.bookFormat,
   itemCaption: books.description
 };
+var isBulkBooksRequest = (body) => typeof body === "object" && body !== null && "books" in body && Array.isArray(body.books);
+var isBulkBookPayload = (book) => typeof book === "object" && book !== null && "isbn" in book && typeof book.isbn === "string" && "title" in book && typeof book.title === "string" && "author" in book && typeof book.author === "string";
+var getOptionalString = (value) => typeof value === "string" ? value : null;
 var findUserBookById = async (id, userId) => {
   const result = await db.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(and(eq(userBooks.id, id), eq(userBooks.userId, userId))).limit(1);
   return result[0];
@@ -17733,6 +17736,67 @@ booksRouter.get("/catalog/:isbn", async (c) => {
     return c.json({ message: "Book not found" }, 404);
   }
   return c.json(book);
+});
+booksRouter.post("/bulk", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const body = await c.req.json();
+  if (!isBulkBooksRequest(body) || body.books.length === 0) {
+    return c.json({ message: "\u767B\u9332\u3059\u308B\u672C\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  }
+  if (body.books.length > 30) {
+    return c.json({ message: "\u4E00\u5EA6\u306B\u767B\u9332\u3067\u304D\u308B\u306E\u306F30\u518A\u307E\u3067\u3067\u3059" }, 400);
+  }
+  const uniqueBooks = Array.from(
+    new Map(
+      body.books.filter(isBulkBookPayload).map((book) => [book.isbn, book])
+    ).values()
+  );
+  if (uniqueBooks.length === 0) {
+    return c.json({ message: "\u6709\u52B9\u306A\u66F8\u7C4D\u60C5\u5831\u304C\u3042\u308A\u307E\u305B\u3093" }, 400);
+  }
+  try {
+    const result = await db.transaction(async (tx) => {
+      const createdIsbns = [];
+      const skippedIsbns = [];
+      for (const book of uniqueBooks) {
+        const insertedBooks = await tx.insert(books).values({
+          isbn: book.isbn,
+          title: book.title,
+          author: book.author,
+          publisher: getOptionalString(book.publisherName),
+          series: getOptionalString(book.seriesName),
+          salesDate: getOptionalString(book.salesDate),
+          imageUrl: getOptionalString(book.largeImageUrl),
+          bookFormat: getOptionalString(book.size),
+          description: getOptionalString(book.itemCaption)
+        }).onConflictDoNothing({ target: books.isbn }).returning({ id: books.id });
+        const bookId = insertedBooks[0]?.id ?? (await tx.select({ id: books.id }).from(books).where(eq(books.isbn, book.isbn)).limit(1))[0]?.id;
+        if (!bookId) {
+          throw new Error("Book could not be created or found");
+        }
+        const createdUserBook = await tx.insert(userBooks).values({
+          userId: user.id,
+          bookId,
+          status: getOptionalString(book.status) ?? "WANT_TO_READ",
+          rating: null,
+          review: null,
+          completedAt: null
+        }).onConflictDoNothing({
+          target: [userBooks.userId, userBooks.bookId]
+        }).returning({ id: userBooks.id });
+        if (createdUserBook.length > 0) {
+          createdIsbns.push(book.isbn);
+        } else {
+          skippedIsbns.push(book.isbn);
+        }
+      }
+      return { createdIsbns, skippedIsbns };
+    });
+    return c.json(result, 201);
+  } catch (error) {
+    console.error(error);
+    return c.json({ message: "\u672C\u306E\u4E00\u62EC\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
+  }
 });
 booksRouter.get("/:id", authMiddleware, async (c) => {
   const user = c.get("user");
