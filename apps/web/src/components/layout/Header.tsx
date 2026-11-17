@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { RiBookShelfLine, RiSearchLine } from "react-icons/ri";
 import Image from "next/image";
 import AuthButton from "../ui/AuthButton";
+import LoginButton from "../ui/LoginButton";
 import { useAuth } from "../providers/AuthProvider";
 
 const Header = () => {
@@ -31,6 +32,15 @@ const Header = () => {
             aria-label="メインナビゲーション"
             className="flex items-center gap-1"
           >
+            {user && (
+              <Link
+                href="/bookshelf"
+                className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/bookshelf") ? "bg-[#344941] font-medium text-white shadow-[0_3px_8px_rgb(38_58_49/14%)]" : "bg-[#eeece5] font-medium text-[#40584e] hover:bg-[#e1dfd7]"}`}
+              >
+                <RiBookShelfLine className="text-base" aria-hidden="true" />
+                <span className="max-[374px]:hidden">本棚</span>
+              </Link>
+            )}
             <Link
               href="/books/search"
               className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/books/search") ? "bg-[#e7e5de] font-medium text-[#293630]" : "text-[#526159] hover:bg-[#e7e5de]"}`}
@@ -39,22 +49,22 @@ const Header = () => {
               <span className="max-[374px]:hidden sm:hidden">探す</span>
               <span className="hidden sm:inline">本を探す</span>
             </Link>
-            {user && (
-              <Link
-                href="/bookshelf"
-                className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/bookshelf") ? "bg-[#e7e5de] font-medium text-[#293630]" : "text-[#526159] hover:bg-[#e7e5de]"}`}
-              >
-                <RiBookShelfLine className="text-base" aria-hidden="true" />
-                <span className="max-[374px]:hidden">本棚</span>
-              </Link>
-            )}
           </nav>
 
-          <span
-            className="mx-1 h-5 w-px bg-[#293630]/10 sm:ml-1 sm:mr-3"
-            aria-hidden="true"
-          />
-          <AuthButton compact />
+          {user ? (
+            <>
+              <span
+                className="mx-1 h-5 w-px bg-[#293630]/10 sm:ml-1 sm:mr-3"
+                aria-hidden="true"
+              />
+              <AuthButton compact />
+            </>
+          ) : (
+            <LoginButton
+              label="本棚をつくる"
+              className="min-h-9 rounded-md bg-[#344941] px-3 text-sm font-medium text-white shadow-[0_4px_10px_rgb(38_58_49/14%)] transition hover:bg-[#263a33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:ml-2 sm:px-4"
+            />
+          )}
         </div>
       </div>
     </header>
