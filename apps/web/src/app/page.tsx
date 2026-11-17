@@ -342,136 +342,187 @@ function AuthenticatedHome() {
 
 function GuestHome() {
   return (
-    <main className="overflow-hidden text-[#293630]">
-      <section className="mx-auto grid grid-cols-1 max-w-290 items-center gap-14 px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-20 lg:pt-28">
-        <div className="contents">
-          <div className="min-w-0 max-w-132.5">
-            <p className="mb-6 flex items-center gap-3 text-xs tracking-[0.18em] text-[#718078]">
+    <main className="-mx-3 overflow-hidden text-[#293630]">
+      <section className="mx-auto max-w-290 px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24 lg:pt-28">
+        <div className="mx-auto min-w-0 max-w-250 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.54fr)] lg:items-center lg:gap-20">
+          <div className="text-left sm:text-center lg:text-left">
+            <p className="mb-6 flex items-center justify-start gap-3 text-xs tracking-[0.18em] text-[#718078] sm:justify-center lg:justify-start">
               <span className="h-px w-8 bg-[#8e9b94]" />
-              あなたのためだけの、本棚
+              無料の読書記録・積読管理アプリ
             </p>
-            <h1 className="font-serif-jp text-[clamp(2.7rem,5.8vw,4.8rem)] font-medium leading-tight tracking-[-0.055em] text-[#26342e]">
-              読みたい本を、
+            <h1 className="font-serif-jp text-[clamp(2.6rem,4.5vw,4rem)] font-medium leading-[1.3] tracking-[-0.055em] text-[#26342e] sm:text-[clamp(3rem,3.5vw,3.5rem)]">
+              <span className="sm:whitespace-nowrap">
+                読みたい本も、
+                <br className="sm:hidden" />
+                読んだ本も、
+              </span>
               <br />
-              静かに積む。
+              ひとつの本棚に。
             </h1>
-            <p className="mt-8 max-w-117.5 text-[15px] leading-8 text-[#647069] sm:text-base">
-              誰かに見せるためではなく、自分が読むために。
-              <br className="hidden sm:block" />
-              SNS機能のない、シンプルな読書管理アプリです。
+            <p className="mt-8 max-w-145 text-[15px] leading-8 text-[#647069] sm:mx-auto sm:text-base lg:mx-0">
+              誰かに見せるためではなく、自分が読むために。積読も読書記録も、自分のペースで管理できるシンプルなWebアプリです。
             </p>
-            <div className="mt-10 flex flex-col items-start gap-5 sm:flex-row sm:items-center">
-              <LoginButton
-                label="自分の本棚をつくる"
-                className="min-h-13 rounded-md bg-[#344941] px-7 py-4 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
-              />
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-center lg:justify-start">
+              <div className="flex w-full flex-col sm:relative sm:block sm:w-auto">
+                <p className="order-first mb-2 flex items-center justify-center gap-2 text-xs text-[#718078] sm:absolute sm:left-0 sm:top-full sm:mt-2 sm:mb-0 sm:whitespace-nowrap lg:justify-start">
+                  <Image
+                    src="/google_logo.svg"
+                    alt=""
+                    width={14}
+                    height={14}
+                    aria-hidden="true"
+                  />
+                  Googleアカウントでかんたんに開始
+                </p>
+                <LoginButton
+                  label="無料で本棚をつくる"
+                  className="min-h-14 w-full rounded-md bg-[#344941] px-7 py-4 text-sm font-medium text-white shadow-[0_8px_18px_rgb(38_58_49/16%)] transition-all hover:-translate-y-0.5 hover:bg-[#263a33] hover:shadow-[0_12px_22px_rgb(38_58_49/20%)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:w-auto"
+                />
+              </div>
               <Link
                 href="/books/search"
-                className="group flex items-center gap-2 text-xs text-[#66756d] transition hover:text-[#293630]"
+                className="group flex min-h-14 w-full items-center justify-center gap-2 rounded-md border border-[#293630]/14 bg-[#faf9f5] px-6 py-4 text-sm font-medium text-[#506058] transition-all hover:-translate-y-0.5 hover:border-[#718078] hover:bg-[#f2f0e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:w-auto"
               >
-                <RiSearchLine className="text-base" aria-hidden="true" />
-                まずは本を探す
-                <RiArrowRightLine
-                  className="transition-transform group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </Link>
-              <Link
-                href="/guides"
-                className="group flex items-center gap-2 text-xs text-[#66756d] transition hover:text-[#293630]"
-              >
-                <RiBookOpenLine className="text-base" aria-hidden="true" />
-                使い方を見る
+                <RiSearchLine className="text-lg" aria-hidden="true" />
+                本を探してみる
                 <RiArrowRightLine
                   className="transition-transform group-hover:translate-x-0.5"
                   aria-hidden="true"
                 />
               </Link>
             </div>
-            <p className="mt-5 flex items-center gap-2 text-xs text-[#7a857f]">
-              <RiLockLine className="text-sm" aria-hidden="true" />
-              本棚はあなたにしか見えません
-            </p>
-            <HomeNews className="mt-8" />
+            <div className="mt-4 flex flex-wrap items-center justify-start gap-2 sm:mt-12 sm:justify-center lg:justify-start">
+              <p className="flex items-center gap-2 rounded-full border border-[#53655c]/18 bg-[#f4f3ed] px-3 py-2 text-xs font-medium text-[#53655c] shadow-[0_2px_6px_rgb(43_56_50/4%)]">
+                <RiLockLine className="text-base" aria-hidden="true" />
+                SNS機能なし・本棚は非公開
+              </p>
+              <p className="flex items-center gap-2 rounded-full border border-[#53655c]/18 bg-[#f4f3ed] px-3 py-2 text-xs font-medium text-[#53655c] shadow-[0_2px_6px_rgb(43_56_50/4%)]">
+                <RiSearchLine className="text-base" aria-hidden="true" />
+                登録不要で本の検索をお試し
+              </p>
+            </div>
           </div>
-
-          <BookshelfPreview />
+          <figure className="mx-auto mt-10 w-[min(78vw,320px)] overflow-hidden rounded-xl border border-[#293630]/10 bg-[#faf9f5] shadow-[0_24px_60px_rgba(43,56,50,0.14)] sm:mt-12 sm:w-75 lg:mt-0 lg:w-full lg:max-w-[320px] lg:justify-self-end">
+            <Image
+              src="/bookshelf_sp.png"
+              alt="つみほんの本棚画面"
+              width={361}
+              height={674}
+              priority
+              sizes="(min-width: 1024px) 320px, (min-width: 640px) 300px, 78vw"
+              className="h-auto w-full"
+            />
+          </figure>
         </div>
       </section>
 
       <section
-        className="border-y border-[#293630]/8 bg-[#eeece5] px-5 py-20 sm:px-8 sm:py-28"
+        className="border-y border-[#293630]/8 bg-[#eeece5] px-5 py-12 sm:px-8 sm:py-28"
         aria-labelledby="feature-heading"
       >
         <div className="mx-auto max-w-265">
           <p className="text-xs tracking-[0.18em] text-[#7a877f]">
-            大切にしていること
+            ABOUT TSUMIHON
           </p>
           <h2
             id="feature-heading"
             className="mt-5 font-serif-jp text-3xl font-medium leading-snug tracking-[-0.04em] sm:text-[42px]"
           >
-            読みたい気持ちを、
-            <br />
-            置き去りにしないこと。
+            つみほんとは？
           </h2>
-          <div className="mt-14 grid border-t border-[#293630]/12 md:grid-cols-3">
-            {[
-              [
-                RiAddLine,
-                "本を探して登録",
-                "タイトル・著者名・ISBNからすぐに検索。",
-              ],
-              [
-                RiStackLine,
-                "読書の状態を記録",
-                "読みたい、読んでいる、読み終わったを整理。",
-              ],
-              [
-                RiBookOpenLine,
-                "本棚を育てる",
-                "読書の積み重ねを、いつでも振り返れます。",
-              ],
-            ].map(([Icon, title, description]) => {
-              const FeatureIcon = Icon as typeof RiAddLine;
-              return (
-                <div
-                  key={title as string}
-                  className="border-b border-[#293630]/12 py-8 last:border-b-0 md:border-b-0 md:px-8 md:first:pl-0 md:not-first:border-l md:border-[#293630]/12 md:py-10"
-                >
-                  <FeatureIcon
-                    className="text-xl text-[#607169]"
-                    aria-hidden="true"
-                  />
-                  <h3 className="mt-8 font-serif-jp text-xl font-medium text-[#293630]">
-                    {title as string}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-[#6d7872]">
-                    {description as string}
-                  </p>
-                </div>
-              );
-            })}
+          <p className="mt-6 text-sm leading-8 text-[#647069] sm:text-base">
+            気になる本は、検索・ISBN・バーコードからすぐに追加。登録した本やメモは公開されないので、誰かの目を気にせず残せます。
+            <br />
+            読みたい本から読み終えた本まで、変わっていく読書の時間を、ひとつの本棚で整理できます。
+          </p>
+          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:items-center lg:gap-16">
+            <div className="divide-y divide-[#293630]/12 border-y border-[#293630]/12">
+              {[
+                [
+                  RiLockLine,
+                  "人に見せない本棚",
+                  "登録した本、評価、メモはあなたのためだけに残せます。",
+                ],
+                [
+                  RiAddLine,
+                  "気になる本をすぐ残せる",
+                  "タイトル・著者名・ISBN、バーコードから本を登録できます。",
+                ],
+                [
+                  RiStackLine,
+                  "読書の変化が見えてくる",
+                  "読みたい、読んでいる、読み終わった本を自分のペースで整理できます。",
+                ],
+              ].map(([Icon, title, description]) => {
+                const FeatureIcon = Icon as typeof RiAddLine;
+                return (
+                  <div
+                    key={title as string}
+                    className="flex gap-5 py-6 sm:gap-6"
+                  >
+                    <FeatureIcon
+                      className="mt-1 shrink-0 text-xl text-[#607169]"
+                      aria-hidden="true"
+                    />
+                    <div>
+                      <h3 className="font-serif-jp text-xl font-medium text-[#293630]">
+                        {title as string}
+                      </h3>
+                      <p className="mt-2 text-sm leading-7 text-[#6d7872]">
+                        {description as string}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <BookshelfPreview className="max-w-none" />
+          </div>
+          <div className="mt-12 flex justify-end">
+            <Link
+              href="/guides"
+              className="group flex min-h-12 w-full items-center justify-center gap-2 rounded-md border border-[#293630]/14 bg-[#faf9f5] px-6 py-3.5 text-sm font-medium text-[#40584e] transition-all hover:-translate-y-0.5 hover:border-[#718078] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:inline-flex sm:w-auto"
+            >
+              つみほんの使い方を見る
+              <RiArrowRightLine
+                className="transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </Link>
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto max-w-225 px-5 py-16 sm:px-8 sm:py-24">
+        <HomeNews className="text-left" />
       </section>
     </main>
   );
 }
 
-function BookshelfPreview() {
+function BookshelfPreview({ className = "" }: { className?: string }) {
   return (
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      aria-label="つみほんの本棚画面の紹介動画"
-      className="mx-auto h-auto min-w-0 w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:max-w-142.5"
-    >
-      <source src="/videos/introduction.mp4" type="video/mp4" />
-      お使いのブラウザは動画の再生に対応していません。
-    </video>
+    <figure>
+      <figcaption className="mb-5 text-left">
+        <p className="text-xs tracking-[0.18em] text-[#7a877f]">
+          SCREEN WALKTHROUGH
+        </p>
+        <p className="mt-2 font-serif-jp text-xl font-medium text-[#293630] sm:text-2xl">
+          本を登録して、本棚に残すまで
+        </p>
+      </figcaption>
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-label="本を登録して本棚に残すまでを紹介する動画"
+        className={`mx-auto h-auto min-w-0 w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:max-w-142.5 ${className}`}
+      >
+        <source src="/videos/introduction.mp4" type="video/mp4" />
+        お使いのブラウザは動画の再生に対応していません。
+      </video>
+    </figure>
   );
 }
