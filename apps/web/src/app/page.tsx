@@ -334,9 +334,9 @@ function AuthenticatedHome() {
 function GuestHome() {
   return (
     <main className="overflow-hidden text-[#293630]">
-      <section className="mx-auto grid max-w-290 items-center gap-14 px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24 lg:grid-cols-[0.92fr_1.08fr] lg:gap-20 lg:pt-28">
+      <section className="mx-auto grid grid-cols-1 max-w-290 items-center gap-14 px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-20 lg:pt-28">
         <div className="contents">
-          <div className="max-w-132.5">
+          <div className="min-w-0 max-w-132.5">
             <p className="mb-6 flex items-center gap-3 text-xs tracking-[0.18em] text-[#718078]">
               <span className="h-px w-8 bg-[#8e9b94]" />
               あなたのためだけの、本棚
@@ -448,7 +448,7 @@ function BookshelfPreview() {
       playsInline
       preload="metadata"
       aria-label="つみほんの本棚画面の紹介動画"
-      className="mx-auto h-auto w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:max-w-142.5"
+      className="mx-auto h-auto min-w-0 w-full max-w-90.25 border border-[#293630]/10 shadow-[0_24px_60px_rgba(43,56,50,0.08)] sm:max-w-142.5"
     >
       <source src="/videos/introduction.mp4" type="video/mp4" />
       お使いのブラウザは動画の再生に対応していません。
