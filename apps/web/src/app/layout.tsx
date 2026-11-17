@@ -24,7 +24,7 @@ const siteUrl = new URL(
 
 const siteTitle = "つみほん｜あなただけの本棚";
 const siteDescription =
-  "読みたい本、読んでいる本、読み終えた本を記録して、あなただけの本棚を育てる読書記録サービスです。";
+  "読みたい本も、読んだ本も、ひとつの本棚に。SNS機能なし・本棚非公開の無料読書記録・積読管理アプリです。";
 const googleAnalyticsMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const websiteStructuredData = {
   "@context": "https://schema.org",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "つみほん - あなただけの本棚",
+        alt: "つみほん - 読みたい本も、読んだ本も、ひとつの本棚に。",
       },
     ],
   },

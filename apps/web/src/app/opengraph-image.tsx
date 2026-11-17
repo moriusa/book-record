@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "つみほん - 読みたい本を、静かに積む。";
+export const alt = "つみほん - 読みたい本も、読んだ本も、ひとつの本棚に。";
 export const size = {
   width: 1200,
   height: 630,
@@ -67,7 +67,7 @@ export default function OpenGraphImage() {
                 color: "#718078",
                 display: "flex",
                 fontSize: 16,
-                letterSpacing: 4,
+                letterSpacing: 2,
               }}
             >
               <span
@@ -79,12 +79,12 @@ export default function OpenGraphImage() {
                   width: "36px",
                 }}
               />
-              YOUR PERSONAL BOOKSHELF
+              無料の読書記録・積読管理アプリ
             </div>
             <div
               style={{
                 fontFamily: "serif",
-                fontSize: 64,
+                fontSize: 50,
                 fontWeight: 500,
                 letterSpacing: -3,
                 lineHeight: 1.25,
@@ -92,7 +92,7 @@ export default function OpenGraphImage() {
                 whiteSpace: "pre-wrap",
               }}
             >
-              {"読みたい本を、\n静かに積む。"}
+              {"読みたい本も、読んだ本も、\nひとつの本棚に。"}
             </div>
             <div
               style={{
@@ -102,7 +102,7 @@ export default function OpenGraphImage() {
                 marginTop: "24px",
               }}
             >
-              SNS機能のない、あなただけの読書記録。
+              SNS機能なし・本棚は非公開。
             </div>
           </div>
 
