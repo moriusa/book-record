@@ -12,6 +12,11 @@ export type BlogPost = {
   updatedAt: string;
 };
 
+export type BlogPostSummary = Pick<
+  BlogPost,
+  "id" | "title" | "publishedAt" | "createdAt"
+>;
+
 type MicrocmsListResponse<T> = {
   contents: T[];
   totalCount: number;
@@ -70,6 +75,14 @@ export const getBlogPostsWithStatus = async () => {
 };
 
 export const getBlogPosts = async () => (await getBlogPostsWithStatus()).posts;
+
+export const getRecentBlogPosts = async (limit = 3) => {
+  const response = await fetchMicrocms<MicrocmsListResponse<BlogPostSummary>>(
+    `blog?limit=${limit}&orders=-publishedAt&fields=id,title,publishedAt,createdAt`,
+  );
+
+  return response.data?.contents ?? [];
+};
 
 export const getBlogPost = async (id: string) =>
   (await fetchMicrocms<BlogPost>(`blog/${id}`)).data;
