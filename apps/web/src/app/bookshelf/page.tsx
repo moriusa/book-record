@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { RiAddLine, RiBookShelfLine, RiBookmark3Line } from "react-icons/ri";
@@ -15,7 +15,7 @@ import {
   GroupOption,
 } from "@/types/book";
 
-const Page = () => {
+const BookshelfPage = () => {
   const searchParams = useSearchParams();
   const statusFromQuery = searchParams.get("status");
   const isFilterStatus = (status: string | null): status is FilterStatus =>
@@ -119,5 +119,15 @@ const Page = () => {
     </main>
   );
 };
+
+const Page = () => (
+  <Suspense
+    fallback={
+      <main className="mx-auto min-h-80 max-w-295 px-5 py-10 sm:px-8" />
+    }
+  >
+    <BookshelfPage />
+  </Suspense>
+);
 
 export default Page;
