@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { RiAddLine, RiBookShelfLine, RiBookmark3Line } from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
@@ -15,7 +16,17 @@ import {
 } from "@/types/book";
 
 const Page = () => {
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>("ALL");
+  const searchParams = useSearchParams();
+  const statusFromQuery = searchParams.get("status");
+  const isFilterStatus = (status: string | null): status is FilterStatus =>
+    status === "ALL" ||
+    status === "WANT_TO_READ" ||
+    status === "READING" ||
+    status === "COMPLETED" ||
+    status === "ON_HOLD";
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>(() =>
+    isFilterStatus(statusFromQuery) ? statusFromQuery : "ALL",
+  );
   const [sortOption, setSortOption] = useState<SortOption>("CREATED");
   const [sortDirection, setSortDirection] = useState<SortDirection>("DESC");
   const [groupOption, setGroupOption] = useState<GroupOption>("NONE");

@@ -75,10 +75,13 @@ function AuthenticatedHome() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )
     .slice(0, 5);
-  const readingBook = books?.find((book) => book.status === "READING");
-  const wantToReadBooks = (books ?? []).filter(
-    (book) => book.status === "WANT_TO_READ" || book.status === "ON_HOLD",
-  );
+  const readingBooks = [...(books ?? [])]
+    .filter((book) => book.status === "READING")
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+  const readingBook = readingBooks[0];
 
   return (
     <main className="mx-auto max-w-270 px-5 pb-24 pt-12 text-[#293630] sm:px-8 sm:pt-16">
@@ -112,22 +115,33 @@ function AuthenticatedHome() {
         </div>
       </div>
 
-      <HomeNews className="mt-8" />
-
       <section
         className="mt-11 grid lg:grid-cols-[1.55fr_0.8fr]"
         aria-labelledby="current-reading-heading"
       >
         <div className="py-9 lg:border-r lg:border-[#293630]/10 lg:pr-12">
-          <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-            CURRENTLY READING
-          </p>
-          <h2
-            id="current-reading-heading"
-            className="mt-2 font-serif-jp text-xl font-medium"
-          >
-            今、読んでいる本
-          </h2>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[10px] tracking-[0.16em] text-[#839089]">
+                CURRENTLY READING
+              </p>
+              <h2
+                id="current-reading-heading"
+                className="mt-2 font-serif-jp text-xl font-medium"
+              >
+                今、読んでいる本
+              </h2>
+            </div>
+            {readingBooks.length > 1 && (
+              <Link
+                href="/bookshelf?status=READING"
+                className="flex shrink-0 items-center gap-1.5 text-[10px] text-[#69766f]"
+              >
+                {readingBooks.length}冊すべて見る
+                <RiArrowRightLine aria-hidden="true" />
+              </Link>
+            )}
+          </div>
           {readingBook ? (
             <div className="mt-8 grid grid-cols-[105px_1fr] gap-6 sm:grid-cols-[150px_1fr] sm:gap-9">
               <Link
@@ -184,9 +198,18 @@ function AuthenticatedHome() {
               </div>
             </div>
           ) : (
-            <p className="mt-8 text-sm text-[#75817b]">
-              読んでいる本はまだありません。
-            </p>
+            <div className="mt-8">
+              <p className="text-sm text-[#75817b]">
+                読んでいる本はまだありません。
+              </p>
+              <Link
+                href="/bookshelf?status=WANT_TO_READ"
+                className="mt-4 inline-flex items-center gap-2 text-xs text-[#50665c] underline underline-offset-4"
+              >
+                本棚から次に読む本を選ぶ
+                <RiArrowRightLine aria-hidden="true" />
+              </Link>
+            </div>
           )}
         </div>
         <aside className="py-9 lg:pl-10">
@@ -211,7 +234,7 @@ function AuthenticatedHome() {
             {statusCards.map(({ status, label }) => (
               <Link
                 key={status}
-                href="/bookshelf"
+                href={`/bookshelf?status=${status}`}
                 className="flex items-center justify-between py-4"
               >
                 <span className="flex items-center gap-2.5 text-xs text-[#647169]">
@@ -313,29 +336,7 @@ function AuthenticatedHome() {
         )}
       </section>
 
-      {wantToReadBooks.length > 0 && (
-        <section className="mt-16 border border-[#293630]/10 bg-[#eeece5] px-6 py-8 sm:px-9">
-          <div className="grid gap-7 sm:grid-cols-[1fr_auto] sm:items-center">
-            <div>
-              <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-                READ NEXT
-              </p>
-              <h2 className="mt-2 font-serif-jp text-xl font-medium">
-                次は、どの本を読みましょう。
-              </h2>
-              <p className="mt-3 text-xs leading-6 text-[#75817b]">
-                読みたい本と積読の中から、今の気分に合う一冊を選べます。
-              </p>
-            </div>
-            <Link
-              href="/bookshelf"
-              className="w-fit rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-xs text-[#58685f] transition-colors hover:border-[#718078]"
-            >
-              本棚から選ぶ
-            </Link>
-          </div>
-        </section>
-      )}
+      <HomeNews className="mt-16" />
     </main>
   );
 }
