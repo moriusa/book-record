@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { guides } from "@/data/guides";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -27,6 +28,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: new URL("/guides", siteUrl).toString(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...guides.map(({ slug }) => ({
+      url: new URL(`/guides/${slug}`, siteUrl).toString(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
   ];
 
   if (!apiUrl) {
