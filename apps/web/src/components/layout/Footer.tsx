@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const footerLinks = [
+  { href: "/blog", label: "ブログ" },
   { href: "/guides", label: "読書のガイド" },
   { href: "/updates", label: "更新履歴" },
   { href: "/privacy", label: "プライバシーポリシー" },

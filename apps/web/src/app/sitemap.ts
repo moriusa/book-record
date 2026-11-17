@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { guides } from "@/data/guides";
+import { getBlogPosts } from "@/lib/microcms";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -38,10 +39,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
+    {
+      url: new URL("/blog", siteUrl).toString(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
   ];
 
+  const blogPosts = await getBlogPosts();
+  const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: new URL(`/blog/${post.id}`, siteUrl).toString(),
+    lastModified: post.revisedAt ?? post.updatedAt,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
   if (!apiUrl) {
-    return baseEntries;
+    return [...baseEntries, ...blogEntries];
   }
 
   try {
@@ -50,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     if (!response.ok) {
-      return baseEntries;
+      return [...baseEntries, ...blogEntries];
     }
 
     const books: CatalogBook[] = await response.json();
@@ -62,8 +76,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "monthly" as const,
         priority: 0.7,
       })),
+      ...blogEntries,
     ];
   } catch {
-    return baseEntries;
+    return [...baseEntries, ...blogEntries];
   }
 }
