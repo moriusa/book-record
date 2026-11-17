@@ -41,7 +41,7 @@ const fetchMicrocms = async <T>(
   try {
     const response = await fetch(getEndpoint(path), {
       headers: { "X-MICROCMS-API-KEY": apiKey },
-      next: { revalidate: 3600, tags: ["blogaa"] },
+      next: { revalidate: 3600, tags: ["blog"] },
     });
 
     if (!response.ok) {
