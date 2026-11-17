@@ -426,7 +426,7 @@ const SearchPage = () => {
                       onChange={(event) =>
                         setBulkStatus(event.target.value as BookStatus)
                       }
-                      className="mt-2 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white px-3 text-xs text-[#40584e] outline-none focus:border-[#60736a]"
+                      className="mt-2 min-h-13 w-full rounded-md border border-[#293630]/12 bg-white px-4 text-sm text-[#40584e] outline-none focus:border-[#60736a]"
                     >
                       {bookStatusOptions.map((option) => (
                         <option key={option.value} value={option.value}>
