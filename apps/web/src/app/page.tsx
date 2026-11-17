@@ -94,13 +94,22 @@ function AuthenticatedHome() {
             今日も、気になる本を少しずつ。
           </p>
         </div>
-        <Link
-          href="/books/search"
-          className="flex w-fit items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
-        >
-          <RiAddLine aria-hidden="true" />
-          本を探す
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/guides"
+            className="flex items-center gap-2 rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-xs text-[#58685f] transition-colors hover:border-[#718078]"
+          >
+            <RiBookOpenLine aria-hidden="true" />
+            使い方を見る
+          </Link>
+          <Link
+            href="/books/search"
+            className="flex w-fit items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+          >
+            <RiAddLine aria-hidden="true" />
+            本を探す
+          </Link>
+        </div>
       </div>
 
       <HomeNews className="mt-8" />
@@ -362,6 +371,17 @@ function GuestHome() {
               >
                 <RiSearchLine className="text-base" aria-hidden="true" />
                 まずは本を探す
+                <RiArrowRightLine
+                  className="transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Link>
+              <Link
+                href="/guides"
+                className="group flex items-center gap-2 text-xs text-[#66756d] transition hover:text-[#293630]"
+              >
+                <RiBookOpenLine className="text-base" aria-hidden="true" />
+                使い方を見る
                 <RiArrowRightLine
                   className="transition-transform group-hover:translate-x-0.5"
                   aria-hidden="true"
