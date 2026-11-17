@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signInWithRedirect } from "aws-amplify/auth";
 import Image from "next/image";
 import { createPortal } from "react-dom";
@@ -12,6 +12,43 @@ type Props = {
 
 export default function LoginButton({ label = "ログイン", className }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const dialogOverlayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const updateDialogViewport = () => {
+      const overlay = dialogOverlayRef.current;
+      if (!overlay) return;
+
+      const viewport = window.visualViewport;
+      if (!viewport) {
+        overlay.style.transform = "";
+        overlay.style.width = "100vw";
+        overlay.style.height = "100dvh";
+        return;
+      }
+
+      overlay.style.transform = `translate(${viewport.offsetLeft}px, ${viewport.offsetTop}px)`;
+      overlay.style.width = `${viewport.width}px`;
+      overlay.style.height = `${viewport.height}px`;
+    };
+
+    updateDialogViewport();
+    window.visualViewport?.addEventListener("resize", updateDialogViewport);
+    window.visualViewport?.addEventListener("scroll", updateDialogViewport);
+
+    return () => {
+      window.visualViewport?.removeEventListener(
+        "resize",
+        updateDialogViewport,
+      );
+      window.visualViewport?.removeEventListener(
+        "scroll",
+        updateDialogViewport,
+      );
+    };
+  }, [isOpen]);
 
   const handleGoogleLogin = async () => {
     await signInWithRedirect({
@@ -36,7 +73,9 @@ export default function LoginButton({ label = "ログイン", className }: Props
         typeof document !== "undefined" &&
         createPortal(
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#1e2b26]/45 p-5 backdrop-blur-[3px]"
+            ref={dialogOverlayRef}
+            className="fixed left-0 top-0 z-50 flex items-center justify-center bg-[#1e2b26]/45 p-5 backdrop-blur-[3px]"
+            style={{ width: "100vw", height: "100dvh" }}
             role="dialog"
             aria-modal="true"
             onClick={() => setIsOpen(false)}
