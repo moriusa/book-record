@@ -35,7 +35,7 @@ const Header = () => {
             {user && (
               <Link
                 href="/bookshelf"
-                className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/bookshelf") ? "bg-[#344941] font-medium text-white shadow-[0_3px_8px_rgb(38_58_49/14%)]" : "bg-[#eeece5] font-medium text-[#40584e] hover:bg-[#e1dfd7]"}`}
+                className={`flex items-center gap-2 rounded-md px-2 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-4 ${pathname.startsWith("/bookshelf") ? "bg-[#344941] font-medium text-white shadow-[0_3px_8px_rgb(38_58_49/14%)]" : "text-[#526159] hover:bg-[#e7e5de]"}`}
               >
                 <RiBookShelfLine className="text-base" aria-hidden="true" />
                 <span className="max-[374px]:hidden">本棚</span>
