@@ -13,6 +13,7 @@ import {
   RiArrowDownSLine,
   RiLayoutGridLine,
   RiListUnordered,
+  RiSearchLine,
   RiSortDesc,
   RiStackLine,
 } from "react-icons/ri";
@@ -20,11 +21,13 @@ import {
 type Props = {
   filterStatus: FilterStatus;
   statusCounts: Record<FilterStatus, number>;
+  searchQuery: string;
   sortOption: SortOption;
   sortDirection: SortDirection;
   groupOption: GroupOption;
   viewMode: ViewMode;
   onFilterChange: (status: FilterStatus) => void;
+  onSearchChange: (query: string) => void;
   onSortChange: (option: SortOption) => void;
   onSortDirectionChange: (direction: SortDirection) => void;
   onGroupChange: (option: GroupOption) => void;
@@ -59,11 +62,13 @@ const groupOptions = [
 const BookshelfToolbar = ({
   filterStatus,
   statusCounts,
+  searchQuery,
   sortOption,
   sortDirection,
   groupOption,
   viewMode,
   onFilterChange,
+  onSearchChange,
   onSortChange,
   onSortDirectionChange,
   onGroupChange,
@@ -178,7 +183,21 @@ const BookshelfToolbar = ({
           </div>
         </div>
 
-        <div className="relative flex items-center justify-end gap-3 pt-3">
+        <div className="relative flex items-center justify-between gap-3 pt-3">
+          <label className="relative min-w-0 flex-1 sm:max-w-90">
+            <span className="sr-only">本棚を検索</span>
+            <RiSearchLine
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#7b8781]"
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="本棚を検索"
+              className="min-h-10 w-full rounded-md border border-[#293630]/10 bg-[#f9f8f4] py-2 pl-9 pr-3 text-sm text-[#34443d] outline-none transition placeholder:text-[#929b96] hover:border-[#293630]/20 focus:border-[#60736a] focus:ring-2 focus:ring-[#dfe5e0]"
+            />
+          </label>
           <button
             type="button"
             onClick={() => setIsDisplaySettingsOpen((isOpen) => !isOpen)}

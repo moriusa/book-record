@@ -8,10 +8,12 @@ import {
   ViewMode,
 } from "@/types/book";
 import BookshelfSection from "./BookshelfSection";
+import { RiSearchLine } from "react-icons/ri";
 
 type Props = {
   books: Book[];
   filterStatus: FilterStatus;
+  searchQuery: string;
   sortOption: SortOption;
   sortDirection: SortDirection;
   groupOption: GroupOption;
@@ -57,16 +59,27 @@ const getSalesDateGroup = (salesDate: string | null | undefined) => {
 const BookshelfList = ({
   books,
   filterStatus,
+  searchQuery,
   sortOption,
   sortDirection,
   groupOption,
   viewMode,
 }: Props) => {
   // ① フィルター
-  const filteredBooks =
+  const booksByStatus =
     filterStatus === "ALL"
       ? books
       : books.filter((book) => book.status === filterStatus);
+  const normalizedQuery = searchQuery.trim().toLocaleLowerCase("ja-JP");
+  const filteredBooks = normalizedQuery
+    ? booksByStatus.filter((book) =>
+        [book.title, book.author, book.publisher, book.series, book.isbn]
+          .filter(Boolean)
+          .some((value) =>
+            value?.toLocaleLowerCase("ja-JP").includes(normalizedQuery),
+          ),
+      )
+    : booksByStatus;
 
   // ② ソート
   const sortedBooks = [...filteredBooks].sort((a, b) => {
@@ -89,7 +102,9 @@ const BookshelfList = ({
     const comparison = (() => {
       switch (sortOption) {
         case "CREATED":
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
         case "TITLE":
           return a.title.localeCompare(b.title, "ja");
         case "RATING":
@@ -100,6 +115,25 @@ const BookshelfList = ({
     return sortDirection === "ASC" ? comparison : -comparison;
   });
 
+  if (sortedBooks.length === 0) {
+    const message = normalizedQuery
+      ? `「${searchQuery.trim()}」に一致する本はありません。`
+      : "この条件に当てはまる本はありません。";
+
+    return (
+      <section className="mt-10 border border-dashed border-[#293630]/15 bg-[#eeece5]/55 px-6 py-12 text-center sm:px-10">
+        <RiSearchLine
+          className="mx-auto text-2xl text-[#75817b]"
+          aria-hidden="true"
+        />
+        <p className="mt-4 text-sm text-[#526159]">{message}</p>
+        <p className="mt-2 text-xs text-[#7b8781]">
+          検索語やステータスを変更してみてください。
+        </p>
+      </section>
+    );
+  }
+
   if (sortOption === "SALES_DATE") {
     const groupedBooks = Map.groupBy(sortedBooks, (book) => {
       const salesDateGroup = getSalesDateGroup(book.salesDate);
@@ -109,9 +143,7 @@ const BookshelfList = ({
     return (
       <div>
         {[...groupedBooks.entries()].map(([groupKey, groupedBooks]) => {
-          const salesDateGroup = getSalesDateGroup(
-            groupedBooks[0]?.salesDate,
-          );
+          const salesDateGroup = getSalesDateGroup(groupedBooks[0]?.salesDate);
 
           return (
             <BookshelfSection

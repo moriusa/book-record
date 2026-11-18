@@ -31,6 +31,7 @@ const BookshelfPage = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>("DESC");
   const [groupOption, setGroupOption] = useState<GroupOption>("NONE");
   const [viewMode, setViewMode] = useState<ViewMode>("GRID");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isLoading, error } = useGetBooks();
   const statusCounts: Record<FilterStatus, number> = {
@@ -97,11 +98,13 @@ const BookshelfPage = () => {
       <BookshelfToolbar
         filterStatus={filterStatus}
         statusCounts={statusCounts}
+        searchQuery={searchQuery}
         sortOption={sortOption}
         sortDirection={sortDirection}
         groupOption={groupOption}
         viewMode={viewMode}
         onFilterChange={setFilterStatus}
+        onSearchChange={setSearchQuery}
         onSortChange={handleSortChange}
         onSortDirectionChange={setSortDirection}
         onGroupChange={setGroupOption}
@@ -111,6 +114,7 @@ const BookshelfPage = () => {
       <BookshelfList
         books={data ?? []}
         filterStatus={filterStatus}
+        searchQuery={searchQuery}
         sortOption={sortOption}
         sortDirection={sortDirection}
         groupOption={groupOption}
