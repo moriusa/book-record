@@ -7,8 +7,9 @@ import {
   SortOption,
   ViewMode,
 } from "@/types/book";
+import Link from "next/link";
 import BookshelfSection from "./BookshelfSection";
-import { RiSearchLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine } from "react-icons/ri";
 
 type Props = {
   books: Book[];
@@ -116,6 +117,26 @@ const BookshelfList = ({
   });
 
   if (sortedBooks.length === 0) {
+    if (books.length === 0) {
+      return (
+        <section className="mt-10 border border-dashed border-[#293630]/15 bg-[#eeece5]/55 px-6 py-12 text-center sm:px-10 sm:py-16">
+          <p className="font-serif-jp text-xl font-medium text-[#34443d]">
+            最初の一冊を、本棚へ。
+          </p>
+          <p className="mx-auto mt-3 max-w-105 text-sm leading-7 text-[#65736c]">
+            気になる本を検索して、あなたの本棚をはじめましょう。
+          </p>
+          <Link
+            href="/books/search"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md bg-[#344941] px-5 text-sm font-medium text-white transition hover:bg-[#263a33]"
+          >
+            <RiAddLine className="text-lg" aria-hidden="true" />
+            本を探す
+          </Link>
+        </section>
+      );
+    }
+
     const message = normalizedQuery
       ? `「${searchQuery.trim()}」に一致する本はありません。`
       : "この条件に当てはまる本はありません。";

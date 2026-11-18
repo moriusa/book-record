@@ -183,8 +183,8 @@ const BookshelfToolbar = ({
           </div>
         </div>
 
-        <div className="relative flex items-center justify-between gap-3 pt-3">
-          <label className="relative min-w-0 flex-1 sm:max-w-90">
+        <div className="relative flex flex-wrap items-center gap-3 pt-3">
+          <label className="relative w-full min-w-0 sm:w-auto sm:max-w-90 sm:flex-1">
             <span className="sr-only">本棚を検索</span>
             <RiSearchLine
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#7b8781]"
@@ -198,27 +198,60 @@ const BookshelfToolbar = ({
               className="min-h-10 w-full rounded-md border border-[#293630]/10 bg-[#f9f8f4] py-2 pl-9 pr-3 text-sm text-[#34443d] outline-none transition placeholder:text-[#929b96] hover:border-[#293630]/20 focus:border-[#60736a] focus:ring-2 focus:ring-[#dfe5e0]"
             />
           </label>
-          <button
-            type="button"
-            onClick={() => setIsDisplaySettingsOpen((isOpen) => !isOpen)}
-            aria-expanded={isDisplaySettingsOpen}
-            aria-controls="bookshelf-display-settings"
-            className={`flex min-h-10 items-center gap-2 rounded-md border px-4 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 ${isDisplaySettingsOpen ? "border-[#6c7c74] bg-[#e9e9e2] text-[#344941]" : "border-[#293630]/10 bg-[#f9f8f4] text-[#5f6d66] hover:border-[#293630]/20"}`}
-          >
-            表示設定
-            <RiArrowDownSLine
-              aria-hidden="true"
-              className={`text-lg transition-transform ${
-                isDisplaySettingsOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <div
+              className="flex min-h-10 rounded-md border border-[#293630]/12 bg-[#f9f8f4] p-1"
+              aria-label="表示形式"
+            >
+              <button
+                type="button"
+                onClick={() => onViewModeChange("GRID")}
+                aria-pressed={viewMode === "GRID"}
+                className={`flex min-w-9 items-center justify-center rounded px-2 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
+                  viewMode === "GRID"
+                    ? "bg-[#e4e7e2] text-[#344941]"
+                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
+                }`}
+                aria-label="カード表示"
+              >
+                <RiLayoutGridLine aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onViewModeChange("LIST")}
+                aria-pressed={viewMode === "LIST"}
+                className={`flex min-w-9 items-center justify-center rounded px-2 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
+                  viewMode === "LIST"
+                    ? "bg-[#e4e7e2] text-[#344941]"
+                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
+                }`}
+                aria-label="リスト表示"
+              >
+                <RiListUnordered aria-hidden="true" />
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsDisplaySettingsOpen((isOpen) => !isOpen)}
+              aria-expanded={isDisplaySettingsOpen}
+              aria-controls="bookshelf-display-settings"
+              className={`flex min-h-10 items-center gap-2 rounded-md border px-4 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 ${isDisplaySettingsOpen ? "border-[#6c7c74] bg-[#e9e9e2] text-[#344941]" : "border-[#293630]/10 bg-[#f9f8f4] text-[#5f6d66] hover:border-[#293630]/20"}`}
+            >
+              表示設定
+              <RiArrowDownSLine
+                aria-hidden="true"
+                className={`text-lg transition-transform ${
+                  isDisplaySettingsOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          </div>
         </div>
 
         <div
           id="bookshelf-display-settings"
           hidden={!isDisplaySettingsOpen}
-          className="absolute right-0 top-full z-20 mt-2 grid w-full max-w-155 gap-5 border border-[#293630]/10 bg-[#faf9f5] p-5 shadow-[0_18px_50px_rgb(43_56_50/13%)] sm:grid-cols-3"
+          className="absolute right-0 top-full z-20 mt-2 grid w-full max-w-110 gap-5 border border-[#293630]/10 bg-[#faf9f5] p-5 shadow-[0_18px_50px_rgb(43_56_50/13%)] sm:grid-cols-2"
         >
           <label className="min-w-0">
             <span className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[#65736c]">
@@ -295,40 +328,6 @@ const BookshelfToolbar = ({
               </span>
             )}
           </label>
-
-          <div className="min-w-0">
-            <span className="mb-2 block text-[11px] font-medium text-[#65736c]">
-              表示形式
-            </span>
-            <div className="flex min-h-11 rounded-md border border-[#293630]/12 bg-white p-1">
-              <button
-                type="button"
-                onClick={() => onViewModeChange("GRID")}
-                aria-pressed={viewMode === "GRID"}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded px-2.5 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
-                  viewMode === "GRID"
-                    ? "bg-[#e4e7e2] text-[#344941]"
-                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
-                }`}
-              >
-                <RiLayoutGridLine aria-hidden="true" />
-                <span className="sr-only sm:not-sr-only">カード</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onViewModeChange("LIST")}
-                aria-pressed={viewMode === "LIST"}
-                className={`flex flex-1 items-center justify-center gap-1.5 rounded px-2.5 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
-                  viewMode === "LIST"
-                    ? "bg-[#e4e7e2] text-[#344941]"
-                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
-                }`}
-              >
-                <RiListUnordered aria-hidden="true" />
-                <span className="sr-only sm:not-sr-only">リスト</span>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </section>
