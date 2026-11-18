@@ -118,8 +118,14 @@ const BookshelfToolbar = ({
   };
 
   return (
-    <section className="relative mt-10 py-2" aria-label="本棚の表示設定">
-      <div className="flex flex-col gap-3">
+    <section className="relative mt-10" aria-label="本棚の表示設定">
+      <div className="flex items-center gap-3">
+        <p className="shrink-0 text-[10px] font-medium tracking-[0.14em] text-[#7b8781]">
+          本棚に登録した本
+        </p>
+        <span className="h-px w-full bg-[#293630]/10" aria-hidden="true" />
+      </div>
+      <div className="mt-4 flex flex-col gap-3">
         <div className="min-w-0">
           <div className="relative">
             <div
