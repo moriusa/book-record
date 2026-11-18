@@ -118,16 +118,13 @@ const BookshelfToolbar = ({
   };
 
   return (
-    <section
-      className="relative mt-11 border-t border-[#293630]/10 py-2"
-      aria-label="本棚の表示設定"
-    >
+    <section className="relative mt-10 py-2" aria-label="本棚の表示設定">
       <div className="flex flex-col gap-3">
         <div className="min-w-0">
           <div className="relative">
             <div
               ref={filterScrollRef}
-              className="scrollbar-none -mx-1 flex snap-x snap-mandatory gap-1 overflow-x-auto px-1 pr-10"
+              className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto pr-10"
               role="group"
               aria-label="読書ステータスで絞り込む"
             >
@@ -140,15 +137,15 @@ const BookshelfToolbar = ({
                     type="button"
                     onClick={() => onFilterChange(option.value)}
                     aria-pressed={isActive}
-                    className={`min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:px-5 ${
+                    className={`min-h-10 shrink-0 snap-start rounded-md border px-3.5 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:px-4 ${
                       isActive
-                        ? "border-[#40584e] font-medium text-[#293630]"
-                        : "border-transparent bg-transparent text-[#7b8680] hover:text-[#46564f]"
+                        ? "border-[#344941] bg-[#344941] font-medium text-white shadow-sm"
+                        : "border-[#293630]/12 bg-[#faf9f5] text-[#65736c] hover:border-[#75817b] hover:text-[#344941]"
                     }`}
                   >
                     {option.label}
                     <span
-                      className={`ml-1 ${isActive ? "text-[#65756d]" : "text-[#9ba39f]"}`}
+                      className={`ml-1 ${isActive ? "text-white/75" : "text-[#89938e]"}`}
                     >
                       {statusCounts[option.value]}
                     </span>
