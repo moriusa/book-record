@@ -24,7 +24,12 @@ import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
 import { useAuth } from "@/components/providers/AuthProvider";
 import LoginButton from "@/components/ui/LoginButton";
 import Link from "next/link";
-import { RiBarcodeLine, RiCloseLine, RiEditLine } from "react-icons/ri";
+import {
+  RiArrowRightLine,
+  RiBarcodeLine,
+  RiCloseLine,
+  RiEditLine,
+} from "react-icons/ri";
 
 const bookStatusOptions: { value: BookStatus; label: string }[] = [
   { value: "WANT_TO_READ", label: "読みたい" },
@@ -221,14 +226,12 @@ const SearchPage = () => {
         <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] sm:text-[42px]">
           本を探す
         </h1>
-        <p className="mt-4 text-sm leading-7 text-[#748078]">
-          気になっていた一冊を、あなたの本棚へ。
-          <br className="hidden sm:block" />
-          タイトルや著者名から静かに探せます。
-        </p>
       </div>
 
-      <section className="mt-10 border border-[#293630]/10 bg-[#eeece5] p-4 sm:p-6">
+      <section
+        className="mt-10 border border-[#293630]/10 bg-[#eeece5] p-4 sm:p-6"
+        aria-labelledby="book-search-heading"
+      >
         <div className="max-w-190">
           <SearchBox
             key={`${searchField}-${searchKeyword}`}
@@ -237,21 +240,47 @@ const SearchPage = () => {
             initialKeyword={searchKeyword}
             initialSearchField={searchField}
           />
-          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <div className="mt-5 grid border-t border-[#293630]/10 pt-4 sm:grid-cols-2 sm:divide-x sm:divide-[#293630]/10 sm:pt-5">
             <button
               type="button"
               onClick={startBarcodeScanner}
-              className="inline-flex items-center gap-2 text-[11px] text-[#66756d] transition-colors hover:text-[#344941]"
+              className="group flex min-h-14 items-center gap-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pr-5"
             >
-              <RiBarcodeLine className="text-base" aria-hidden="true" />
-              バーコードでまとめて登録
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
+                <RiBarcodeLine className="text-lg" aria-hidden="true" />
+              </span>
+              <span>
+                <span className="block text-xs font-medium text-[#40584e]">
+                  バーコードで追加
+                </span>
+                <span className="mt-1 block text-[10px] text-[#7b8781]">
+                  手元の本をまとめて読み取る
+                </span>
+              </span>
+              <RiArrowRightLine
+                className="ml-auto text-base text-[#89938e] transition group-hover:translate-x-0.5 group-hover:text-[#40584e]"
+                aria-hidden="true"
+              />
             </button>
             <Link
               href="/books/manual/register"
-              className="inline-flex items-center gap-2 text-[11px] text-[#66756d] transition-colors hover:text-[#344941]"
+              className="group flex min-h-14 items-center gap-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pl-5"
             >
-              <RiEditLine className="text-base" aria-hidden="true" />
-              本を手動で登録
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
+                <RiEditLine className="text-base" aria-hidden="true" />
+              </span>
+              <span>
+                <span className="block text-xs font-medium text-[#40584e]">
+                  手動で追加
+                </span>
+                <span className="mt-1 block text-[10px] text-[#7b8781]">
+                  同人誌など検索にない本を登録
+                </span>
+              </span>
+              <RiArrowRightLine
+                className="ml-auto text-base text-[#89938e] transition group-hover:translate-x-0.5 group-hover:text-[#40584e]"
+                aria-hidden="true"
+              />
             </Link>
           </div>
           {barcodeMessage && (
@@ -262,8 +291,34 @@ const SearchPage = () => {
         </div>
       </section>
 
-      <section className="mt-14">
-        {hasSearched && !isLoading && books.length === 0 ? (
+      <section className="mt-12" aria-live="polite">
+        {hasSearched && (
+          <div className="mb-5 flex items-end justify-between gap-4 border-b border-[#293630]/10 pb-4">
+            <div>
+              <p className="text-[10px] tracking-[0.16em] text-[#7b8781]">
+                SEARCH RESULTS
+              </p>
+              <h2 className="mt-1 font-serif-jp text-xl font-medium text-[#35463e]">
+                {isLoading ? "検索中…" : `「${searchKeyword}」の検索結果`}
+              </h2>
+            </div>
+            {!isLoading && (
+              <p className="shrink-0 text-xs text-[#718078]">
+                {books.length}冊
+              </p>
+            )}
+          </div>
+        )}
+        {!hasSearched ? (
+          <div className="border-b border-[#293630]/10 py-14 sm:py-18">
+            <p className="font-serif-jp text-lg text-[#46574e]">
+              気になる一冊から、はじめよう
+            </p>
+            <p className="mt-3 text-xs leading-6 text-[#7b8781]">
+              タイトル・著者名・ISBNで検索できます。見つからない本は手動で追加できます。
+            </p>
+          </div>
+        ) : hasSearched && !isLoading && books.length === 0 ? (
           <div className="border-b border-[#293630]/10 py-20 text-center">
             <p className="font-serif-jp text-lg font-medium text-[#293630]">
               該当する本が見つかりませんでした
@@ -279,7 +334,7 @@ const SearchPage = () => {
               見つからない本を手動で登録
             </Link>
           </div>
-        ) : (
+        ) : hasSearched ? (
           <div className="grid md:grid-cols-2 md:gap-x-10">
             {books.map((book) => (
               <BookCard
@@ -294,7 +349,7 @@ const SearchPage = () => {
               />
             ))}
           </div>
-        )}
+        ) : null}
         {books.length > 0 && (
           <div
             ref={loadMoreTargetRef}
