@@ -9,6 +9,10 @@ import BookFormFields, { BookFormValues } from "@/components/ui/BookFormFields";
 import { useUpdateBook } from "./hooks/useUpdateBook";
 import { useRouter } from "next/navigation";
 import { Book } from "@/types/book";
+import {
+  getBookAuthorLabel,
+  getBookPublisherLabel,
+} from "@/lib/getBookAuthorLabel";
 
 type Props = {
   id: string;
@@ -99,9 +103,11 @@ const EditBookForm = ({ id }: Props) => {
             <h2 className="font-serif-jp text-lg font-medium lg:text-xl">
               {book.title}
             </h2>
-            <p className="mt-2 text-xs text-[#718078]">{book.author}</p>
+            <p className="mt-2 text-xs text-[#718078]">
+              {getBookAuthorLabel(book.author)}
+            </p>
             <p className="mt-1 text-[10px] text-[#909994]">
-              {book.publisher || "-"}
+              {getBookPublisherLabel(book.publisher)}
               {book.series ? `・${book.series}` : ""}
             </p>
           </div>

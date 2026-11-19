@@ -1,4 +1,5 @@
 export type BookStatus = "WANT_TO_READ" | "READING" | "COMPLETED" | "ON_HOLD";
+export type BookSource = "catalog" | "manual";
 
 export type FilterStatus = "ALL" | BookStatus;
 export type GroupOption = "NONE" | "AUTHOR" | "PUBLISHER" | "SERIES";
@@ -9,6 +10,7 @@ export type ViewMode = "GRID" | "LIST";
 export type Book = {
   id: string;
   isbn: string;
+  source: BookSource;
   title: string;
   author: string;
   publisher: string;

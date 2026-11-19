@@ -1,0 +1,1 @@
+ALTER TABLE "books" ALTER COLUMN "isbn" SET DATA TYPE varchar(64);

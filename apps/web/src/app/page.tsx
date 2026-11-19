@@ -14,6 +14,8 @@ import {
 } from "react-icons/ri";
 import { useGetBooks } from "./bookshelf/hooks/useGetBooks";
 import { BookStatus } from "@/types/book";
+import { getBookHref } from "@/lib/getBookHref";
+import { getBookAuthorLabel } from "@/lib/getBookAuthorLabel";
 import { useAuth } from "@/components/providers/AuthProvider";
 import LoginButton from "@/components/ui/LoginButton";
 import HomeNews from "@/components/home/HomeNews";
@@ -145,7 +147,7 @@ function AuthenticatedHome() {
           {readingBook ? (
             <div className="mt-8 grid grid-cols-[105px_1fr] gap-6 sm:grid-cols-[150px_1fr] sm:gap-9">
               <Link
-                href={`/books/${readingBook.isbn}`}
+                href={getBookHref(readingBook)}
                 className="relative aspect-2/3 w-full self-start overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)]"
               >
                 {readingBook.imageUrl ? (
@@ -164,12 +166,12 @@ function AuthenticatedHome() {
                 )}
               </Link>
               <div className="flex min-w-0 flex-col py-1">
-                <Link href={`/books/${readingBook.isbn}`}>
+                <Link href={getBookHref(readingBook)}>
                   <h3 className="font-serif-jp text-2xl font-medium sm:text-3xl">
                     {readingBook.title}
                   </h3>
                   <p className="mt-2 text-xs text-[#748078]">
-                    {readingBook.author}
+                    {getBookAuthorLabel(readingBook.author)}
                   </p>
                 </Link>
                 {readingBook.review && (
@@ -188,7 +190,7 @@ function AuthenticatedHome() {
                     記録を書く
                   </Link>
                   <Link
-                    href={`/books/${readingBook.isbn}`}
+                    href={getBookHref(readingBook)}
                     className="flex items-center gap-2 rounded-md border border-[#293630]/12 px-4 py-2.5 text-xs text-[#65736c] transition-colors hover:border-[#718078]"
                   >
                     詳細を見る
@@ -308,7 +310,7 @@ function AuthenticatedHome() {
             {recentBooks.map((book) => (
               <Link
                 key={book.id}
-                href={`/books/${book.isbn}`}
+                href={getBookHref(book)}
                 className="group w-28 shrink-0 text-left sm:w-auto"
               >
                 <div className="relative aspect-2/3 w-full overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)] transition-transform group-hover:-translate-y-1">
@@ -328,7 +330,7 @@ function AuthenticatedHome() {
                   {book.title}
                 </h3>
                 <p className="mt-1 truncate text-[9px] text-[#87918c]">
-                  {book.author}
+                  {getBookAuthorLabel(book.author)}
                 </p>
               </Link>
             ))}

@@ -23,7 +23,11 @@ export const books = pgTable(
   "books",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    isbn: varchar("isbn", { length: 20 }).notNull(),
+    isbn: varchar("isbn", { length: 64 }).notNull(),
+    source: varchar("source", { length: 20 }).notNull().default("catalog"),
+    ownerUserId: uuid("owner_user_id").references(() => users.id, {
+      onDelete: "cascade",
+    }),
     title: varchar("title", { length: 255 }).notNull(),
     author: varchar("author", { length: 255 }).notNull(),
     publisher: varchar("publisher", { length: 255 }),

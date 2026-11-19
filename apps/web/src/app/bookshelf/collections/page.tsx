@@ -5,6 +5,7 @@ import Link from "next/link";
 import { RiBookOpenLine } from "react-icons/ri";
 import BookTenShareActions from "./BookTenShareActions";
 import { useGetCollections } from "./hooks/useGetCollections";
+import { getBookAuthorLabel } from "@/lib/getBookAuthorLabel";
 
 export default function BookCollectionsPage() {
   const { data: collections = [], isLoading, error } = useGetCollections();
@@ -80,7 +81,7 @@ export default function BookCollectionsPage() {
                         {item.title}
                       </h3>
                       <p className="mt-2 truncate text-xs text-[#718078]">
-                        {item.author}
+                        {getBookAuthorLabel(item.author)}
                       </p>
                     </div>
                   </Link>

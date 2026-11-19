@@ -41,7 +41,9 @@ const BookshelfSection = ({
           {books.map((book) => (
             <BookCard
               key={book.id}
+              id={book.id}
               isbn={book.isbn}
+              source={book.source}
               title={book.title}
               imageUrl={book.imageUrl}
             />

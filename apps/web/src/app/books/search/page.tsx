@@ -23,7 +23,8 @@ import {
 import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
 import { useAuth } from "@/components/providers/AuthProvider";
 import LoginButton from "@/components/ui/LoginButton";
-import { RiBarcodeLine, RiCloseLine } from "react-icons/ri";
+import Link from "next/link";
+import { RiBarcodeLine, RiCloseLine, RiEditLine } from "react-icons/ri";
 
 const bookStatusOptions: { value: BookStatus; label: string }[] = [
   { value: "WANT_TO_READ", label: "読みたい" },
@@ -236,14 +237,23 @@ const SearchPage = () => {
             initialKeyword={searchKeyword}
             initialSearchField={searchField}
           />
-          <button
-            type="button"
-            onClick={startBarcodeScanner}
-            className="mt-3 inline-flex items-center gap-2 text-[11px] text-[#66756d] transition-colors hover:text-[#344941]"
-          >
-            <RiBarcodeLine className="text-base" aria-hidden="true" />
-            バーコードでまとめて登録
-          </button>
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <button
+              type="button"
+              onClick={startBarcodeScanner}
+              className="inline-flex items-center gap-2 text-[11px] text-[#66756d] transition-colors hover:text-[#344941]"
+            >
+              <RiBarcodeLine className="text-base" aria-hidden="true" />
+              バーコードでまとめて登録
+            </button>
+            <Link
+              href="/books/manual/register"
+              className="inline-flex items-center gap-2 text-[11px] text-[#66756d] transition-colors hover:text-[#344941]"
+            >
+              <RiEditLine className="text-base" aria-hidden="true" />
+              本を手動で登録
+            </Link>
+          </div>
           {barcodeMessage && (
             <p className="mt-3 text-xs leading-6 text-[#526159]" role="status">
               {barcodeMessage}
@@ -261,6 +271,13 @@ const SearchPage = () => {
             <p className="mt-3 text-xs leading-6 text-[#849089]">
               タイトルの一部や、表記を変えてもう一度検索してみてください。
             </p>
+            <Link
+              href="/books/manual/register"
+              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 text-xs font-medium text-[#40584e] transition hover:border-[#718078]"
+            >
+              <RiEditLine className="text-base" aria-hidden="true" />
+              見つからない本を手動で登録
+            </Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 md:gap-x-10">

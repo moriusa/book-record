@@ -61,7 +61,7 @@ const RAKUTEN_BOOKS_TOTAL_SEARCH_URL =
 const REGISTERED_SITE_URL = "https://tsumihon.com";
 
 const fetchRakutenApi = (url: string, params: URLSearchParams) =>
-  fetcher(`${url}?${params}`, {
+  fetcher<RakutenBooksResponse>(`${url}?${params}`, {
     headers: {
       Origin: REGISTERED_SITE_URL,
       Referer: REGISTERED_SITE_URL,

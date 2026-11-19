@@ -1,6 +1,23 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 
-export const fetcher = async (url: string, options?: RequestInit) => {
+async function parseJsonBody<T>(res: Response): Promise<T | null> {
+  const body = await res.text();
+
+  if (!body) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(body) as T;
+  } catch {
+    return null;
+  }
+}
+
+export const fetcher = async <T>(
+  url: string,
+  options?: RequestInit,
+): Promise<T> => {
   const res = await fetch(url, {
     ...options,
     next: { revalidate: 86400 }, // 1day
@@ -13,7 +30,13 @@ export const fetcher = async (url: string, options?: RequestInit) => {
     throw error;
   }
 
-  return res.json();
+  const body = await parseJsonBody<T>(res);
+
+  if (body === null) {
+    throw new Error("サーバーからの応答を読み取れませんでした。");
+  }
+
+  return body;
 };
 
 export async function authFetcher<T>(
@@ -37,10 +60,19 @@ export async function authFetcher<T>(
     },
   });
 
+  const body = await parseJsonBody<{ message?: unknown }>(res);
+
   if (!res.ok) {
-    const errorBody: { message?: string } = await res.json();
-    throw new Error(`${res.status}: ${errorBody.message}`);
+    const message =
+      typeof body?.message === "string"
+        ? body.message
+        : "リクエストに失敗しました。時間をおいてもう一度お試しください。";
+    throw new Error(`${res.status}: ${message}`);
   }
 
-  return res.json();
+  if (body === null) {
+    throw new Error("サーバーからの応答を読み取れませんでした。");
+  }
+
+  return body as T;
 }

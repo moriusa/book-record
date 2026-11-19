@@ -12793,6 +12793,9 @@ function mapRelationalRow(tablesConfig, tableConfig, row, buildQueryResultSelect
   return result;
 }
 
+// src/routes/books.ts
+var import_node_crypto = require("node:crypto");
+
 // src/db/index.ts
 var import_config = __toESM(require_config(), 1);
 
@@ -16485,7 +16488,11 @@ var books = pgTable(
   "books",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    isbn: varchar("isbn", { length: 20 }).notNull(),
+    isbn: varchar("isbn", { length: 64 }).notNull(),
+    source: varchar("source", { length: 20 }).notNull().default("catalog"),
+    ownerUserId: uuid("owner_user_id").references(() => users.id, {
+      onDelete: "cascade"
+    }),
     title: varchar("title", { length: 255 }).notNull(),
     author: varchar("author", { length: 255 }).notNull(),
     publisher: varchar("publisher", { length: 255 }),
@@ -17675,6 +17682,7 @@ var booksRouter = new Hono2();
 var bookSelection = {
   id: userBooks.id,
   isbn: books.isbn,
+  source: books.source,
   title: books.title,
   author: books.author,
   publisher: books.publisher,
@@ -17704,6 +17712,7 @@ var catalogBookSelection = {
 var isBulkBooksRequest = (body) => typeof body === "object" && body !== null && "books" in body && Array.isArray(body.books);
 var isBulkBookPayload = (book) => typeof book === "object" && book !== null && "isbn" in book && typeof book.isbn === "string" && "title" in book && typeof book.title === "string" && "author" in book && typeof book.author === "string";
 var getOptionalString = (value) => typeof value === "string" ? value : null;
+var isManualBookPayload = (body) => typeof body === "object" && body !== null && "title" in body && typeof body.title === "string" && body.title.trim().length > 0;
 var findUserBookById = async (id, userId) => {
   const result = await db.select(bookSelection).from(userBooks).innerJoin(books, eq(userBooks.bookId, books.id)).where(and(eq(userBooks.id, id), eq(userBooks.userId, userId))).limit(1);
   return result[0];
@@ -17726,11 +17735,13 @@ booksRouter.get("/", authMiddleware, async (c) => {
   return c.json(result);
 });
 booksRouter.get("/catalog", async (c) => {
-  const result = await db.select({ isbn: books.isbn }).from(books);
+  const result = await db.select({ isbn: books.isbn }).from(books).where(eq(books.source, "catalog"));
   return c.json(result);
 });
 booksRouter.get("/catalog/:isbn", async (c) => {
-  const result = await db.select(catalogBookSelection).from(books).where(eq(books.isbn, c.req.param("isbn"))).limit(1);
+  const result = await db.select(catalogBookSelection).from(books).where(
+    and(eq(books.isbn, c.req.param("isbn")), eq(books.source, "catalog"))
+  ).limit(1);
   const book = result[0];
   if (!book) {
     return c.json({ message: "Book not found" }, 404);
@@ -17796,6 +17807,55 @@ booksRouter.post("/bulk", authMiddleware, async (c) => {
   } catch (error) {
     console.error(error);
     return c.json({ message: "\u672C\u306E\u4E00\u62EC\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
+  }
+});
+booksRouter.post("/manual", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const body = await c.req.json();
+  if (!isManualBookPayload(body)) {
+    return c.json({ message: "\u30BF\u30A4\u30C8\u30EB\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  }
+  try {
+    const createdUserBookId = await db.transaction(async (tx) => {
+      const insertedBooks = await tx.insert(books).values({
+        isbn: `manual-${(0, import_node_crypto.randomUUID)()}`,
+        source: "manual",
+        ownerUserId: user.id,
+        title: body.title.trim(),
+        author: getOptionalString(body.author)?.trim() || "\u8457\u8005\u30FB\u30B5\u30FC\u30AF\u30EB\u540D\u672A\u767B\u9332",
+        publisher: getOptionalString(body.publisherName)?.trim() || null,
+        series: null,
+        salesDate: null,
+        imageUrl: null,
+        bookFormat: null,
+        description: null
+      }).returning({ id: books.id });
+      const bookId = insertedBooks[0]?.id;
+      if (!bookId) {
+        throw new Error("Manual book could not be created");
+      }
+      const createdUserBooks = await tx.insert(userBooks).values({
+        userId: user.id,
+        bookId,
+        status: getOptionalString(body.status) ?? "WANT_TO_READ",
+        rating: typeof body.rating === "number" ? body.rating : null,
+        review: getOptionalString(body.review),
+        completedAt: getOptionalString(body.completedAt)
+      }).returning({ id: userBooks.id });
+      const createdUserBook = createdUserBooks[0];
+      if (!createdUserBook) {
+        throw new Error("Manual user book could not be created");
+      }
+      return createdUserBook.id;
+    });
+    const createdBook = await findUserBookById(createdUserBookId, user.id);
+    if (!createdBook) {
+      throw new Error("Manual book could not be loaded after creation");
+    }
+    return c.json(createdBook, 201);
+  } catch (error) {
+    console.error(error);
+    return c.json({ message: "\u624B\u52D5\u767B\u9332\u306B\u5931\u6557\u3057\u307E\u3057\u305F" }, 500);
   }
 });
 booksRouter.get("/:id", authMiddleware, async (c) => {

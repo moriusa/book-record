@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { and, eq, sql } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 import { db } from "../db/index.js";
 import { books, userBooks } from "../db/schema.js";
 import { authMiddleware } from "../middleware/auth.js";
@@ -10,6 +11,7 @@ const booksRouter = new Hono<AppEnv>();
 const bookSelection = {
   id: userBooks.id,
   isbn: books.isbn,
+  source: books.source,
   title: books.title,
   author: books.author,
   publisher: books.publisher,
@@ -67,6 +69,15 @@ const isBulkBookPayload = (book: unknown): book is BulkBookPayload =>
 const getOptionalString = (value: unknown) =>
   typeof value === "string" ? value : null;
 
+const isManualBookPayload = (
+  body: unknown,
+): body is Record<string, unknown> & { title: string } =>
+  typeof body === "object" &&
+  body !== null &&
+  "title" in body &&
+  typeof body.title === "string" &&
+  body.title.trim().length > 0;
+
 const findUserBookById = async (id: string, userId: string) => {
   const result = await db
     .select(bookSelection)
@@ -114,7 +125,10 @@ booksRouter.get("/", authMiddleware, async (c) => {
 });
 
 booksRouter.get("/catalog", async (c) => {
-  const result = await db.select({ isbn: books.isbn }).from(books);
+  const result = await db
+    .select({ isbn: books.isbn })
+    .from(books)
+    .where(eq(books.source, "catalog"));
 
   return c.json(result);
 });
@@ -123,7 +137,9 @@ booksRouter.get("/catalog/:isbn", async (c) => {
   const result = await db
     .select(catalogBookSelection)
     .from(books)
-    .where(eq(books.isbn, c.req.param("isbn")))
+    .where(
+      and(eq(books.isbn, c.req.param("isbn")), eq(books.source, "catalog")),
+    )
     .limit(1);
 
   const book = result[0];
@@ -221,6 +237,71 @@ booksRouter.post("/bulk", authMiddleware, async (c) => {
   } catch (error) {
     console.error(error);
     return c.json({ message: "本の一括登録に失敗しました" }, 500);
+  }
+});
+
+booksRouter.post("/manual", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const body: unknown = await c.req.json();
+
+  if (!isManualBookPayload(body)) {
+    return c.json({ message: "タイトルを入力してください" }, 400);
+  }
+
+  try {
+    const createdUserBookId = await db.transaction(async (tx) => {
+      const insertedBooks = await tx
+        .insert(books)
+        .values({
+          isbn: `manual-${randomUUID()}`,
+          source: "manual",
+          ownerUserId: user.id,
+          title: body.title.trim(),
+          author:
+            getOptionalString(body.author)?.trim() || "著者・サークル名未登録",
+          publisher: getOptionalString(body.publisherName)?.trim() || null,
+          series: null,
+          salesDate: null,
+          imageUrl: null,
+          bookFormat: null,
+          description: null,
+        })
+        .returning({ id: books.id });
+
+      const bookId = insertedBooks[0]?.id;
+      if (!bookId) {
+        throw new Error("Manual book could not be created");
+      }
+
+      const createdUserBooks = await tx
+        .insert(userBooks)
+        .values({
+          userId: user.id,
+          bookId,
+          status: getOptionalString(body.status) ?? "WANT_TO_READ",
+          rating: typeof body.rating === "number" ? body.rating : null,
+          review: getOptionalString(body.review),
+          completedAt: getOptionalString(body.completedAt),
+        })
+        .returning({ id: userBooks.id });
+
+      const createdUserBook = createdUserBooks[0];
+      if (!createdUserBook) {
+        throw new Error("Manual user book could not be created");
+      }
+
+      return createdUserBook.id;
+    });
+
+    const createdBook = await findUserBookById(createdUserBookId, user.id);
+    if (!createdBook) {
+      throw new Error("Manual book could not be loaded after creation");
+    }
+
+    return c.json(createdBook, 201);
+  } catch (error) {
+    console.error(error);
+    return c.json({ message: "手動登録に失敗しました" }, 500);
   }
 });
 
