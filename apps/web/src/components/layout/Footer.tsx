@@ -8,7 +8,7 @@ import LoginButton from "../ui/LoginButton";
 
 const discoverLinks = [
   { href: "/blog", label: "ブログ" },
-  { href: "/guides", label: "読書のガイド" },
+  { href: "/guides", label: "つみほんの使い方" },
   { href: "/updates", label: "更新履歴" },
 ];
 

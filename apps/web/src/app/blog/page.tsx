@@ -30,9 +30,9 @@ export default async function BlogPage() {
           TSUMIHON BLOG
         </p>
         <h1 className="mt-5 font-serif-jp text-4xl font-medium tracking-[-0.045em] sm:text-5xl">
-          読書のそばにあること。
+          つみほんブログ
         </h1>
-        <p className="mt-6 max-w-155 text-sm leading-8 text-[#647069] sm:text-base">
+        <p className="mt-6 text-sm leading-8 text-[#647069] sm:text-base">
           本を読む時間や、本棚を育てる日々について。つみほんから、ゆっくりお届けします。
         </p>
 
