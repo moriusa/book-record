@@ -1,25 +1,17 @@
 "use client";
 
-import { getCurrentUser } from "aws-amplify/auth";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type AuthContextValue = {
   isLoading: boolean;
   user: Awaited<ReturnType<typeof getCurrentUser>> | null;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-export function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthContextValue["user"]>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -38,8 +30,13 @@ export function AuthProvider({
     checkAuth();
   }, []);
 
+  const logout = async () => {
+    await signOut();
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading }}>
+    <AuthContext.Provider value={{ user, isLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );
