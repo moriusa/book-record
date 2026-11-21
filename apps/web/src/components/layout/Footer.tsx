@@ -13,6 +13,7 @@ const discoverLinks = [
 ];
 
 const supportLinks = [
+  { href: "/faq", label: "よくある質問" },
   { href: "/contact", label: "お問い合わせ" },
   { href: "/privacy", label: "プライバシーポリシー" },
   { href: "/terms", label: "利用規約" },

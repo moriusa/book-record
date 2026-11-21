@@ -30,6 +30,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
     {
+      url: new URL("/faq", siteUrl).toString(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
       url: new URL("/guides", siteUrl).toString(),
       changeFrequency: "monthly",
       priority: 0.8,
