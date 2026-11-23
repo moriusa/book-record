@@ -55,6 +55,21 @@ export default function GuidesPage() {
             </Link>
           ))}
         </section>
+        <div className="mt-10 flex flex-col items-start gap-3 border-l-2 border-[#758b7f] pl-5 sm:mt-12">
+          <p className="text-sm text-[#647069]">
+            使い方以外の疑問は、よくある質問で確認できます。
+          </p>
+          <Link
+            href="/faq"
+            className="group flex min-h-10 items-center gap-2 text-xs font-medium text-[#40584e] transition-colors hover:text-[#263a33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2"
+          >
+            よくある質問を見る
+            <RiArrowRightLine
+              className="transition-transform group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </Link>
+        </div>
       </div>
     </main>
   );

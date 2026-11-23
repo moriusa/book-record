@@ -481,12 +481,22 @@ function GuestHome() {
             </div>
             <BookshelfPreview className="max-w-none" />
           </div>
-          <div className="mt-12 flex justify-end">
+          <div className="mt-12 flex flex-col items-end gap-4">
             <Link
               href="/guides"
               className="group flex min-h-12 w-full items-center justify-center gap-2 rounded-md border border-[#293630]/14 bg-[#faf9f5] px-6 py-3.5 text-sm font-medium text-[#40584e] transition-all hover:-translate-y-0.5 hover:border-[#718078] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:inline-flex sm:w-auto"
             >
               つみほんの使い方を見る
+              <RiArrowRightLine
+                className="transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </Link>
+            <Link
+              href="/faq"
+              className="group flex min-h-10 items-center gap-2 px-2 text-xs text-[#607169] transition-colors hover:text-[#344941] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2"
+            >
+              よくある質問を見る
               <RiArrowRightLine
                 className="transition-transform group-hover:translate-x-0.5"
                 aria-hidden="true"
