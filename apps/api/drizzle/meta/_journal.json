@@ -120,6 +120,13 @@
       "when": 1795074432784,
       "tag": "0016_black_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1795494392623,
+      "tag": "0017_tranquil_firedrake",
+      "breakpoints": true
     }
   ]
 }

@@ -10,6 +10,7 @@ import { useGetBookByIsbn } from "@/app/bookshelf/hooks/useGetBookByIsbn";
 import { useDeleteBook } from "@/app/bookshelf/hooks/useDeleteBook";
 import { AddToBookshelfButton } from "./AddToBookshelfButton";
 import BookTenToggleButton from "./BookTenToggleButton";
+import ReadingListControls from "@/components/ui/ReadingListControls";
 
 type Props = {
   bookData: { isbn: string };
@@ -187,6 +188,13 @@ const BookShelfStatus = ({
           </div>
         )}
       </aside>
+
+      {user && book && (
+        <ReadingListControls
+          userBookId={book.id}
+          isFavorite={book.isFavorite}
+        />
+      )}
 
       {user && book && (
         <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">

@@ -23,6 +23,7 @@ export type Book = {
   completedAt: string | null;
   rating: number | null;
   review: string | null;
+  isFavorite: boolean;
   createdAt: string;
   updatedAt: string;
 };

@@ -16514,11 +16514,34 @@ var userBooks = pgTable(
     rating: smallint("rating"),
     review: text("review"),
     completedAt: date("completed_at"),
+    isFavorite: boolean("is_favorite").notNull().default(false),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
   },
   (table) => [
     unique("user_books_user_id_book_id_unique").on(table.userId, table.bookId)
+  ]
+);
+var readingLists = pgTable("reading_lists", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 80 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+var readingListItems = pgTable(
+  "reading_list_items",
+  {
+    listId: uuid("list_id").notNull().references(() => readingLists.id, { onDelete: "cascade" }),
+    userBookId: uuid("user_book_id").notNull().references(() => userBooks.id, { onDelete: "cascade" }),
+    position: smallint("position").notNull()
+  },
+  (table) => [
+    primaryKey({ columns: [table.listId, table.userBookId] }),
+    unique("reading_list_items_list_position_unique").on(
+      table.listId,
+      table.position
+    )
   ]
 );
 var bookCollections = pgTable(
@@ -17695,6 +17718,7 @@ var bookSelection = {
   rating: userBooks.rating,
   review: userBooks.review,
   completedAt: userBooks.completedAt,
+  isFavorite: userBooks.isFavorite,
   createdAt: userBooks.createdAt,
   updatedAt: userBooks.updatedAt
 };
@@ -18060,6 +18084,118 @@ collectionsRouter.delete("/items/:userBookId", authMiddleware, async (c) => {
 });
 var collections_default = collectionsRouter;
 
+// src/routes/readingLists.ts
+var readingListsRouter = new Hono2();
+var itemSelection = {
+  id: userBooks.id,
+  isbn: books.isbn,
+  source: books.source,
+  title: books.title,
+  author: books.author,
+  publisher: books.publisher,
+  imageUrl: books.imageUrl,
+  status: userBooks.status,
+  rating: userBooks.rating,
+  review: userBooks.review,
+  isFavorite: userBooks.isFavorite,
+  position: readingListItems.position
+};
+var getTitle = (body) => {
+  if (typeof body !== "object" || body === null || !("title" in body)) {
+    return null;
+  }
+  const title = body.title;
+  return typeof title === "string" && title.trim().length > 0 ? title.trim().slice(0, 80) : null;
+};
+var getItems = (listId) => db.select(itemSelection).from(readingListItems).innerJoin(userBooks, eq(readingListItems.userBookId, userBooks.id)).innerJoin(books, eq(userBooks.bookId, books.id)).where(eq(readingListItems.listId, listId)).orderBy(asc(readingListItems.position));
+var getList = async (listId, userId) => {
+  const list = await db.select().from(readingLists).where(and(eq(readingLists.id, listId), eq(readingLists.userId, userId))).limit(1);
+  return list[0] ? { ...list[0], items: await getItems(listId) } : null;
+};
+var ownsBook = async (userBookId, userId) => {
+  const book = await db.select({ id: userBooks.id }).from(userBooks).where(and(eq(userBooks.id, userBookId), eq(userBooks.userId, userId))).limit(1);
+  return Boolean(book[0]);
+};
+readingListsRouter.get("/", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const lists = await db.select().from(readingLists).where(eq(readingLists.userId, user.id)).orderBy(asc(readingLists.createdAt));
+  return c.json(
+    await Promise.all(
+      lists.map(async (list) => ({ ...list, items: await getItems(list.id) }))
+    )
+  );
+});
+readingListsRouter.get("/:id", authMiddleware, async (c) => {
+  const list = await getList(c.req.param("id"), c.get("user").id);
+  return list ? c.json(list) : c.json({ message: "\u30EA\u30B9\u30C8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+});
+readingListsRouter.post("/", authMiddleware, async (c) => {
+  const title = getTitle(await c.req.json());
+  if (!title) return c.json({ message: "\u30EA\u30B9\u30C8\u540D\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  const created = await db.insert(readingLists).values({ userId: c.get("user").id, title }).returning();
+  return c.json({ ...created[0], items: [] }, 201);
+});
+readingListsRouter.patch("/:id", authMiddleware, async (c) => {
+  const title = getTitle(await c.req.json());
+  if (!title) return c.json({ message: "\u30EA\u30B9\u30C8\u540D\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  const updated = await db.update(readingLists).set({ title, updatedAt: /* @__PURE__ */ new Date() }).where(
+    and(
+      eq(readingLists.id, c.req.param("id")),
+      eq(readingLists.userId, c.get("user").id)
+    )
+  ).returning();
+  return updated[0] ? c.json({ ...updated[0], items: await getItems(updated[0].id) }) : c.json({ message: "\u30EA\u30B9\u30C8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+});
+readingListsRouter.delete("/:id", authMiddleware, async (c) => {
+  const deleted = await db.delete(readingLists).where(
+    and(
+      eq(readingLists.id, c.req.param("id")),
+      eq(readingLists.userId, c.get("user").id)
+    )
+  ).returning({ id: readingLists.id });
+  return deleted[0] ? c.json(null) : c.json({ message: "\u30EA\u30B9\u30C8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+});
+readingListsRouter.put("/favorites/:userBookId", authMiddleware, async (c) => {
+  const user = c.get("user");
+  if (!await ownsBook(c.req.param("userBookId"), user.id)) {
+    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  }
+  const current = await db.select({ isFavorite: userBooks.isFavorite }).from(userBooks).where(eq(userBooks.id, c.req.param("userBookId"))).limit(1);
+  const isFavorite = !current[0]?.isFavorite;
+  await db.update(userBooks).set({ isFavorite, updatedAt: /* @__PURE__ */ new Date() }).where(eq(userBooks.id, c.req.param("userBookId")));
+  return c.json({ isFavorite });
+});
+readingListsRouter.put("/:id/items/:userBookId", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const list = await getList(c.req.param("id"), user.id);
+  if (!list) return c.json({ message: "\u30EA\u30B9\u30C8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+  if (!await ownsBook(c.req.param("userBookId"), user.id)) {
+    return c.json({ message: "\u672C\u68DA\u306B\u767B\u9332\u6E08\u307F\u306E\u672C\u3092\u6307\u5B9A\u3057\u3066\u304F\u3060\u3055\u3044" }, 400);
+  }
+  if (list.items.some((item) => item.id === c.req.param("userBookId"))) {
+    return c.json(list);
+  }
+  await db.insert(readingListItems).values({
+    listId: list.id,
+    userBookId: c.req.param("userBookId"),
+    position: Math.max(0, ...list.items.map((item) => item.position)) + 1
+  });
+  return c.json(await getList(list.id, user.id));
+});
+readingListsRouter.delete("/:id/items/:userBookId", authMiddleware, async (c) => {
+  const user = c.get("user");
+  const list = await getList(c.req.param("id"), user.id);
+  if (!list) return c.json({ message: "\u30EA\u30B9\u30C8\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093" }, 404);
+  await db.delete(readingListItems).where(
+    and(
+      eq(readingListItems.listId, list.id),
+      eq(readingListItems.userBookId, c.req.param("userBookId"))
+    )
+  );
+  return c.json(await getList(list.id, user.id));
+});
+var readingLists_default = readingListsRouter;
+
 // src/routes/users.ts
 var usersRouter = new Hono2();
 usersRouter.get("/:id", async (c) => {
@@ -18085,12 +18221,13 @@ app.use(
   cors({
     origin: corsOrigin,
     allowHeaders: ["Authorization", "Content-Type"],
-    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
   })
 );
 app.route("/users", users_default);
 app.route("/books", books_default);
 app.route("/collections", collections_default);
+app.route("/reading-lists", readingLists_default);
 serve({
   fetch: app.fetch,
   port: 3001

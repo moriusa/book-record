@@ -6,6 +6,7 @@ import {
   uuid,
   varchar,
   date,
+  boolean,
   primaryKey,
   unique,
 } from "drizzle-orm/pg-core";
@@ -57,12 +58,43 @@ export const userBooks = pgTable(
     rating: smallint("rating"),
     review: text("review"),
     completedAt: date("completed_at"),
+    isFavorite: boolean("is_favorite").notNull().default(false),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     unique("user_books_user_id_book_id_unique").on(table.userId, table.bookId),
+  ],
+);
+
+export const readingLists = pgTable("reading_lists", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 80 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const readingListItems = pgTable(
+  "reading_list_items",
+  {
+    listId: uuid("list_id")
+      .notNull()
+      .references(() => readingLists.id, { onDelete: "cascade" }),
+    userBookId: uuid("user_book_id")
+      .notNull()
+      .references(() => userBooks.id, { onDelete: "cascade" }),
+    position: smallint("position").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.listId, table.userBookId] }),
+    unique("reading_list_items_list_position_unique").on(
+      table.listId,
+      table.position,
+    ),
   ],
 );
 

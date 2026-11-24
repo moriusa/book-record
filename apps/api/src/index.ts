@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import booksRouter from "./routes/books.js";
 import collectionsRouter from "./routes/collections.js";
+import readingListsRouter from "./routes/readingLists.js";
 import usersRouter from "./routes/users.js";
 import { AppEnv } from "./types/hono.js";
 
@@ -15,13 +16,14 @@ app.use(
   cors({
     origin: corsOrigin,
     allowHeaders: ["Authorization", "Content-Type"],
-    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   }),
 );
 
 app.route("/users", usersRouter);
 app.route("/books", booksRouter);
 app.route("/collections", collectionsRouter);
+app.route("/reading-lists", readingListsRouter);
 
 serve({
   fetch: app.fetch,

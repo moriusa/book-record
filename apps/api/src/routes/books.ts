@@ -24,6 +24,7 @@ const bookSelection = {
   rating: userBooks.rating,
   review: userBooks.review,
   completedAt: userBooks.completedAt,
+  isFavorite: userBooks.isFavorite,
   createdAt: userBooks.createdAt,
   updatedAt: userBooks.updatedAt,
 };

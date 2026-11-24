@@ -3,7 +3,12 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { RiAddLine, RiBookShelfLine, RiBookmark3Line } from "react-icons/ri";
+import {
+  RiAddLine,
+  RiBookShelfLine,
+  RiBookmark3Line,
+  RiListCheck2,
+} from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
@@ -77,6 +82,13 @@ const BookshelfPage = () => {
         </div>
 
         <div className="flex flex-wrap gap-3">
+          <Link
+            href="/bookshelf/lists"
+            className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 py-3 text-sm font-medium text-[#40584e] transition-colors hover:border-[#718078]"
+          >
+            <RiListCheck2 className="text-lg" aria-hidden="true" />
+            リスト
+          </Link>
           <Link
             href="/bookshelf/collections"
             className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 py-3 text-sm font-medium text-[#40584e] transition-colors hover:border-[#718078]"

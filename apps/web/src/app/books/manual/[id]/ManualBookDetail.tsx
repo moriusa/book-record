@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FaStar } from "react-icons/fa";
 import { RiBook3Line, RiEditLine } from "react-icons/ri";
 import BookTenToggleButton from "@/app/books/[isbn]/BookTenToggleButton";
+import ReadingListControls from "@/components/ui/ReadingListControls";
 import { authFetcher } from "@/lib/fetcher";
 import {
   getBookAuthorLabel,
@@ -150,6 +151,11 @@ export default function ManualBookDetail({ id }: Props) {
               </Link>
             </div>
           </aside>
+
+          <ReadingListControls
+            userBookId={book.id}
+            isFavorite={book.isFavorite}
+          />
 
           <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
             <BookTenToggleButton userBookId={book.id} />
