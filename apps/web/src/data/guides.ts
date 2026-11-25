@@ -1,6 +1,6 @@
 export type Guide = {
   slug: string;
-  icon: "search" | "edit" | "barcode" | "bookTen";
+  icon: "search" | "edit" | "barcode" | "bookTen" | "manual" | "list";
   eyebrow: string;
   title: string;
   mobileTitleLines: string[];
@@ -14,6 +14,34 @@ export type Guide = {
 };
 
 export const guides: Guide[] = [
+  {
+    slug: "add-books-manually",
+    icon: "manual",
+    eyebrow: "MANUAL ENTRY",
+    title: "本を手動で登録する",
+    mobileTitleLines: ["本を手動で", "登録する"],
+    description: "同人誌や自費出版など、検索で見つからない本を手動で本棚に追加する方法を紹介します。",
+    lead: "検索で見つからない本も、自分の本棚に残せます。ISBNのない同人誌や自費出版の本も登録できます。",
+    sections: [
+      { heading: "「本を探す」から手動登録を開く", body: "「本を探す」画面の「手動で追加」を選びます。検索結果が見つからなかった場合も、表示される手動登録のボタンから進めます。本棚への登録にはログインが必要です。" },
+      { heading: "本の情報と読書状態を入力する", body: "タイトルを入力し、必要に応じて著者・サークル名、出版社・頒布元などを記入します。読書の状態を選び、評価やメモも残せます。" },
+      { heading: "本棚に追加して確認する", body: "「本棚に追加」を押すと、自分の本棚に登録されます。本棚から詳細を開き、読書記録を確認・編集できます。表紙画像や外部リンクは登録されません。" },
+    ],
+  },
+  {
+    slug: "organize-books-with-lists",
+    icon: "list",
+    eyebrow: "MY LISTS",
+    title: "お気に入りやリストで本をまとめる",
+    mobileTitleLines: ["お気に入りやリストで", "本をまとめる"],
+    description: "お気に入りへの追加や、名前を付けたリストで本棚の本を整理する方法を紹介します。",
+    lead: "お気に入りの本や、同じテーマの本を自分だけのリストにまとめられます。ひとつの本を複数のリストに追加することもできます。",
+    sections: [
+      { heading: "リストを作成する", body: "本棚の「リスト」を開き、「新しいリストを作る」を選びます。リスト名を入力して「作成する」を押すと、一覧に追加されます。" },
+      { heading: "本をお気に入りやリストに追加する", body: "本棚に登録した本の詳細で「お気に入りに追加」を選ぶと、お気に入りに追加できます。「リストに追加」からは、追加したいリストを選べます。" },
+      { heading: "リストを確認・整理する", body: "本棚の「リスト」から、お気に入りや作成したリストを開けます。各本の三点メニューから取り外せます。リストの名前変更や削除もできますが、リストを削除しても本棚の本や読書記録は残ります。" },
+    ],
+  },
   {
     slug: "find-and-add-books",
     icon: "search",

@@ -3,6 +3,8 @@ import {
   RiBookmark3Line,
   RiEditLine,
   RiSearchLine,
+  RiFileEditLine,
+  RiListCheck2,
 } from "react-icons/ri";
 import type { Guide } from "@/data/guides";
 
@@ -11,6 +13,8 @@ const guideIcons = {
   edit: RiEditLine,
   barcode: RiBarcodeLine,
   bookTen: RiBookmark3Line,
+  manual: RiFileEditLine,
+  list: RiListCheck2,
 };
 
 export default function GuideIcon({
