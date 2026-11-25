@@ -15,6 +15,7 @@ export async function POST(request: Request) {
   const id = url.searchParams.get("id");
   revalidateTag("blog", "max");
   revalidatePath("/blog");
+  revalidatePath("/blog/category/[slug]", "page");
   revalidatePath("/sitemap.xml");
   if (id) revalidatePath(`/blog/${id}`);
 

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { RiArticleLine } from "react-icons/ri";
 import Link from "next/link";
-import { RiArrowRightLine, RiArticleLine } from "react-icons/ri";
+import { categoryIcons } from "@/components/blog/categoryIcons";
+import { blogCategories } from "@/data/blogCategories";
+import BlogPostList from "@/components/blog/BlogPostList";
 import { getBlogPostsWithStatus, isMicrocmsConfigured } from "@/lib/microcms";
 
 export const metadata: Metadata = {
@@ -9,15 +12,6 @@ export const metadata: Metadata = {
     "つみほんの読書記録、積読、本棚づくりにまつわる記事をお届けします。",
   alternates: { canonical: "/blog" },
 };
-
-const formatDate = (date?: string) =>
-  date
-    ? new Intl.DateTimeFormat("ja-JP", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }).format(new Date(date))
-    : null;
 
 export default async function BlogPage() {
   const { posts, error } = await getBlogPostsWithStatus();
@@ -42,35 +36,55 @@ export default async function BlogPage() {
           </p>
         )}
 
-        {posts.length > 0 ? (
-          <div className="mt-14 divide-y border-y border-[#293630]/12">
-            {posts.map((post) => (
-              <article key={post.id} className="py-8 sm:py-10">
+        <section className="mt-14" aria-labelledby="categories-heading">
+          <p className="text-xs tracking-[0.16em] text-[#75817a]">
+            EXPLORE BY TOPIC
+          </p>
+          <h2
+            id="categories-heading"
+            className="mt-3 font-serif-jp text-2xl font-medium"
+          >
+            ジャンルから探す
+          </h2>
+          <div className="mt-6 grid grid-cols-1 border-t border-[#293630]/12 sm:grid-cols-2 sm:gap-x-12">
+            {blogCategories.map((category) => {
+              const Icon = categoryIcons[category.icon];
+              return (
                 <Link
-                  href={`/blog/${post.id}`}
-                  className="group grid gap-4 sm:grid-cols-[130px_minmax(0,1fr)_auto] sm:items-start sm:gap-8"
+                  key={category.slug}
+                  href={`/blog/category/${category.slug}`}
+                  className="group flex items-start gap-4 border-b border-[#293630]/12 py-5 transition-colors hover:text-[#50665c]"
                 >
-                  <time className="pt-1 text-xs tracking-[0.06em] text-[#78847d]">
-                    {formatDate(post.publishedAt ?? post.createdAt)}
-                  </time>
-                  <div>
-                    <h2 className="font-serif-jp text-xl font-medium leading-relaxed transition-colors group-hover:text-[#50665c] sm:text-2xl">
-                      {post.title}
-                    </h2>
-                    {post.description && (
-                      <p className="mt-3 text-sm leading-7 text-[#647069]">
-                        {post.description}
-                      </p>
-                    )}
-                  </div>
-                  <RiArrowRightLine
-                    className="mt-1 hidden text-lg text-[#718078] transition-transform group-hover:translate-x-1 sm:block"
+                  <Icon
+                    className="mt-0.5 shrink-0 text-lg text-[#718078]"
                     aria-hidden="true"
                   />
+                  <span>
+                    <span className="block font-serif-jp text-base font-medium">
+                      {category.name}
+                    </span>
+                    <span className="mt-1 block text-xs text-[#75817a]">
+                      {category.description}
+                    </span>
+                  </span>
                 </Link>
-              </article>
-            ))}
+              );
+            })}
           </div>
+        </section>
+        {posts.length > 0 ? (
+          <section className="mt-16" aria-labelledby="latest-heading">
+            <p className="text-xs tracking-[0.16em] text-[#75817a]">
+              LATEST ARTICLES
+            </p>
+            <h2
+              id="latest-heading"
+              className="mb-6 mt-3 font-serif-jp text-2xl font-medium"
+            >
+              新着記事
+            </h2>
+            <BlogPostList posts={posts} />
+          </section>
         ) : (
           <div className="mt-14 border border-[#293630]/10 bg-[#eeece5] px-7 py-12 text-center sm:px-12 sm:py-16">
             <RiArticleLine

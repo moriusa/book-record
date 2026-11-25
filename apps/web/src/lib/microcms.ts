@@ -5,6 +5,7 @@ export type BlogPost = {
   id: string;
   title: string;
   description?: string;
+  category?: string[];
   body: string;
   publishedAt?: string;
   revisedAt?: string;

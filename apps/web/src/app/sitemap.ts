@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { guides } from "@/data/guides";
 import { getBlogPosts } from "@/lib/microcms";
+import { blogCategories } from "@/data/blogCategories";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -52,6 +53,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const blogPosts = await getBlogPosts();
+  const categoryEntries: MetadataRoute.Sitemap = blogCategories
+    .filter((category) =>
+      blogPosts.some((post) => post.category?.includes(category.name)),
+    )
+    .map((category) => ({
+      url: new URL(`/blog/category/${category.slug}`, siteUrl).toString(),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    }));
   const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: new URL(`/blog/${post.id}`, siteUrl).toString(),
     lastModified: post.revisedAt ?? post.updatedAt,
@@ -60,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   if (!apiUrl) {
-    return [...baseEntries, ...blogEntries];
+    return [...baseEntries, ...categoryEntries, ...blogEntries];
   }
 
   try {
@@ -69,13 +79,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     if (!response.ok) {
-      return [...baseEntries, ...blogEntries];
+      return [...baseEntries, ...categoryEntries, ...blogEntries];
     }
 
     const books: CatalogBook[] = await response.json();
 
     return [
       ...baseEntries,
+      ...categoryEntries,
       ...books.map(({ isbn }) => ({
         url: new URL(`/books/${encodeURIComponent(isbn)}`, siteUrl).toString(),
         changeFrequency: "monthly" as const,
@@ -84,6 +95,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...blogEntries,
     ];
   } catch {
-    return [...baseEntries, ...blogEntries];
+    return [...baseEntries, ...categoryEntries, ...blogEntries];
   }
 }

@@ -1,14 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  RiArrowLeftLine,
-  RiArrowRightLine,
-  RiBookOpenLine,
-  RiListCheck2,
-} from "react-icons/ri";
+import { RiArrowRightLine, RiBookOpenLine, RiListCheck2 } from "react-icons/ri";
 import BlogTableOfContents from "@/components/blog/BlogTableOfContents";
 import { getBlogPost, getBlogPosts } from "@/lib/microcms";
+import { blogCategories } from "@/data/blogCategories";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -78,6 +74,12 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const { html: articleBody, headings } = createArticleBody(post.body);
+  const categories = Array.isArray(post.category)
+    ? post.category.flatMap((name) => {
+        const category = blogCategories.find((item) => item.name === name);
+        return category ? [category] : [];
+      })
+    : [];
   const relatedPosts = (await getBlogPosts())
     .filter((candidate) => candidate.id !== post.id)
     .slice(0, 2);
@@ -85,13 +87,32 @@ export default async function BlogPostPage({ params }: Props) {
   return (
     <main className="bg-[#f7f5f0] text-[#293630]">
       <article className="mx-auto max-w-175 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16">
-        <Link
-          href="/blog"
-          className="inline-flex items-center gap-2 text-xs text-[#647069] transition-colors hover:text-[#293630]"
+        <nav
+          aria-label="ブログのナビゲーション"
+          className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#647069]"
         >
-          <RiArrowLeftLine aria-hidden="true" />
-          ブログ一覧
-        </Link>
+          <Link href="/blog" className="transition-colors hover:text-[#293630]">
+            ブログ一覧
+          </Link>
+          {categories.length > 0 && (
+            <>
+              <span aria-hidden="true" className="text-[#a0aaa3]">
+                /
+              </span>
+              <span className="flex flex-wrap gap-x-3 gap-y-2">
+                {categories.map((category) => (
+                  <Link
+                    key={category.slug}
+                    href={`/blog/category/${category.slug}`}
+                    className="transition-colors hover:text-[#293630]"
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </span>
+            </>
+          )}
+        </nav>
         <header className="mt-14 pb-6 sm:mt-18 sm:pb-10">
           <time className="text-xs tracking-[0.08em] text-[#75817a]">
             {formatDate(post.publishedAt ?? post.createdAt)}
