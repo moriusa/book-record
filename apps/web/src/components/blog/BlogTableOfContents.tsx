@@ -32,7 +32,7 @@ export default function BlogTableOfContents({ headings }: Props) {
         <RiListCheck2 className="text-base" aria-hidden="true" />
         CONTENTS
       </p>
-      <ol className="mt-4 space-y-2.5 text-sm leading-6">
+      <ol className="mt-4 space-y-2.5 text-sm leading-6 lg:text-base lg:leading-7">
         {headings.map((heading) => (
           <li
             key={heading.id}

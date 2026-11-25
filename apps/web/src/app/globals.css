@@ -44,6 +44,13 @@
   line-height: 2;
 }
 
+@media (min-width: 1024px) {
+  .blog-content {
+    font-size: 1.125rem;
+    line-height: 2;
+  }
+}
+
 .blog-content > * + * {
   margin-top: 2rem;
 }
@@ -77,6 +84,8 @@
 
 .blog-content h3 {
   margin-top: 3rem;
+  border-bottom: 1px solid #c9d2cb;
+  padding-bottom: 0.5rem;
   font-size: 1.25rem;
 }
 

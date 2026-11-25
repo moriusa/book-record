@@ -81,12 +81,20 @@ export default async function BlogPostPage({ params }: Props) {
       })
     : [];
   const relatedPosts = (await getBlogPosts())
-    .filter((candidate) => candidate.id !== post.id)
-    .slice(0, 2);
+    .filter(
+      (candidate) =>
+        candidate.id !== post.id &&
+        Array.isArray(post.category) &&
+        Array.isArray(candidate.category) &&
+        candidate.category.some((category) =>
+          post.category?.includes(category),
+        ),
+    )
+    .slice(0, 4);
 
   return (
     <main className="bg-[#f7f5f0] text-[#293630]">
-      <article className="mx-auto max-w-175 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16">
+      <article className="mx-auto max-w-225 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16">
         <nav
           aria-label="ブログのナビゲーション"
           className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#647069]"
@@ -117,7 +125,7 @@ export default async function BlogPostPage({ params }: Props) {
           <time className="text-xs tracking-[0.08em] text-[#75817a]">
             {formatDate(post.publishedAt ?? post.createdAt)}
           </time>
-          <h1 className="mt-5 font-serif-jp text-4xl font-medium leading-snug tracking-[-0.045em] sm:text-5xl">
+          <h1 className="mt-5 font-serif-jp text-[clamp(1.75rem,3.5vw,2.5rem)] font-medium leading-snug tracking-[-0.035em]">
             {post.title}
           </h1>
           {post.description && (
@@ -132,6 +140,34 @@ export default async function BlogPostPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: articleBody }}
         />
         <aside className="mt-16 border-t border-[#293630]/12 pt-10 sm:mt-20 sm:pt-12">
+          {relatedPosts.length > 0 && (
+            <section
+              className="mb-12 sm:mb-16"
+              aria-labelledby="related-posts-heading"
+            >
+              <h2
+                id="related-posts-heading"
+                className="font-serif-jp text-xl font-medium text-[#293630]"
+              >
+                あわせて読みたい
+              </h2>
+              <div className="mt-4 divide-y divide-[#293630]/12 border-y border-[#293630]/12">
+                {relatedPosts.map((relatedPost) => (
+                  <Link
+                    key={relatedPost.id}
+                    href={`/blog/${relatedPost.id}`}
+                    className="group flex items-center justify-between gap-5 py-4 text-sm leading-6 transition-colors hover:text-[#50665c] lg:text-base lg:leading-7"
+                  >
+                    <span>{relatedPost.title}</span>
+                    <RiArrowRightLine
+                      className="shrink-0 text-lg transition-transform group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
           <p className="text-xs tracking-[0.14em] text-[#75817a]">
             EXPLORE MORE
           </p>
@@ -186,28 +222,6 @@ export default async function BlogPostPage({ params }: Props) {
               </span>
             </Link>
           </div>
-          {relatedPosts.length > 0 && (
-            <div className="mt-10">
-              <h3 className="text-sm font-medium text-[#526159]">
-                あわせて読みたい
-              </h3>
-              <div className="mt-3 divide-y border-y border-[#293630]/12">
-                {relatedPosts.map((relatedPost) => (
-                  <Link
-                    key={relatedPost.id}
-                    href={`/blog/${relatedPost.id}`}
-                    className="group flex items-center justify-between gap-5 py-4 text-sm leading-6 transition-colors hover:text-[#50665c]"
-                  >
-                    <span>{relatedPost.title}</span>
-                    <RiArrowRightLine
-                      className="shrink-0 text-lg transition-transform group-hover:translate-x-1"
-                      aria-hidden="true"
-                    />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
         </aside>
       </article>
     </main>
