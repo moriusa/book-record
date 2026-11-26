@@ -23,36 +23,26 @@ const statusCards = [
     status: "WANT_TO_READ",
     label: "読みたい",
     icon: RiStackLine,
-    accent: "text-amber-700",
-    background: "bg-amber-100/70",
   },
   {
     status: "READING",
     label: "読んでいる",
     icon: RiBookOpenLine,
-    accent: "text-sky-700",
-    background: "bg-sky-100/70",
   },
   {
     status: "COMPLETED",
     label: "読み終わった",
     icon: RiCheckLine,
-    accent: "text-emerald-700",
-    background: "bg-emerald-100/70",
   },
   {
     status: "ON_HOLD",
     label: "積読",
     icon: RiPauseCircleLine,
-    accent: "text-stone-600",
-    background: "bg-stone-200/70",
   },
 ] as const satisfies ReadonlyArray<{
   status: BookStatus;
   label: string;
   icon: typeof RiStackLine;
-  accent: string;
-  background: string;
 }>;
 
 export default function Home() {
@@ -82,79 +72,100 @@ function AuthenticatedHome() {
         new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
     );
   const readingBook = readingBooks[0];
+  const hasBooks = (books?.length ?? 0) > 0;
+  const nextBookStatus = books?.some((book) => book.status === "WANT_TO_READ")
+    ? "WANT_TO_READ"
+    : books?.some((book) => book.status === "ON_HOLD")
+      ? "ON_HOLD"
+      : null;
 
   return (
-    <main className="mx-auto max-w-270 px-5 pb-24 pt-12 text-[#293630] sm:px-8 sm:pt-16">
-      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-[10px] tracking-[0.18em] text-[#7d8982]">
+    <main className="mx-auto max-w-280 px-4 pb-20 pt-4 text-[#293630] sm:px-8 sm:pt-11">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 rounded-2xl bg-[#ede9dc] p-5 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-3 sm:border sm:border-[#344941]/10 sm:px-9 sm:py-0">
+        <div className="sm:col-start-1 sm:row-start-1 sm:self-end">
+          <p className="mb-1 text-[10px] text-[#526158] sm:hidden">
             YOUR READING SPACE
           </p>
-          <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] sm:text-[42px]">
+          <h1 className="font-serif-jp text-[clamp(1.25rem,6vw,1.5rem)] font-semibold tracking-[-0.04em] sm:text-[42px]">
             おかえりなさい。
           </h1>
-          <p className="mt-3 text-sm text-[#748078]">
-            今日も、気になる本を少しずつ。
+          <p className="mt-1 text-xs leading-5 text-[#526158] sm:mt-2 sm:text-sm sm:leading-6">
+            読書の続きを、自分のペースで。
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href="/guides"
-            className="flex items-center gap-2 rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-xs text-[#58685f] transition-colors hover:border-[#718078]"
-          >
-            <RiBookOpenLine aria-hidden="true" />
-            使い方を見る
-          </Link>
+        <div className="col-span-2 flex flex-wrap items-center gap-x-3 gap-y-1 sm:col-start-1 sm:row-start-2 sm:col-span-1 sm:gap-x-4 sm:self-start">
           <Link
             href="/books/search"
-            className="flex w-fit items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#344941] px-4 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
           >
             <RiAddLine aria-hidden="true" />
             本を探す
           </Link>
+          <Link
+            href="/guides"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[#43584e] underline decoration-[#43584e]/40 underline-offset-4 hover:decoration-current"
+          >
+            使い方を見る
+            <RiArrowRightLine aria-hidden="true" />
+          </Link>
         </div>
-      </div>
+        <Image
+          src="/loose-kotatsu.png"
+          alt=""
+          width={192}
+          height={192}
+          className="col-start-2 row-start-1 size-[clamp(5rem,27vw,7.25rem)] object-contain sm:row-span-2 sm:size-42 sm:justify-self-center lg:size-60"
+        />
+      </header>
 
-      <section
-        className="mt-11 grid lg:grid-cols-[1.55fr_0.8fr]"
-        aria-labelledby="current-reading-heading"
-      >
-        <div className="py-9 lg:border-r lg:border-[#293630]/10 lg:pr-12">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-                CURRENTLY READING
-              </p>
-              <h2
-                id="current-reading-heading"
-                className="mt-2 font-serif-jp text-xl font-medium"
-              >
-                今、読んでいる本
-              </h2>
-            </div>
+      <div className="mt-7 grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <section
+          aria-labelledby="current-reading-heading"
+          className="min-w-0 px-1 py-8 sm:rounded-2xl sm:border sm:border-[#344941]/12 sm:bg-[#faf8f1] sm:p-7"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <h2
+              id="current-reading-heading"
+              className="font-serif-jp text-xl font-semibold sm:text-2xl"
+            >
+              今、読んでいる本
+            </h2>
             {readingBooks.length > 1 && (
               <Link
                 href="/bookshelf?status=READING"
-                className="flex shrink-0 items-center gap-1.5 text-[10px] text-[#69766f]"
+                className="inline-flex items-center gap-1.5 text-xs text-[#43584e] underline underline-offset-4"
               >
                 {readingBooks.length}冊すべて見る
                 <RiArrowRightLine aria-hidden="true" />
               </Link>
             )}
           </div>
-          {readingBook ? (
-            <div className="mt-8 grid grid-cols-[105px_1fr] gap-6 sm:grid-cols-[150px_1fr] sm:gap-9">
+          {isLoading ? (
+            <div
+              role="status"
+              className="mt-5 flex gap-4 motion-safe:animate-pulse"
+            >
+              <span className="sr-only">読書記録を読み込み中</span>
+              <div className="aspect-2/3 w-20 shrink-0 rounded-md bg-[#e4e2db] sm:w-28" />
+              <div className="mt-2 h-5 w-1/2 rounded bg-[#e4e2db]" />
+            </div>
+          ) : error && !books ? (
+            <p role="status" className="mt-5 text-sm text-[#526158]">
+              本棚を読み込めませんでした。
+            </p>
+          ) : readingBook ? (
+            <div className="mt-6 grid grid-cols-[80px_minmax(0,1fr)] gap-3 sm:mt-5 sm:grid-cols-[112px_minmax(0,1fr)] sm:gap-6">
               <Link
                 href={getBookHref(readingBook)}
-                className="relative aspect-2/3 w-full self-start overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)]"
+                className="relative aspect-2/3 w-full self-start overflow-hidden rounded-lg bg-[#d9d4c5] sm:rounded-r-[3px] sm:rounded-l-[1px] sm:border-l-[3px] sm:border-black/10 sm:shadow-[5px_7px_16px_rgb(38_48_43/15%)]"
               >
                 {readingBook.imageUrl ? (
                   <Image
                     src={readingBook.imageUrl}
                     alt={readingBook.title}
                     fill
-                    sizes="(max-width: 640px) 105px, 150px"
-                    className="object-cover"
+                    sizes="(min-width: 640px) 112px, 80px"
+                    className="object-contain"
                   />
                 ) : (
                   <RiBookOpenLine
@@ -165,7 +176,7 @@ function AuthenticatedHome() {
               </Link>
               <div className="flex min-w-0 flex-col py-1">
                 <Link href={getBookHref(readingBook)}>
-                  <h3 className="font-serif-jp text-2xl font-medium sm:text-3xl">
+                  <h3 className="wrap-anywhere font-serif-jp text-lg font-semibold sm:text-2xl">
                     {readingBook.title}
                   </h3>
                   <p className="mt-2 text-xs text-[#748078]">
@@ -173,14 +184,14 @@ function AuthenticatedHome() {
                   </p>
                 </Link>
                 {readingBook.review && (
-                  <div className="mt-6 border-l-2 border-[#aab6af] pl-4">
+                  <div className="mt-2 border-l-2 border-[#aab6af] pl-2 sm:mt-6 sm:pl-4">
                     <p className="text-[10px] text-[#929b96]">自分のメモ</p>
-                    <p className="mt-2 line-clamp-3 text-xs leading-6 text-[#607068]">
+                    <p className="line-clamp-3 text-xs leading-5 text-[#607068] sm:mt-2 sm:leading-6">
                       {readingBook.review}
                     </p>
                   </div>
                 )}
-                <div className="mt-auto flex flex-wrap gap-2 pt-7">
+                <div className="mt-auto flex flex-wrap gap-2 pt-5 sm:pt-7">
                   <Link
                     href={`/bookshelf/edit/${readingBook.id}`}
                     className="rounded-md bg-[#40584e] px-4 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#30483e]"
@@ -189,7 +200,7 @@ function AuthenticatedHome() {
                   </Link>
                   <Link
                     href={getBookHref(readingBook)}
-                    className="flex items-center gap-2 rounded-md border border-[#293630]/12 px-4 py-2.5 text-xs text-[#65736c] transition-colors hover:border-[#718078]"
+                    className="flex items-center gap-1.5 py-2.5 text-xs text-[#65736c] hover:underline sm:gap-2 sm:rounded-md sm:border sm:border-[#293630]/12 sm:px-4 sm:hover:border-[#718078]"
                   >
                     詳細を見る
                     <RiArrowRightLine aria-hidden="true" />
@@ -198,145 +209,164 @@ function AuthenticatedHome() {
               </div>
             </div>
           ) : (
-            <div className="mt-8">
-              <p className="text-sm text-[#75817b]">
-                読んでいる本はまだありません。
-              </p>
-              <Link
-                href="/bookshelf?status=WANT_TO_READ"
-                className="mt-4 inline-flex items-center gap-2 text-xs text-[#50665c] underline underline-offset-4"
-              >
-                本棚から次に読む本を選ぶ
-                <RiArrowRightLine aria-hidden="true" />
-              </Link>
+            <div className="mt-5 flex items-center gap-4 sm:gap-6">
+              <Image
+                src="/loose-reading-books.png"
+                alt=""
+                width={120}
+                height={120}
+                className="size-18 shrink-0 object-contain sm:size-28"
+              />
+              <div>
+                <p className="text-sm leading-6 text-[#526158]">
+                  読んでいる本はまだありません。
+                </p>
+                <Link
+                  href={
+                    nextBookStatus
+                      ? `/bookshelf?status=${nextBookStatus}`
+                      : "/books/search"
+                  }
+                  className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-[#43584e] underline underline-offset-4"
+                >
+                  {nextBookStatus
+                    ? "本棚から次の一冊を選ぶ"
+                    : "次に読む本を探す"}
+                  <RiArrowRightLine className="shrink-0" aria-hidden="true" />
+                </Link>
+              </div>
             </div>
           )}
-        </div>
-        <aside className="py-9 lg:pl-10">
-          <div className="flex items-center justify-between">
+        </section>
+        <section
+          aria-labelledby="bookshelf-overview-heading"
+          className="min-w-0 rounded-2xl bg-[#e8ece1] p-5 sm:border sm:border-[#344941]/12 sm:p-7"
+        >
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-                MY BOOKSHELF
-              </p>
-              <h2 className="mt-2 font-serif-jp text-xl font-medium">
-                本棚の様子
+              <h2
+                id="bookshelf-overview-heading"
+                className="font-serif-jp text-xl font-semibold sm:text-2xl"
+              >
+                わたしの本棚
               </h2>
+              {books && (
+                <p className="mt-1 text-xs text-[#526158]">
+                  全 {books.length} 冊
+                </p>
+              )}
             </div>
             <Link
               href="/bookshelf"
-              className="flex items-center gap-1.5 text-[10px] text-[#69766f]"
+              className="inline-flex shrink-0 items-center gap-1.5 text-xs text-[#43584e] underline underline-offset-4"
             >
               本棚へ
               <RiArrowRightLine aria-hidden="true" />
             </Link>
           </div>
-          <div className="mt-7 divide-y divide-[#293630]/8 border-y border-[#293630]/8">
-            {statusCards.map(({ status, label }) => (
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {statusCards.map(({ status, label, icon: Icon }) => (
               <Link
                 key={status}
                 href={`/bookshelf?status=${status}`}
-                className="flex items-center justify-between py-4"
+                className="group flex min-w-0 flex-col gap-1.5 rounded-lg bg-[#faf9f3] px-3 py-2.5 transition-colors hover:bg-white sm:border sm:border-[#344941]/10 sm:hover:border-[#344941]/35"
               >
-                <span className="flex items-center gap-2.5 text-xs text-[#647169]">
-                  <span
-                    className={`size-1.5 rounded-full ${status === "READING" ? "bg-[#5d7c6e]" : "bg-[#b4b9b3]"}`}
-                  />
+                <span className="flex items-center gap-1.5 text-xs text-[#526158]">
+                  <Icon className="shrink-0" aria-hidden="true" />
                   {label}
                 </span>
-                <span className="font-serif-jp text-lg text-[#3d4d45]">
-                  {isLoading
-                    ? "–"
-                    : (books?.filter((book) => book.status === status).length ??
-                      0)}
-                  <small className="ml-1 font-sans text-[9px] text-[#89938e]">
-                    冊
-                  </small>
+                <span className="flex items-center justify-between gap-2">
+                  <span className="font-serif-jp text-xl tabular-nums">
+                    {books ? (
+                      <>
+                        {books.filter((book) => book.status === status).length}
+                        <small className="ml-1 font-sans text-xs text-[#526158]">
+                          冊
+                        </small>
+                      </>
+                    ) : (
+                      "–"
+                    )}
+                  </span>
+                  <RiArrowRightLine
+                    className="shrink-0 text-[#526158] transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
                 </span>
               </Link>
             ))}
           </div>
-        </aside>
-      </section>
+        </section>
+      </div>
 
-      <section className="mt-16" aria-labelledby="recent-books-heading">
-        <div className="flex items-end justify-between border-b border-[#293630]/10 pb-4">
-          <div>
-            <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-              RECENTLY ADDED
-            </p>
+      {(hasBooks || isLoading) && (
+        <section
+          className="mt-10 sm:mt-12"
+          aria-labelledby="recent-books-heading"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#293630]/15 pb-3">
             <h2
               id="recent-books-heading"
-              className="mt-2 font-serif-jp text-xl font-medium"
+              className="font-serif-jp text-xl font-semibold sm:text-2xl"
             >
-              最近、本棚に加えた本
+              最近追加した本
             </h2>
-          </div>
-          <Link
-            href="/bookshelf"
-            className="flex items-center gap-1.5 text-[10px] text-[#69766f]"
-          >
-            すべて見る
-            <RiArrowRightLine aria-hidden="true" />
-          </Link>
-        </div>
-        {isLoading ? (
-          <div className="mt-7 grid grid-cols-3 gap-5 sm:grid-cols-5 sm:gap-7">
-            {[...Array(5)].map((_, index) => (
-              <div
-                key={index}
-                className="aspect-2/3 animate-pulse bg-[#e4e2db]"
-              />
-            ))}
-          </div>
-        ) : error ? (
-          <p className="py-12 text-sm text-[#75817b]">
-            本棚を読み込めませんでした。
-          </p>
-        ) : recentBooks.length === 0 ? (
-          <div className="py-16 text-center">
-            <RiBookOpenLine className="mx-auto text-3xl text-[#9ba49f]" />
-            <p className="mt-4 font-serif-jp text-lg">まだ本棚は空です</p>
             <Link
-              href="/books/search"
-              className="mt-5 inline-flex text-xs text-[#50665c] underline underline-offset-4"
+              href="/bookshelf"
+              className="inline-flex items-center gap-1.5 text-xs text-[#43584e] underline underline-offset-4"
             >
-              本を探しにいく
+              すべて見る
+              <RiArrowRightLine aria-hidden="true" />
             </Link>
           </div>
-        ) : (
-          <div className="scrollbar-none -mx-5 flex gap-5 overflow-x-auto px-5 pb-4 pt-7 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-7 sm:px-0">
-            {recentBooks.map((book) => (
-              <Link
-                key={book.id}
-                href={getBookHref(book)}
-                className="group w-28 shrink-0 text-left sm:w-auto"
-              >
-                <div className="relative aspect-2/3 w-full overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)] transition-transform group-hover:-translate-y-1">
-                  {book.imageUrl ? (
-                    <Image
-                      src={book.imageUrl}
-                      alt={book.title}
-                      fill
-                      sizes="(max-width: 640px) 112px, 20vw"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <RiBookOpenLine className="absolute inset-0 m-auto text-2xl text-[#75817b]" />
-                  )}
-                </div>
-                <h3 className="mt-4 truncate font-serif-jp text-xs font-medium">
-                  {book.title}
-                </h3>
-                <p className="mt-1 truncate text-[9px] text-[#87918c]">
-                  {getBookAuthorLabel(book.author)}
-                </p>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
+          {isLoading ? (
+            <div
+              role="status"
+              className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-5 sm:gap-6"
+            >
+              <span className="sr-only">最近追加した本を読み込み中</span>
+              {[...Array(5)].map((_, index) => (
+                <div
+                  key={index}
+                  className={`aspect-2/3 rounded-md bg-[#e4e2db] motion-safe:animate-pulse ${index > 2 ? "hidden sm:block" : ""}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-4 pt-5 sm:mx-0 sm:grid sm:grid-cols-5 sm:gap-6 sm:px-1">
+              {recentBooks.map((book) => (
+                <Link
+                  key={book.id}
+                  href={getBookHref(book)}
+                  className="group w-26 min-w-0 shrink-0 snap-center rounded-sm text-left sm:w-auto"
+                >
+                  <div className="relative aspect-2/3 w-full overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[5px_7px_16px_rgb(38_48_43/15%)] transition-transform group-hover:-translate-y-1">
+                    {book.imageUrl ? (
+                      <Image
+                        src={book.imageUrl}
+                        alt={book.title}
+                        fill
+                        sizes="(min-width: 1120px) 200px, (min-width: 640px) 20vw, 104px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <RiBookOpenLine className="absolute inset-0 m-auto text-2xl text-[#75817b]" />
+                    )}
+                  </div>
+                  <h3 className="mt-3 line-clamp-2 wrap-anywhere font-serif-jp text-sm font-semibold">
+                    {book.title}
+                  </h3>
+                  <p className="mt-1 truncate text-xs text-[#526158]">
+                    {getBookAuthorLabel(book.author)}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
-      <HomeNews className="mt-16" />
+      <HomeNews className="mt-12 border-t border-[#293630]/10 pt-8 sm:mt-16" />
     </main>
   );
 }
