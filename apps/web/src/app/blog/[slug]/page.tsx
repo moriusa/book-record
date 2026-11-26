@@ -52,7 +52,13 @@ const createArticleBody = (body: string) => {
     },
   );
 
-  return { html, headings };
+  const htmlWithTables = html.replace(
+    /<table\b[^>]*>[\s\S]*?<\/table>/gi,
+    (table) =>
+      `<div class="table-scroll" role="region" aria-label="表（横にスクロールできます）" tabindex="0">${table}</div>`,
+  );
+
+  return { html: htmlWithTables, headings };
 };
 
 export async function generateStaticParams() {
