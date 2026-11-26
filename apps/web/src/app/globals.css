@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Noto+Serif+JP:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500&family=Noto+Serif+JP:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @layer base {
@@ -59,7 +59,7 @@
 .blog-content h3 {
   color: #293630;
   font-family: "Noto Serif JP", "Yu Mincho", serif;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.6;
   scroll-margin-top: 5.5rem;
 }
@@ -69,6 +69,12 @@
   margin-top: 4rem;
   padding-left: 1.58rem;
   font-size: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .blog-content h2 {
+    font-size: 1.75rem;
+  }
 }
 
 .blog-content h2::before {
@@ -86,7 +92,13 @@
   margin-top: 3rem;
   border-bottom: 1px solid #c9d2cb;
   padding-bottom: 0.5rem;
-  font-size: 1.25rem;
+  font-size: 1.45rem;
+}
+
+@media (min-width: 1024px) {
+  .blog-content h3 {
+    font-size: 1.5rem;
+  }
 }
 
 .blog-content a {
@@ -106,6 +118,20 @@
 
 .blog-content ol {
   list-style: decimal;
+}
+
+.blog-content .table-scroll-hint {
+  margin: 0 0 0.5rem;
+  color: #75817a;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+@media (min-width: 768px) {
+  .blog-content .table-scroll-hint {
+    display: none;
+  }
 }
 
 .blog-content .table-scroll {

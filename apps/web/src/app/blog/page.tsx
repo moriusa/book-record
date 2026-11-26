@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { RiArticleLine } from "react-icons/ri";
+import { RiArrowDownLine, RiArticleLine } from "react-icons/ri";
 import Link from "next/link";
 import { categoryIcons } from "@/components/blog/categoryIcons";
 import { blogCategories } from "@/data/blogCategories";
@@ -29,6 +29,14 @@ export default async function BlogPage() {
         <p className="mt-6 text-sm leading-8 text-[#647069] sm:text-base">
           本を読む時間や、本棚を育てる日々について。つみほんから、ゆっくりお届けします。
         </p>
+        {posts.length > 0 && (
+          <a
+            href="#latest-heading"
+            className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm text-[#40584e] underline decoration-[#9eafa4] underline-offset-4 transition-colors hover:text-[#293630] sm:hidden"
+          >
+            新着記事を見る <RiArrowDownLine aria-hidden="true" />
+          </a>
+        )}
 
         {error && process.env.NODE_ENV === "development" && (
           <p className="mt-8 border border-red-900/20 bg-red-50 px-4 py-3 text-xs leading-6 text-red-900">
@@ -79,7 +87,7 @@ export default async function BlogPage() {
             </p>
             <h2
               id="latest-heading"
-              className="mb-6 mt-3 font-serif-jp text-2xl font-medium"
+              className="mb-6 mt-3 scroll-mt-24 font-serif-jp text-2xl font-medium"
             >
               新着記事
             </h2>

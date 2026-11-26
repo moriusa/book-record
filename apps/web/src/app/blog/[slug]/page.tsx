@@ -55,7 +55,7 @@ const createArticleBody = (body: string) => {
   const htmlWithTables = html.replace(
     /<table\b[^>]*>[\s\S]*?<\/table>/gi,
     (table) =>
-      `<div class="table-scroll" role="region" aria-label="表（横にスクロールできます）" tabindex="0">${table}</div>`,
+      `<div class="table-container"><p class="table-scroll-hint" aria-hidden="true">← 横にスクロールできます →</p><div class="table-scroll" role="region" aria-label="表（横にスクロールできます）" tabindex="0">${table}</div></div>`,
   );
 
   return { html: htmlWithTables, headings };
@@ -121,13 +121,16 @@ export default async function BlogPostPage({ params }: Props) {
     .slice(0, 4);
 
   return (
-    <main className="bg-[#f7f5f0] text-[#293630]">
-      <article className="mx-auto max-w-225 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16">
+    <main className="mx-auto max-w-7xl bg-[#f7f5f0] text-[#293630]">
+      <article className="mx-auto max-w-225 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16 lg:ml-0 lg:mr-80">
         <nav
           aria-label="ブログのナビゲーション"
           className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#647069]"
         >
-          <Link href="/blog" className="transition-colors hover:text-[#293630]">
+          <Link
+            href="/blog"
+            className="underline decoration-[#9eafa4] underline-offset-4 transition-colors hover:text-[#293630]"
+          >
             ブログ一覧
           </Link>
           {categories.length > 0 && (
@@ -140,7 +143,7 @@ export default async function BlogPostPage({ params }: Props) {
                   <Link
                     key={category.slug}
                     href={`/blog/category/${category.slug}`}
-                    className="transition-colors hover:text-[#293630]"
+                    className="underline decoration-[#9eafa4] underline-offset-4 transition-colors hover:text-[#293630]"
                   >
                     {category.name}
                   </Link>
@@ -149,11 +152,11 @@ export default async function BlogPostPage({ params }: Props) {
             </>
           )}
         </nav>
-        <header className="mt-14 pb-6 sm:mt-18 sm:pb-10">
+        <header className="mt-14 pb-6 sm:mt-18 sm:pb-10 lg:border-b lg:border-[#293630]/12 lg:pb-12">
           <time className="text-xs tracking-[0.08em] text-[#75817a]">
             {formatDate(post.publishedAt ?? post.createdAt)}
           </time>
-          <h1 className="mt-5 font-serif-jp text-[clamp(1.75rem,3.5vw,2.5rem)] font-medium leading-snug tracking-[-0.035em]">
+          <h1 className="mt-5 font-serif-jp text-[clamp(1.9rem,3.5vw,2.5rem)] font-bold leading-snug tracking-[-0.035em]">
             {post.title}
           </h1>
           {post.description && (
@@ -162,11 +165,18 @@ export default async function BlogPostPage({ params }: Props) {
             </p>
           )}
         </header>
-        {headings.length > 0 && <BlogTableOfContents headings={headings} />}
-        <div
-          className="blog-content pt-12 sm:pt-16"
-          dangerouslySetInnerHTML={{ __html: articleBody }}
-        />
+        {headings.length > 0 && (
+          <BlogTableOfContents headings={headings} variant="mobile" />
+        )}
+        <div className="relative">
+          {headings.length > 0 && (
+            <BlogTableOfContents headings={headings} variant="desktop" />
+          )}
+          <div
+            className="blog-content pt-12 sm:pt-16"
+            dangerouslySetInnerHTML={{ __html: articleBody }}
+          />
+        </div>
         <aside className="mt-16 border-t border-[#293630]/12 pt-10 sm:mt-20 sm:pt-12">
           {relatedPosts.length > 0 && (
             <section
