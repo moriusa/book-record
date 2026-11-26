@@ -14,6 +14,7 @@ import {
   RiLayoutGridLine,
   RiListUnordered,
   RiSearchLine,
+  RiCloseLine,
   RiSortDesc,
   RiStackLine,
 } from "react-icons/ri";
@@ -79,6 +80,7 @@ const BookshelfToolbar = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [isDisplaySettingsOpen, setIsDisplaySettingsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(Boolean(searchQuery));
 
   useEffect(() => {
     const scrollArea = filterScrollRef.current;
@@ -187,21 +189,44 @@ const BookshelfToolbar = ({
         </div>
 
         <div className="relative flex flex-wrap items-center gap-3 pt-3">
-          <label className="relative w-full min-w-0 sm:w-auto sm:max-w-90 sm:flex-1">
-            <span className="sr-only">本棚を検索</span>
-            <RiSearchLine
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#7b8781]"
-              aria-hidden="true"
-            />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(event) => onSearchChange(event.target.value)}
-              placeholder="本棚を検索"
-              className="min-h-10 w-full rounded-md border border-[#293630]/10 bg-[#f9f8f4] py-2 pl-9 pr-3 text-sm text-[#34443d] outline-none transition placeholder:text-[#929b96] hover:border-[#293630]/20 focus:border-[#60736a] focus:ring-2 focus:ring-[#dfe5e0]"
-            />
-          </label>
+          {isSearchOpen && (
+            <label className="relative order-3 w-full min-w-0 sm:order-0 sm:w-auto sm:max-w-90 sm:flex-1">
+              <span className="sr-only">本棚を検索</span>
+              <RiSearchLine
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-[#7b8781]"
+                aria-hidden="true"
+              />
+              <input
+                autoFocus
+                type="search"
+                value={searchQuery}
+                onChange={(event) => onSearchChange(event.target.value)}
+                placeholder="タイトル・著者・ISBNで検索"
+                className="min-h-10 w-full rounded-md border border-[#293630]/10 bg-[#f9f8f4] py-2 pl-9 pr-3 text-sm text-[#34443d] outline-none transition placeholder:text-[#929b96] hover:border-[#293630]/20 focus:border-[#60736a] focus:ring-2 focus:ring-[#dfe5e0]"
+              />
+            </label>
+          )}
           <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (isSearchOpen) {
+                  onSearchChange("");
+                  setIsSearchOpen(false);
+                } else {
+                  setIsSearchOpen(true);
+                }
+              }}
+              aria-label={isSearchOpen ? "本棚検索を閉じる" : "本棚を検索"}
+              aria-expanded={isSearchOpen}
+              className="flex size-10 items-center justify-center rounded-md border border-[#293630]/12 bg-[#f9f8f4] text-[#526159] transition hover:border-[#60736a] hover:text-[#344941] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a]"
+            >
+              {isSearchOpen ? (
+                <RiCloseLine aria-hidden="true" />
+              ) : (
+                <RiSearchLine aria-hidden="true" />
+              )}
+            </button>
             <div
               className="flex min-h-10 rounded-md border border-[#293630]/12 bg-[#f9f8f4] p-1"
               aria-label="表示形式"

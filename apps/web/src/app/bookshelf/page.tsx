@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -21,6 +21,29 @@ import {
   GroupOption,
 } from "@/types/book";
 
+const BOOKSHELF_VIEW_STORAGE_KEY = "tsumihon:bookshelf-view-mode";
+const BOOKSHELF_VIEW_CHANGE_EVENT = "bookshelf-view-mode-change";
+
+const getStoredViewMode = (): ViewMode => {
+  try {
+    return window.localStorage.getItem(BOOKSHELF_VIEW_STORAGE_KEY) === "LIST"
+      ? "LIST"
+      : "GRID";
+  } catch {
+    return "GRID";
+  }
+};
+
+const subscribeToViewMode = (callback: () => void) => {
+  window.addEventListener("storage", callback);
+  window.addEventListener(BOOKSHELF_VIEW_CHANGE_EVENT, callback);
+
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener(BOOKSHELF_VIEW_CHANGE_EVENT, callback);
+  };
+};
+
 const BookshelfPage = () => {
   const searchParams = useSearchParams();
   const statusFromQuery = searchParams.get("status");
@@ -36,8 +59,21 @@ const BookshelfPage = () => {
   const [sortOption, setSortOption] = useState<SortOption>("CREATED");
   const [sortDirection, setSortDirection] = useState<SortDirection>("DESC");
   const [groupOption, setGroupOption] = useState<GroupOption>("NONE");
-  const [viewMode, setViewMode] = useState<ViewMode>("GRID");
+  const viewMode = useSyncExternalStore<ViewMode>(
+    subscribeToViewMode,
+    getStoredViewMode,
+    () => "GRID",
+  );
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    try {
+      window.localStorage.setItem(BOOKSHELF_VIEW_STORAGE_KEY, mode);
+    } catch {
+      // Keep the selected view for this render when local storage is unavailable.
+    }
+    window.dispatchEvent(new Event(BOOKSHELF_VIEW_CHANGE_EVENT));
+  };
 
   const { data, isLoading, error } = useGetBooks();
   const statusCounts: Record<FilterStatus, number> = {
@@ -68,38 +104,38 @@ const BookshelfPage = () => {
 
   return (
     <main className="mx-auto max-w-295 px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
-      <div className="flex flex-col justify-between gap-7 sm:flex-row sm:items-end">
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end sm:gap-7">
         <div>
           <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
             <RiBookShelfLine className="text-sm" aria-hidden="true" />
             MY BOOKSHELF
           </p>
-          <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:text-[40px]">
+          <h1 className="mt-2 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:mt-3 sm:text-[40px]">
             わたしの本棚
           </h1>
-          <p className="mt-3 text-sm text-[#75817b]">
+          <p className="mt-2 text-xs text-[#75817b] sm:mt-3 sm:text-sm">
             読みたい気持ちも、読んだ思い出も。
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex w-full flex-nowrap gap-2 sm:w-auto sm:flex-wrap sm:gap-3">
           <Link
             href="/bookshelf/lists"
-            className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 py-3 text-sm font-medium text-[#40584e] transition-colors hover:border-[#718078]"
+            className="group inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-2.5 py-2 text-xs font-medium text-[#40584e] transition-colors hover:border-[#718078] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
           >
             <RiListCheck2 className="text-lg" aria-hidden="true" />
             リスト
           </Link>
           <Link
             href="/bookshelf/collections"
-            className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 py-3 text-sm font-medium text-[#40584e] transition-colors hover:border-[#718078]"
+            className="group inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-2.5 py-2 text-xs font-medium text-[#40584e] transition-colors hover:border-[#718078] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
           >
             <RiBookmark3Line className="text-lg" aria-hidden="true" />
             本10選
           </Link>
           <Link
             href="/books/search"
-            className="group inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
+            className="group inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md bg-[#344941] px-2.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[#263a33] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
             aria-label="本を探して本棚に追加"
           >
             <RiAddLine className="text-lg font-light" aria-hidden="true" />
@@ -121,7 +157,7 @@ const BookshelfPage = () => {
         onSortChange={handleSortChange}
         onSortDirectionChange={setSortDirection}
         onGroupChange={setGroupOption}
-        onViewModeChange={setViewMode}
+        onViewModeChange={handleViewModeChange}
       />
 
       <BookshelfList
