@@ -96,7 +96,7 @@ export default function HomeNews({ className = "" }: { className?: string }) {
           </p>
           <h2
             id="home-news-heading"
-            className="mt-2 font-serif-jp text-xl font-medium"
+            className="mt-2 font-serif-jp text-2xl font-bold sm:text-3xl"
           >
             お知らせ
           </h2>

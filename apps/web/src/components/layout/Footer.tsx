@@ -1,10 +1,5 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuth } from "../providers/AuthProvider";
-import LoginButton from "../ui/LoginButton";
 
 const discoverLinks = [
   { href: "/blog", label: "ブログ" },
@@ -20,33 +15,9 @@ const supportLinks = [
 ];
 
 export default function Footer() {
-  const { user, isLoading } = useAuth();
-  const pathname = usePathname();
-  const showHomeCta = pathname === "/" && !isLoading && !user;
-
   return (
     <footer className="border-t border-[#293630]/10 bg-[#eeece5] text-[#59675f]">
       <div className="mx-auto max-w-295 px-5 sm:px-8">
-        {showHomeCta && (
-          <section className="flex flex-col gap-5 border-b border-[#293630]/10 py-8 sm:gap-6 sm:py-12">
-            <div>
-              <p className="text-[10px] tracking-[0.18em] text-[#7a877f]">
-                YOUR READING SPACE
-              </p>
-              <h2 className="mt-3 font-serif-jp text-2xl font-medium text-[#293630] sm:text-3xl">
-                気になる一冊を、あなたの本棚へ。
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-[#647069]">
-                読みたい本も、読んだ本も。自分のペースで残せます。
-              </p>
-            </div>
-            <LoginButton
-              label="無料で本棚をつくる"
-              className="min-h-12 w-full shrink-0 rounded-md bg-[#344941] px-6 py-3 text-sm font-medium text-white shadow-[0_8px_18px_rgb(38_58_49/14%)] transition hover:bg-[#263a33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 sm:w-auto"
-            />
-          </section>
-        )}
-
         <div className="grid gap-7 py-8 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1.8fr)] sm:gap-10 sm:py-12">
           <div>
             <Link
