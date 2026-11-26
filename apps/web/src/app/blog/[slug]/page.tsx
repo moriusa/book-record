@@ -63,10 +63,31 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getBlogPost((await params).slug);
   if (!post) return {};
+  const url = `/blog/${post.id}`;
+  const image = `${url}/opengraph-image`;
+  const description =
+    post.description || "読書と本棚について、つみほんからお届けします。";
   return {
     title: post.title,
-    description: post.description,
-    alternates: { canonical: `/blog/${post.id}` },
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      locale: "ja_JP",
+      siteName: "つみほん",
+      title: post.title,
+      description,
+      url,
+      images: [{ url: image, width: 1200, height: 630, alt: post.title }],
+      publishedTime: post.publishedAt ?? post.createdAt,
+      modifiedTime: post.revisedAt ?? post.updatedAt,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: [image],
+    },
   };
 }
 
