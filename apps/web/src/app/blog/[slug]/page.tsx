@@ -121,8 +121,8 @@ export default async function BlogPostPage({ params }: Props) {
     .slice(0, 4);
 
   return (
-    <main className="mx-auto max-w-7xl bg-[#f7f5f0] text-[#293630]">
-      <article className="mx-auto max-w-225 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16 lg:ml-0 lg:mr-80">
+    <main className="mx-auto max-w-280 bg-[#f7f5f0] text-[#293630]">
+      <article className="mx-auto max-w-200 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16 lg:ml-0 lg:mr-80">
         <nav
           aria-label="ブログのナビゲーション"
           className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#647069]"
@@ -156,11 +156,11 @@ export default async function BlogPostPage({ params }: Props) {
           <time className="text-xs tracking-[0.08em] text-[#75817a]">
             {formatDate(post.publishedAt ?? post.createdAt)}
           </time>
-          <h1 className="mt-5 font-serif-jp text-[clamp(1.9rem,3.5vw,2.5rem)] font-bold leading-snug tracking-[-0.035em]">
+          <h1 className="mt-5 font-serif-jp text-[clamp(1.9rem,3.5vw,2.5rem)] font-bold leading-snug tracking-[-0.035em] lg:text-4xl">
             {post.title}
           </h1>
           {post.description && (
-            <p className="mt-6 text-base leading-8 text-[#526159] sm:text-lg">
+            <p className="mt-6 text-base leading-8 text-[#526159] sm:text-lg lg:text-base">
               {post.description}
             </p>
           )}
@@ -194,7 +194,7 @@ export default async function BlogPostPage({ params }: Props) {
                   <Link
                     key={relatedPost.id}
                     href={`/blog/${relatedPost.id}`}
-                    className="group flex items-center justify-between gap-5 py-4 text-sm leading-6 transition-colors hover:text-[#50665c] lg:text-base lg:leading-7"
+                    className="group flex items-center justify-between gap-5 py-4 text-sm leading-6 transition-colors hover:text-[#50665c]"
                   >
                     <span>{relatedPost.title}</span>
                     <RiArrowRightLine

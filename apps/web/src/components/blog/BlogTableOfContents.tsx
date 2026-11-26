@@ -51,7 +51,7 @@ export default function BlogTableOfContents({
           key={heading.id}
           className={
             desktop
-              ? "relative before:absolute before:bottom-0 before:left-3.5 before:top-0 before:z-10 before:w-[3] before:bg-[#b4c1b7] first:before:top-5.5 last:before:bottom-[calc(100%-22px)]"
+              ? "relative before:absolute before:bottom-0 before:left-3.5 before:top-0 before:z-10 before:w-[3] before:bg-[#b4c1b7] first:before:top-4 last:before:bottom-[calc(100%-16px)]"
               : undefined
           }
         >
@@ -60,14 +60,14 @@ export default function BlogTableOfContents({
             aria-current={desktop && active ? "location" : undefined}
             className={
               desktop
-                ? `flex items-start gap-3 rounded-md px-3 py-2.5 text-base leading-6 transition-colors ${active ? "bg-[#e2e8e1] font-medium text-[#293630]" : "text-[#647069] hover:bg-[#e3e4dc] hover:text-[#293630]"}`
+                ? `flex items-start gap-3 rounded-md px-3 py-1.5 text-[13px] leading-5 transition-colors ${active ? "bg-[#e2e8e1] font-medium text-[#293630]" : "text-[#647069] hover:bg-[#e3e4dc] hover:text-[#293630]"}`
                 : "flex min-h-11 items-start gap-3 py-2 text-sm leading-6 text-[#40584e] underline decoration-[#9eafa4] underline-offset-4 transition-colors hover:text-[#293630]"
             }
           >
             {desktop ? (
               <span
                 aria-hidden="true"
-                className={`relative z-20 mt-2.5 size-2 shrink-0 rounded-full ring-4 ${active ? "bg-[#506b5d] ring-[#e2e8e1]" : "bg-[#aab9af] ring-[#eeece5]"}`}
+                className={`relative z-20 mt-1.5 size-2 shrink-0 rounded-full ring-4 ${active ? "bg-[#506b5d] ring-[#e2e8e1]" : "bg-[#aab9af] ring-[#eeece5]"}`}
               />
             ) : (
               <span
