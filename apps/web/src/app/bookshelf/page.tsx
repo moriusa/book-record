@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -105,17 +106,27 @@ const BookshelfPage = () => {
   return (
     <main className="mx-auto max-w-295 px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end sm:gap-7">
-        <div>
-          <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
-            <RiBookShelfLine className="text-sm" aria-hidden="true" />
-            MY BOOKSHELF
-          </p>
-          <h1 className="mt-2 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:mt-3 sm:text-[40px]">
-            わたしの本棚
-          </h1>
-          <p className="mt-2 text-xs text-[#75817b] sm:mt-3 sm:text-sm">
-            読みたい気持ちも、読んだ思い出も。
-          </p>
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
+              <RiBookShelfLine className="text-sm" aria-hidden="true" />
+              MY BOOKSHELF
+            </p>
+            <h1 className="mt-2 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:mt-3 sm:text-[40px]">
+              わたしの本棚
+            </h1>
+            <p className="mt-2 text-xs text-[#75817b] sm:mt-3 sm:text-sm">
+              読みたい気持ちも、読んだ思い出も。
+            </p>
+          </div>
+          <Image
+            src="/loose-library.png"
+            alt=""
+            width={128}
+            height={128}
+            sizes="(min-width: 1024px) 128px, (min-width: 640px) 112px, (min-width: 386px) 104px, (min-width: 320px) 27vw, 84px"
+            className="size-[clamp(84px,27vw,104px)] shrink-0 object-contain sm:size-28 lg:size-32"
+          />
         </div>
 
         <div className="flex w-full flex-nowrap gap-2 sm:w-auto sm:flex-wrap sm:gap-3">
