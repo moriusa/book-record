@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RiArrowRightLine, RiBookOpenLine, RiListCheck2 } from "react-icons/ri";
 import BlogTableOfContents from "@/components/blog/BlogTableOfContents";
+import RakutenAffiliateWidget from "@/components/blog/RakutenAffiliateWidget";
 import { getBlogPost, getBlogPosts } from "@/lib/microcms";
 import { blogCategories } from "@/data/blogCategories";
 
@@ -168,59 +169,62 @@ export default async function BlogPostPage({ params }: Props) {
               </div>
             </section>
           )}
-          <p className="text-xs tracking-[0.14em] text-[#75817a]">
-            EXPLORE MORE
-          </p>
-          <h2 className="mt-3 font-serif-jp text-2xl font-medium tracking-[-0.035em] sm:text-3xl">
-            読書の時間を、もう少し心地よく。
-          </h2>
-          <div className="mt-7 grid gap-3 sm:grid-cols-2">
-            <Link
-              href="/guides"
-              className="group flex min-h-30 flex-col justify-between border border-[#293630]/12 bg-[#eeece5] p-5 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8e8df]"
-            >
-              <RiBookOpenLine
-                className="text-xl text-[#50665c]"
-                aria-hidden="true"
-              />
-              <span className="mt-5 flex items-end justify-between gap-4">
-                <span>
-                  <span className="block text-sm font-medium">
-                    つみほんの使い方
-                  </span>
-                  <span className="mt-1 block text-xs text-[#647069]">
-                    本棚づくりをはじめる
-                  </span>
-                </span>
-                <RiArrowRightLine
-                  className="text-lg transition-transform group-hover:translate-x-1"
+          <RakutenAffiliateWidget />
+          <div className="mt-12 sm:mt-16">
+            <p className="text-xs tracking-[0.14em] text-[#75817a]">
+              EXPLORE MORE
+            </p>
+            <h2 className="mt-3 font-serif-jp text-2xl font-medium tracking-[-0.035em] sm:text-3xl">
+              読書の時間を、もう少し心地よく。
+            </h2>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <Link
+                href="/guides"
+                className="group flex min-h-30 flex-col justify-between border border-[#293630]/12 bg-[#eeece5] p-5 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8e8df]"
+              >
+                <RiBookOpenLine
+                  className="text-xl text-[#50665c]"
                   aria-hidden="true"
                 />
-              </span>
-            </Link>
-            <Link
-              href="/blog"
-              className="group flex min-h-30 flex-col justify-between border border-[#293630]/12 bg-[#eeece5] p-5 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8e8df]"
-            >
-              <RiListCheck2
-                className="text-xl text-[#50665c]"
-                aria-hidden="true"
-              />
-              <span className="mt-5 flex items-end justify-between gap-4">
-                <span>
-                  <span className="block text-sm font-medium">
-                    ほかの記事を読む
+                <span className="mt-5 flex items-end justify-between gap-4">
+                  <span>
+                    <span className="block text-sm font-medium">
+                      つみほんの使い方
+                    </span>
+                    <span className="mt-1 block text-xs text-[#647069]">
+                      本棚づくりをはじめる
+                    </span>
                   </span>
-                  <span className="mt-1 block text-xs text-[#647069]">
-                    読書と本棚のヒント
-                  </span>
+                  <RiArrowRightLine
+                    className="text-lg transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
                 </span>
-                <RiArrowRightLine
-                  className="text-lg transition-transform group-hover:translate-x-1"
+              </Link>
+              <Link
+                href="/blog"
+                className="group flex min-h-30 flex-col justify-between border border-[#293630]/12 bg-[#eeece5] p-5 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8e8df]"
+              >
+                <RiListCheck2
+                  className="text-xl text-[#50665c]"
                   aria-hidden="true"
                 />
-              </span>
-            </Link>
+                <span className="mt-5 flex items-end justify-between gap-4">
+                  <span>
+                    <span className="block text-sm font-medium">
+                      ほかの記事を読む
+                    </span>
+                    <span className="mt-1 block text-xs text-[#647069]">
+                      読書と本棚のヒント
+                    </span>
+                  </span>
+                  <RiArrowRightLine
+                    className="text-lg transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </span>
+              </Link>
+            </div>
           </div>
         </aside>
       </article>
