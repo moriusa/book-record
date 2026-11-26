@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RiArrowLeftLine, RiHeartFill, RiMore2Fill } from "react-icons/ri";
 import { useGetBooks } from "../../hooks/useGetBooks";
 import BookListItem from "@/components/ui/BookListItem";
+import { BookRowsSkeleton } from "@/components/ui/LoadingSkeleton";
 import { authFetcher } from "@/lib/fetcher";
 
 export default function FavoritesPage() {
@@ -35,7 +36,7 @@ export default function FavoritesPage() {
         <h1 className="font-serif-jp text-3xl font-medium">お気に入り</h1>
       </div>
       {isLoading ? (
-        <p className="mt-10 text-sm text-[#75817b]">読み込み中…</p>
+        <div className="mt-8"><BookRowsSkeleton /></div>
       ) : favorites.length > 0 ? (
         <div className="mt-8 border-t border-[#293630]/10">
           {favorites.map((book) => (

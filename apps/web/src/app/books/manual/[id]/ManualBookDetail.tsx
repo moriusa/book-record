@@ -8,6 +8,7 @@ import { FaStar } from "react-icons/fa";
 import { RiBook3Line, RiEditLine } from "react-icons/ri";
 import BookTenToggleButton from "@/app/books/[isbn]/BookTenToggleButton";
 import ReadingListControls from "@/components/ui/ReadingListControls";
+import { BookDetailSkeleton } from "@/components/ui/LoadingSkeleton";
 import { authFetcher } from "@/lib/fetcher";
 import {
   getBookAuthorLabel,
@@ -47,7 +48,7 @@ export default function ManualBookDetail({ id }: Props) {
   });
 
   if (isPending) {
-    return <main className="p-8 text-sm text-[#75817b]">読み込み中…</main>;
+    return <BookDetailSkeleton />;
   }
 
   if (isError || !book || book.source !== "manual") {

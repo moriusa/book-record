@@ -12,12 +12,13 @@ import {
 import { useGetBooks } from "../hooks/useGetBooks";
 import { authFetcher } from "@/lib/fetcher";
 import type { ReadingList } from "@/types/readingList";
+import { ReadingListCardsSkeleton } from "@/components/ui/LoadingSkeleton";
 
 export default function ReadingListsPage() {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const { data: books = [] } = useGetBooks();
+  const { data: books = [], isLoading: isBooksLoading } = useGetBooks();
   const { data: lists = [], isLoading } = useQuery({
     queryKey: ["reading-lists"],
     queryFn: () => authFetcher<ReadingList[]>("/reading-lists"),
@@ -68,7 +69,9 @@ export default function ReadingListsPage() {
         >
           <RiHeartFill className="text-xl text-[#a36a5e]" aria-hidden="true" />
           <h2 className="mt-6 font-serif-jp text-xl font-medium">お気に入り</h2>
-          <p className="mt-2 text-xs text-[#8b716a]">{favoriteCount}冊</p>
+          <p className="mt-2 text-xs text-[#8b716a]">
+            {isBooksLoading ? "—" : `${favoriteCount}冊`}
+          </p>
           <span className="mt-6 flex items-center gap-2 text-xs text-[#8f5f55]">
             見る
             <RiArrowRightLine
@@ -77,6 +80,7 @@ export default function ReadingListsPage() {
             />
           </span>
         </Link>
+        {isLoading && <ReadingListCardsSkeleton />}
         {lists.map((list) => (
           <Link
             key={list.id}

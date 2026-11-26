@@ -33,7 +33,11 @@ const BookShelfStatus = ({
   const { user, isLoading: isAuthLoading } = useAuth();
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
-  const { data: book } = useGetBookByIsbn(bookData.isbn, {
+  const {
+    data: book,
+    isLoading: isBookLoading,
+    isError: isBookError,
+  } = useGetBookByIsbn(bookData.isbn, {
     enabled: Boolean(user),
   });
   const deleteBookMutation = useDeleteBook();
@@ -75,7 +79,31 @@ const BookShelfStatus = ({
           <h2 className="font-serif-jp text-xl font-medium">自分の記録</h2>
         </div>
 
-        {!user ? (
+        {user && isBookLoading ? (
+          <div
+            role="status"
+            aria-label="読書記録を読み込み中"
+            className="mt-7 space-y-4 border-t border-[#293630]/10 pt-6"
+          >
+            <span className="sr-only">読み込み中</span>
+            <div
+              aria-hidden="true"
+              className="h-3 w-24 animate-pulse rounded-sm bg-[#d9dcd6] motion-reduce:animate-none"
+            />
+            <div
+              aria-hidden="true"
+              className="h-6 w-32 animate-pulse rounded-sm bg-[#d9dcd6] motion-reduce:animate-none"
+            />
+            <div
+              aria-hidden="true"
+              className="h-10 w-full animate-pulse rounded-sm bg-[#d9dcd6] motion-reduce:animate-none"
+            />
+          </div>
+        ) : user && isBookError ? (
+          <p className="mt-7 border-t border-[#293630]/10 pt-6 text-xs text-[#75817b]">
+            読書記録を取得できませんでした。
+          </p>
+        ) : !user ? (
           <div className="mt-7 border-t border-[#293630]/10 pt-6">
             <p className="text-[11px] leading-5 text-[#7c8781]">
               ログインすると、この本をあなたの本棚へ登録できます。

@@ -13,6 +13,7 @@ import {
 } from "react-icons/ri";
 import { authFetcher } from "@/lib/fetcher";
 import BookListItem from "@/components/ui/BookListItem";
+import { ReadingListSkeleton } from "@/components/ui/LoadingSkeleton";
 import type { ReadingList } from "@/types/readingList";
 
 export default function ReadingListDetailPage() {
@@ -62,8 +63,7 @@ export default function ReadingListDetailPage() {
     },
   });
 
-  if (isLoading)
-    return <main className="p-8 text-sm text-[#75817b]">読み込み中…</main>;
+  if (isLoading) return <ReadingListSkeleton />;
   if (isError || !list)
     return (
       <main className="p-8 text-sm text-[#75817b]">

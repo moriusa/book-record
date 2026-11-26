@@ -6,6 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { authFetcher } from "@/lib/fetcher";
 import { useQuery } from "@tanstack/react-query";
 import BookFormFields, { BookFormValues } from "@/components/ui/BookFormFields";
+import { EditBookSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useUpdateBook } from "./hooks/useUpdateBook";
 import { useRouter } from "next/navigation";
 import { Book } from "@/types/book";
@@ -71,7 +72,7 @@ const EditBookForm = ({ id }: Props) => {
   };
 
   if (isPending) {
-    return <p className="text-sm text-[#75817b]">読み込み中...</p>;
+    return <EditBookSkeleton />;
   }
 
   if (isError || !book) {

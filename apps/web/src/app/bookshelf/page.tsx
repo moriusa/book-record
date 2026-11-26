@@ -12,6 +12,7 @@ import {
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
+import { BookshelfSkeleton } from "@/components/ui/LoadingSkeleton";
 import {
   FilterStatus,
   SortDirection,
@@ -56,7 +57,7 @@ const BookshelfPage = () => {
   };
 
   if (isLoading) {
-    return <p className="p-6 text-sm text-[#75817b]">読み込み中...</p>;
+    return <BookshelfSkeleton />;
   }
 
   if (error) {
@@ -137,11 +138,7 @@ const BookshelfPage = () => {
 };
 
 const Page = () => (
-  <Suspense
-    fallback={
-      <main className="mx-auto min-h-80 max-w-295 px-5 py-10 sm:px-8" />
-    }
-  >
+  <Suspense fallback={<BookshelfSkeleton />}>
     <BookshelfPage />
   </Suspense>
 );

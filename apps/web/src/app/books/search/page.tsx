@@ -22,6 +22,7 @@ import {
 } from "../../books/[isbn]/register/hooks/useCreateBook";
 import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { BookRowsSkeleton } from "@/components/ui/LoadingSkeleton";
 import LoginButton from "@/components/ui/LoginButton";
 import Link from "next/link";
 import {
@@ -334,6 +335,8 @@ const SearchPage = () => {
               見つからない本を手動で登録
             </Link>
           </div>
+        ) : hasSearched && isLoading && books.length === 0 ? (
+          <BookRowsSkeleton />
         ) : hasSearched ? (
           <div className="grid md:grid-cols-2 md:gap-x-10">
             {books.map((book) => (
@@ -356,7 +359,11 @@ const SearchPage = () => {
             className="flex min-h-16 items-center justify-center"
             aria-live="polite"
           >
-            {isLoading && <p className="text-sm text-[#75817b]">読み込み中…</p>}
+            {isLoading && (
+              <div className="w-full">
+                <BookRowsSkeleton count={1} />
+              </div>
+            )}
             {!hasMore && !isLoading && (
               <p className="text-sm text-[#75817b]">
                 すべての検索結果を表示しました
