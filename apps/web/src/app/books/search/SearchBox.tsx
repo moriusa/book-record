@@ -1,4 +1,4 @@
-import { FaSearch } from "react-icons/fa";
+import { RiSearchLine } from "react-icons/ri";
 import { useState } from "react";
 import type { BookSearchField } from "@/lib/bookSearch";
 import type { BookSearchInput } from "./hooks/useBookSearch";
@@ -15,9 +15,9 @@ const searchFieldOptions: {
   label: string;
   placeholder: string;
 }[] = [
-  { value: "title", label: "タイトル", placeholder: "タイトルを入力して検索" },
-  { value: "isbn", label: "ISBN", placeholder: "ISBNを入力して検索" },
-  { value: "author", label: "著者名", placeholder: "著者名を入力して検索" },
+  { value: "title", label: "タイトル", placeholder: "タイトルを入力" },
+  { value: "isbn", label: "ISBN", placeholder: "ISBNを入力" },
+  { value: "author", label: "著者名", placeholder: "著者名を入力" },
 ];
 
 export const SearchBox = ({
@@ -47,10 +47,10 @@ export const SearchBox = ({
         e.preventDefault();
         handleSearch();
       }}
-      className="w-full min-w-0 transition"
+      className="w-full min-w-0"
     >
       <div
-        className="flex gap-1 overflow-x-auto"
+        className="inline-flex max-w-full gap-1 rounded-lg bg-[#faf9f5] p-1"
         role="group"
         aria-label="検索対象"
       >
@@ -63,10 +63,10 @@ export const SearchBox = ({
               type="button"
               onClick={() => setSearchField(option.value)}
               aria-pressed={isActive}
-              className={`shrink-0 rounded-md px-4 py-2 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
+              className={`min-h-9 rounded-md px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-5 ${
                 isActive
                   ? "bg-[#40584e] text-white"
-                  : "text-[#6f7b74] hover:bg-[#e2e1da]"
+                  : "text-[#526158] hover:bg-[#e8ece1]"
               }`}
             >
               {option.label}
@@ -74,14 +74,17 @@ export const SearchBox = ({
           );
         })}
       </div>
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <div className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 focus-within:border-[#60736a]">
-          <FaSearch className="shrink-0 text-[#7f8a84]" aria-hidden="true" />
+      <div className="mt-3 flex gap-2">
+        <div className="flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-lg border border-[#344941]/20 bg-[#faf9f5] px-3 focus-within:border-[#60736a] sm:px-4">
+          <RiSearchLine
+            className="shrink-0 text-[#526158]"
+            aria-hidden="true"
+          />
           <input
             type="text"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            className="min-w-0 flex-1 bg-transparent py-4 text-base text-[#35463e] outline-none placeholder:text-[#9ca49f] sm:text-sm"
+            className="min-w-0 flex-1 bg-transparent py-3 text-base text-[#293630] outline-none placeholder:text-[#64716a]"
             placeholder={activeSearchField?.placeholder}
             aria-label={`${activeSearchField?.label}を検索`}
           />
@@ -89,7 +92,7 @@ export const SearchBox = ({
         <button
           type="submit"
           disabled={isLoading || !keyword.trim()}
-          className="min-h-14 rounded-md bg-[#344941] px-7 text-sm font-medium text-white transition-colors hover:bg-[#263a33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+          className="min-h-12 w-20 shrink-0 rounded-lg bg-[#344941] px-2 text-sm font-medium text-white transition-colors hover:bg-[#263a33] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#68796f] sm:w-28"
         >
           {isLoading ? "検索中…" : "検索"}
         </button>

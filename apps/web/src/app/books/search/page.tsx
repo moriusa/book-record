@@ -24,6 +24,7 @@ import { useGetBooks } from "@/app/bookshelf/hooks/useGetBooks";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { BookRowsSkeleton } from "@/components/ui/LoadingSkeleton";
 import LoginButton from "@/components/ui/LoginButton";
+import Image from "next/image";
 import Link from "next/link";
 import {
   RiArrowRightLine,
@@ -219,159 +220,162 @@ const SearchPage = () => {
   };
 
   return (
-    <main className="mx-auto max-w-265 px-5 pb-24 pt-12 text-[#293630] sm:px-8 sm:pt-16">
-      <div className="max-w-162.5">
-        <p className="text-[10px] tracking-[0.18em] text-[#7b8781]">
-          FIND YOUR NEXT BOOK
-        </p>
-        <h1 className="mt-3 font-serif-jp text-3xl font-medium tracking-[-0.04em] sm:text-[42px]">
-          本を探す
-        </h1>
-      </div>
+    <main className="mx-auto max-w-265 px-5 pb-24 pt-7 text-[#293630] sm:px-8 sm:pt-12">
+      <header className="flex items-center gap-4 sm:gap-7">
+        <div>
+          <h1
+            id="book-search-heading"
+            className="font-serif-jp text-3xl font-semibold tracking-[-0.04em] sm:text-[42px]"
+          >
+            本を探す
+          </h1>
+          <p className="mt-2 text-xs leading-6 text-[#526158] sm:text-sm">
+            タイトル・著者名・ISBNから検索できます。
+          </p>
+        </div>
+        <Image
+          src="/loose-research.png"
+          alt=""
+          width={128}
+          height={128}
+          sizes="(min-width: 1024px) 128px, (min-width: 640px) 112px, 96px"
+          className="size-24 shrink-0 object-contain sm:size-28 lg:size-32"
+        />
+      </header>
 
       <section
-        className="mt-10 border border-[#293630]/10 bg-[#eeece5] p-4 sm:p-6"
+        className="mt-4 rounded-2xl border border-[#344941]/12 bg-[#e8ece1] p-4 sm:mt-6 sm:p-6"
         aria-labelledby="book-search-heading"
       >
-        <div className="max-w-190">
-          <SearchBox
-            key={`${searchField}-${searchKeyword}`}
-            onSearch={handleSearch}
-            isLoading={isLoading}
-            initialKeyword={searchKeyword}
-            initialSearchField={searchField}
-          />
-          <div className="mt-5 grid border-t border-[#293630]/10 pt-4 sm:grid-cols-2 sm:divide-x sm:divide-[#293630]/10 sm:pt-5">
-            <button
-              type="button"
-              onClick={startBarcodeScanner}
-              className="group flex min-h-14 items-center gap-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pr-5"
-            >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
-                <RiBarcodeLine className="text-lg" aria-hidden="true" />
+        <SearchBox
+          key={`${searchField}-${searchKeyword}`}
+          onSearch={handleSearch}
+          isLoading={isLoading}
+          initialKeyword={searchKeyword}
+          initialSearchField={searchField}
+        />
+        <div className="mt-4 grid divide-y divide-[#293630]/10 border-t border-[#293630]/10 pt-1 sm:mt-5 sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:pt-3">
+          <button
+            type="button"
+            onClick={startBarcodeScanner}
+            className="group flex min-h-14 items-center gap-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pr-5"
+          >
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
+              <RiBarcodeLine className="text-lg" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block text-sm font-medium text-[#344941] group-hover:underline">
+                バーコードで追加
               </span>
-              <span>
-                <span className="block text-xs font-medium text-[#40584e]">
-                  バーコードで追加
-                </span>
-                <span className="mt-1 block text-[10px] text-[#7b8781]">
-                  手元の本をまとめて読み取る
-                </span>
+              <span className="block text-xs leading-5 text-[#526158]">
+                手元の本をまとめて読み取る
               </span>
-              <RiArrowRightLine
-                className="ml-auto text-base text-[#89938e] transition group-hover:translate-x-0.5 group-hover:text-[#40584e]"
-                aria-hidden="true"
-              />
-            </button>
-            <Link
-              href="/books/manual/register"
-              className="group flex min-h-14 items-center gap-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pl-5"
-            >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
-                <RiEditLine className="text-base" aria-hidden="true" />
+            </span>
+            <RiArrowRightLine
+              className="ml-auto shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </button>
+          <Link
+            href="/books/manual/register"
+            className="group flex min-h-14 items-center gap-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pl-5"
+          >
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
+              <RiEditLine className="text-base" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block text-sm font-medium text-[#344941] group-hover:underline">
+                手動で追加
               </span>
-              <span>
-                <span className="block text-xs font-medium text-[#40584e]">
-                  手動で追加
-                </span>
-                <span className="mt-1 block text-[10px] text-[#7b8781]">
-                  同人誌など検索にない本を登録
-                </span>
+              <span className="block text-xs leading-5 text-[#526158]">
+                同人誌など検索にない本を登録
               </span>
-              <RiArrowRightLine
-                className="ml-auto text-base text-[#89938e] transition group-hover:translate-x-0.5 group-hover:text-[#40584e]"
-                aria-hidden="true"
-              />
-            </Link>
-          </div>
-          {barcodeMessage && (
-            <p className="mt-3 text-xs leading-6 text-[#526159]" role="status">
-              {barcodeMessage}
-            </p>
-          )}
+            </span>
+            <RiArrowRightLine
+              className="ml-auto shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </Link>
         </div>
+        {barcodeMessage && (
+          <p className="mt-3 text-xs leading-6 text-[#526159]" role="status">
+            {barcodeMessage}
+          </p>
+        )}
       </section>
 
-      <section className="mt-12" aria-live="polite">
-        {hasSearched && (
-          <div className="mb-5 flex items-end justify-between gap-4 border-b border-[#293630]/10 pb-4">
-            <div>
-              <p className="text-[10px] tracking-[0.16em] text-[#7b8781]">
-                SEARCH RESULTS
-              </p>
-              <h2 className="mt-1 font-serif-jp text-xl font-medium text-[#35463e]">
-                {isLoading ? "検索中…" : `「${searchKeyword}」の検索結果`}
-              </h2>
-            </div>
-            {!isLoading && (
-              <p className="shrink-0 text-xs text-[#718078]">
-                {books.length}冊
-              </p>
-            )}
-          </div>
-        )}
-        {!hasSearched ? (
-          <div className="border-b border-[#293630]/10 py-14 sm:py-18">
-            <p className="font-serif-jp text-lg text-[#46574e]">
-              気になる一冊から、はじめよう
-            </p>
-            <p className="mt-3 text-xs leading-6 text-[#7b8781]">
-              タイトル・著者名・ISBNで検索できます。見つからない本は手動で追加できます。
-            </p>
-          </div>
-        ) : hasSearched && !isLoading && books.length === 0 ? (
-          <div className="border-b border-[#293630]/10 py-20 text-center">
-            <p className="font-serif-jp text-lg font-medium text-[#293630]">
-              該当する本が見つかりませんでした
-            </p>
-            <p className="mt-3 text-xs leading-6 text-[#849089]">
-              タイトルの一部や、表記を変えてもう一度検索してみてください。
-            </p>
-            <Link
-              href="/books/manual/register"
-              className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 text-xs font-medium text-[#40584e] transition hover:border-[#718078]"
+      {hasSearched && (
+        <section
+          className="mt-8 sm:mt-10"
+          aria-labelledby="book-search-results"
+        >
+          <div className="border-b border-[#293630]/15 pb-3">
+            <h2
+              id="book-search-results"
+              className="wrap-anywhere font-serif-jp text-xl font-semibold text-[#293630] sm:text-2xl"
             >
-              <RiEditLine className="text-base" aria-hidden="true" />
-              見つからない本を手動で登録
-            </Link>
+              「{searchKeyword}」の検索結果
+            </h2>
           </div>
-        ) : hasSearched && isLoading && books.length === 0 ? (
-          <BookRowsSkeleton />
-        ) : hasSearched ? (
-          <div className="grid md:grid-cols-2 md:gap-x-10">
-            {books.map((book) => (
-              <BookCard
-                key={book.isbn}
-                book={book}
-                onRegister={setBookToRegister}
-                isRegistered={
-                  registeredIsbns.has(book.isbn) ||
-                  bookshelfIsbns.has(book.isbn)
-                }
-                isAuthenticated={Boolean(user)}
-              />
-            ))}
-          </div>
-        ) : null}
-        {books.length > 0 && (
-          <div
-            ref={loadMoreTargetRef}
-            className="flex min-h-16 items-center justify-center"
-            aria-live="polite"
-          >
-            {isLoading && (
-              <div className="w-full">
-                <BookRowsSkeleton count={1} />
-              </div>
-            )}
-            {!hasMore && !isLoading && (
-              <p className="text-sm text-[#75817b]">
-                すべての検索結果を表示しました
+          {isLoading && books.length === 0 ? (
+            <div className="mt-3">
+              <BookRowsSkeleton />
+            </div>
+          ) : books.length === 0 ? (
+            <div className="py-10 text-center sm:py-14">
+              <p
+                role="status"
+                className="font-serif-jp text-lg font-medium text-[#293630]"
+              >
+                該当する本が見つかりませんでした
               </p>
-            )}
-          </div>
-        )}
-      </section>
+              <p className="mt-2 text-sm leading-6 text-[#526158]">
+                検索語を短くするか、別の表記で検索してみてください。
+              </p>
+              <Link
+                href="/books/manual/register"
+                className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-5 text-xs font-medium text-[#40584e] transition hover:border-[#718078]"
+              >
+                <RiEditLine className="text-base" aria-hidden="true" />
+                見つからない本を手動で登録
+              </Link>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 md:gap-x-10">
+              {books.map((book) => (
+                <BookCard
+                  key={book.isbn}
+                  book={book}
+                  onRegister={setBookToRegister}
+                  isRegistered={
+                    registeredIsbns.has(book.isbn) ||
+                    bookshelfIsbns.has(book.isbn)
+                  }
+                  isAuthenticated={Boolean(user)}
+                />
+              ))}
+            </div>
+          )}
+          {books.length > 0 && (
+            <div
+              ref={loadMoreTargetRef}
+              className="flex min-h-16 items-center justify-center"
+              aria-live="polite"
+            >
+              {isLoading && (
+                <div className="w-full">
+                  <BookRowsSkeleton count={1} />
+                </div>
+              )}
+              {!hasMore && !isLoading && (
+                <p className="text-sm text-[#75817b]">
+                  すべての検索結果を表示しました
+                </p>
+              )}
+            </div>
+          )}
+        </section>
+      )}
       {bookToRegister && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/45 p-4"
