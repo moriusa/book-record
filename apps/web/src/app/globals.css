@@ -42,13 +42,7 @@
   color: #526159;
   font-size: 1rem;
   line-height: 2;
-}
-
-@media (min-width: 1024px) {
-  .blog-content {
-    font-size: 1rem;
-    line-height: 2;
-  }
+  overflow-wrap: anywhere;
 }
 
 .blog-content > * + * {
@@ -71,10 +65,8 @@
   font-size: 1.5rem;
 }
 
-@media (min-width: 1024px) {
-  .blog-content h2 {
-    font-size: 1.5rem;
-  }
+.blog-content > :is(h2, h3):first-child {
+  margin-top: 0;
 }
 
 .blog-content h2::before {
@@ -139,6 +131,11 @@
   overflow-x: auto;
   border: 1px solid #d9dcd6;
   border-radius: 0.25rem;
+}
+
+.blog-content .table-scroll:focus-visible {
+  outline: 2px solid #60736a;
+  outline-offset: 3px;
 }
 
 .blog-content table {

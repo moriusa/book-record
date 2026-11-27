@@ -16,17 +16,20 @@ export default function BlogTableOfContents({
   const sections = headings.filter((heading) => heading.level === 2);
 
   useEffect(() => {
+    if (variant !== "desktop") return;
+
+    const elements = headings
+      .filter((heading) => heading.level === 2)
+      .map((heading) => document.getElementById(heading.id))
+      .filter((element): element is HTMLElement => element !== null);
     let frame = 0;
     const update = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const elements = headings
-          .filter((heading) => heading.level === 2)
-          .map((heading) => document.getElementById(heading.id))
-          .filter((element): element is HTMLElement => element !== null);
         let current: string | null = null;
         for (const element of elements) {
-          if (element.getBoundingClientRect().top <= 120) current = element.id;
+          if (element.getBoundingClientRect().top > 96) break;
+          current = element.id;
         }
         setActiveId(current);
       });
@@ -39,7 +42,7 @@ export default function BlogTableOfContents({
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [headings]);
+  }, [headings, variant]);
 
   if (sections.length === 0) return null;
 
@@ -51,7 +54,7 @@ export default function BlogTableOfContents({
           key={heading.id}
           className={
             desktop
-              ? "relative before:absolute before:bottom-0 before:left-3.5 before:top-0 before:z-10 before:w-[3] before:bg-[#b4c1b7] first:before:top-4 last:before:bottom-[calc(100%-16px)]"
+              ? "relative before:pointer-events-none before:absolute before:bottom-0 before:left-[15px] before:top-0 before:z-10 before:w-0.5 before:bg-[#a6b6aa] first:before:top-4 last:before:bottom-[calc(100%-16px)]"
               : undefined
           }
         >
@@ -75,7 +78,7 @@ export default function BlogTableOfContents({
                 className="mt-2.5 size-1.5 shrink-0 rounded-full bg-[#758b7f]"
               />
             )}
-            <span className="min-w-0 flex-1">{heading.text}</span>
+            <span className="min-w-0 flex-1 wrap-anywhere">{heading.text}</span>
           </a>
         </li>
       );
@@ -84,23 +87,23 @@ export default function BlogTableOfContents({
   return variant === "mobile" ? (
     <nav
       aria-label="目次"
-      className="mt-10 rounded-md border border-[#293630]/10 bg-[#eeece5] px-5 py-6 sm:mt-12 sm:px-7 sm:py-7 lg:hidden"
+      className="mt-6 rounded-xl border border-[#293630]/10 bg-[#eeece5] px-4 py-4 sm:mt-8 sm:px-6 lg:hidden"
     >
-      <p className="flex items-center gap-2 text-xs font-medium tracking-[0.12em] text-[#526159]">
+      <p className="flex items-center gap-2 text-sm font-medium text-[#526159]">
         <RiListCheck2 className="text-base" aria-hidden="true" />
-        CONTENTS
+        目次
       </p>
-      <ol className="mt-4">{items(false)}</ol>
+      <ol className="mt-2">{items(false)}</ol>
     </nav>
   ) : (
-    <div className="absolute -right-90 top-0 bottom-0 hidden w-70 lg:block">
+    <div className="col-start-2 row-start-3 hidden pt-10 lg:block">
       <nav
         aria-label="目次"
-        className="sticky top-28 max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-md border border-[#293630]/10 bg-[#eeece5] p-4"
+        className="sticky top-24 max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain rounded-xl border border-[#293630]/10 bg-[#eeece5] p-4"
       >
-        <p className="mb-4 flex items-center gap-2 text-xs font-medium tracking-[0.12em] text-[#526159]">
+        <p className="mb-3 flex items-center gap-2 text-sm font-medium text-[#526159]">
           <RiListCheck2 className="text-base" aria-hidden="true" />
-          CONTENTS
+          目次
         </p>
         <ol>{items(true)}</ol>
       </nav>

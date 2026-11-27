@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RiArrowRightLine, RiBookOpenLine, RiListCheck2 } from "react-icons/ri";
+import {
+  RiArrowRightLine,
+  RiBookOpenLine,
+  RiListCheck2,
+  RiTimeLine,
+} from "react-icons/ri";
 import BlogTableOfContents from "@/components/blog/BlogTableOfContents";
 import RakutenAffiliateWidget from "@/components/blog/RakutenAffiliateWidget";
 import { getBlogPost, getBlogPosts } from "@/lib/microcms";
@@ -102,6 +107,8 @@ export default async function BlogPostPage({ params }: Props) {
   if (!post) notFound();
 
   const { html: articleBody, headings } = createArticleBody(post.body);
+  const hasTableOfContents = headings.some(({ level }) => level === 2);
+  const publishedDate = post.publishedAt ?? post.createdAt;
   const categories = Array.isArray(post.category)
     ? post.category.flatMap((name) => {
         const category = blogCategories.find((item) => item.name === name);
@@ -122,10 +129,12 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <main className="mx-auto max-w-280 bg-[#f7f5f0] text-[#293630]">
-      <article className="mx-auto max-w-200 px-5 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-16 lg:ml-0 lg:mr-80">
+      <article
+        className={`mx-auto max-w-200 px-5 pb-20 pt-7 sm:px-8 sm:pb-28 sm:pt-10 ${hasTableOfContents ? "lg:grid lg:max-w-none lg:grid-cols-[minmax(0,1fr)_17.5rem] lg:gap-x-8 xl:gap-x-10" : ""}`}
+      >
         <nav
           aria-label="ブログのナビゲーション"
-          className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#647069]"
+          className="col-start-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-[#526158]"
         >
           <Link
             href="/blog"
@@ -152,35 +161,34 @@ export default async function BlogPostPage({ params }: Props) {
             </>
           )}
         </nav>
-        <header className="mt-14 pb-6 sm:mt-18 sm:pb-10 lg:border-b lg:border-[#293630]/12 lg:pb-12">
-          <time className="text-xs tracking-[0.08em] text-[#75817a]">
-            {formatDate(post.publishedAt ?? post.createdAt)}
-          </time>
-          <h1 className="mt-5 font-serif-jp text-[clamp(1.9rem,3.5vw,2.5rem)] font-bold leading-snug tracking-[-0.035em] lg:text-4xl">
+        <header className="col-start-1 mt-7 border-b border-[#293630]/12 pb-6 sm:mt-9 sm:pb-8">
+          <div className="flex items-center gap-1.5 text-xs text-[#526158]">
+            <RiTimeLine className="text-sm" aria-hidden="true" />
+            <time dateTime={publishedDate}>{formatDate(publishedDate)}</time>
+          </div>
+          <h1 className="mt-3 wrap-anywhere font-serif-jp text-[clamp(1.75rem,3.5vw,2.25rem)] font-bold leading-snug tracking-[-0.035em]">
             {post.title}
           </h1>
           {post.description && (
-            <p className="mt-6 text-base leading-8 text-[#526159] sm:text-lg lg:text-base">
+            <p className="mt-4 text-sm leading-7 text-[#526159] sm:mt-5 sm:text-base sm:leading-8">
               {post.description}
             </p>
           )}
         </header>
-        {headings.length > 0 && (
+        {hasTableOfContents && (
           <BlogTableOfContents headings={headings} variant="mobile" />
         )}
-        <div className="relative">
-          {headings.length > 0 && (
-            <BlogTableOfContents headings={headings} variant="desktop" />
-          )}
-          <div
-            className="blog-content pt-12 sm:pt-16"
-            dangerouslySetInnerHTML={{ __html: articleBody }}
-          />
-        </div>
-        <aside className="mt-16 border-t border-[#293630]/12 pt-10 sm:mt-20 sm:pt-12">
+        <div
+          className="blog-content col-start-1 min-w-0 pt-8 sm:pt-10"
+          dangerouslySetInnerHTML={{ __html: articleBody }}
+        />
+        {hasTableOfContents && (
+          <BlogTableOfContents headings={headings} variant="desktop" />
+        )}
+        <aside className="col-start-1 mt-12 border-t border-[#293630]/12 pt-7 sm:mt-16 sm:pt-9">
           {relatedPosts.length > 0 && (
             <section
-              className="mb-12 sm:mb-16"
+              className="mb-9 sm:mb-12"
               aria-labelledby="related-posts-heading"
             >
               <h2
@@ -194,9 +202,11 @@ export default async function BlogPostPage({ params }: Props) {
                   <Link
                     key={relatedPost.id}
                     href={`/blog/${relatedPost.id}`}
-                    className="group flex items-center justify-between gap-5 py-4 text-sm leading-6 transition-colors hover:text-[#50665c]"
+                    className="group flex items-center justify-between gap-4 py-3.5 text-sm leading-6 text-[#344941] underline-offset-4 hover:underline"
                   >
-                    <span>{relatedPost.title}</span>
+                    <span className="min-w-0 wrap-anywhere">
+                      {relatedPost.title}
+                    </span>
                     <RiArrowRightLine
                       className="shrink-0 text-lg transition-transform group-hover:translate-x-1"
                       aria-hidden="true"
@@ -207,23 +217,17 @@ export default async function BlogPostPage({ params }: Props) {
             </section>
           )}
           <RakutenAffiliateWidget />
-          <div className="mt-12 sm:mt-16">
-            <p className="text-xs tracking-[0.14em] text-[#75817a]">
-              EXPLORE MORE
-            </p>
-            <h2 className="mt-3 font-serif-jp text-2xl font-medium tracking-[-0.035em] sm:text-3xl">
-              読書の時間を、もう少し心地よく。
-            </h2>
-            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+          <nav aria-label="読書と本棚の関連ページ" className="mt-9 sm:mt-12">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Link
                 href="/guides"
-                className="group flex min-h-30 flex-col justify-between border border-[#293630]/12 bg-[#eeece5] p-5 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8e8df]"
+                className="group flex items-center gap-3 rounded-lg border border-[#293630]/12 bg-[#eeece5] p-4 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8ece1]"
               >
                 <RiBookOpenLine
-                  className="text-xl text-[#50665c]"
+                  className="shrink-0 text-xl text-[#50665c]"
                   aria-hidden="true"
                 />
-                <span className="mt-5 flex items-end justify-between gap-4">
+                <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
                   <span>
                     <span className="block text-sm font-medium">
                       つみほんの使い方
@@ -233,20 +237,20 @@ export default async function BlogPostPage({ params }: Props) {
                     </span>
                   </span>
                   <RiArrowRightLine
-                    className="text-lg transition-transform group-hover:translate-x-1"
+                    className="shrink-0 text-lg transition-transform group-hover:translate-x-0.5"
                     aria-hidden="true"
                   />
                 </span>
               </Link>
               <Link
                 href="/blog"
-                className="group flex min-h-30 flex-col justify-between border border-[#293630]/12 bg-[#eeece5] p-5 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8e8df]"
+                className="group flex items-center gap-3 rounded-lg border border-[#293630]/12 bg-[#eeece5] p-4 transition-colors hover:border-[#50665c]/40 hover:bg-[#e8ece1]"
               >
                 <RiListCheck2
-                  className="text-xl text-[#50665c]"
+                  className="shrink-0 text-xl text-[#50665c]"
                   aria-hidden="true"
                 />
-                <span className="mt-5 flex items-end justify-between gap-4">
+                <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
                   <span>
                     <span className="block text-sm font-medium">
                       ほかの記事を読む
@@ -256,13 +260,13 @@ export default async function BlogPostPage({ params }: Props) {
                     </span>
                   </span>
                   <RiArrowRightLine
-                    className="text-lg transition-transform group-hover:translate-x-1"
+                    className="shrink-0 text-lg transition-transform group-hover:translate-x-0.5"
                     aria-hidden="true"
                   />
                 </span>
               </Link>
             </div>
-          </div>
+          </nav>
         </aside>
       </article>
     </main>
