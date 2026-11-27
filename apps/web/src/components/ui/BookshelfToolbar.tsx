@@ -120,19 +120,19 @@ const BookshelfToolbar = ({
   };
 
   return (
-    <section className="relative mt-10" aria-label="本棚の表示設定">
+    <section className="relative mt-7 sm:mt-10" aria-label="本棚の表示設定">
       <div className="flex items-center gap-3">
         <p className="shrink-0 text-[10px] font-medium tracking-[0.14em] text-[#7b8781]">
           本棚に登録した本
         </p>
         <span className="h-px w-full bg-[#293630]/10" aria-hidden="true" />
       </div>
-      <div className="mt-4 flex flex-col gap-3">
+      <div className="mt-3 flex flex-col gap-2 sm:mt-4 sm:gap-3">
         <div className="min-w-0">
           <div className="relative">
             <div
               ref={filterScrollRef}
-              className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto pr-10"
+              className="scrollbar-none flex snap-x snap-mandatory gap-2 overflow-x-auto pr-10 sm:pr-0"
               role="group"
               aria-label="読書ステータスで絞り込む"
             >
@@ -153,7 +153,7 @@ const BookshelfToolbar = ({
                   >
                     {option.label}
                     <span
-                      className={`ml-1 ${isActive ? "text-white/75" : "text-[#89938e]"}`}
+                      className={`ml-1 tabular-nums ${isActive ? "text-white/85" : "text-[#65736c]"}`}
                     >
                       {statusCounts[option.value]}
                     </span>
@@ -188,7 +188,7 @@ const BookshelfToolbar = ({
           </div>
         </div>
 
-        <div className="relative flex flex-wrap items-center gap-3 pt-3">
+        <div className="relative flex flex-wrap items-center gap-3 pt-1 sm:pt-3">
           {isSearchOpen && (
             <label className="relative order-3 w-full min-w-0 sm:order-0 sm:w-auto sm:max-w-90 sm:flex-1">
               <span className="sr-only">本棚を検索</span>
@@ -238,7 +238,7 @@ const BookshelfToolbar = ({
                 className={`flex min-w-9 items-center justify-center rounded px-2 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
                   viewMode === "GRID"
                     ? "bg-[#e4e7e2] text-[#344941]"
-                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
+                    : "text-[#65736c] hover:bg-[#f3f1eb] hover:text-[#526159]"
                 }`}
                 aria-label="カード表示"
               >
@@ -251,7 +251,7 @@ const BookshelfToolbar = ({
                 className={`flex min-w-9 items-center justify-center rounded px-2 text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] ${
                   viewMode === "LIST"
                     ? "bg-[#e4e7e2] text-[#344941]"
-                    : "text-[#919a95] hover:bg-[#f3f1eb] hover:text-[#526159]"
+                    : "text-[#65736c] hover:bg-[#f3f1eb] hover:text-[#526159]"
                 }`}
                 aria-label="リスト表示"
               >
@@ -279,7 +279,7 @@ const BookshelfToolbar = ({
         <div
           id="bookshelf-display-settings"
           hidden={!isDisplaySettingsOpen}
-          className="absolute right-0 top-full z-20 mt-2 grid w-full max-w-110 gap-5 border border-[#293630]/10 bg-[#faf9f5] p-5 shadow-[0_18px_50px_rgb(43_56_50/13%)] sm:grid-cols-2"
+          className="absolute right-0 top-full z-20 mt-2 grid w-full max-w-110 gap-5 rounded-xl border border-[#344941]/12 bg-[#faf9f5] p-5 shadow-[0_18px_50px_rgb(43_56_50/13%)] sm:grid-cols-2"
         >
           <label className="min-w-0">
             <span className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-[#65736c]">

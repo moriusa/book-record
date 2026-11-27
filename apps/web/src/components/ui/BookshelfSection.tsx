@@ -20,8 +20,8 @@ const BookshelfSection = ({
   }
 
   return (
-    <section className="mt-10">
-      <h2 className="flex items-baseline justify-between gap-2 border-b border-[#293630]/10 pb-4 text-[#293630]">
+    <section className="mt-7 sm:mt-10">
+      <h2 className="flex items-baseline justify-between gap-2 border-b border-[#293630]/10 pb-3 text-[#293630] sm:pb-4">
         {salesDateGroup ? (
           <>
             <span className="text-sm font-medium tracking-wide text-[#75817b]">
@@ -37,7 +37,7 @@ const BookshelfSection = ({
       </h2>
 
       {viewMode === "GRID" ? (
-        <div className="mt-7 grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 sm:gap-x-8 lg:grid-cols-5">
+        <div className="mt-5 grid grid-cols-2 gap-x-5 gap-y-8 sm:mt-7 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10 lg:grid-cols-5">
           {books.map((book) => (
             <BookCard
               key={book.id}

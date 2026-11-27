@@ -4,12 +4,7 @@ import { Suspense, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  RiAddLine,
-  RiBookShelfLine,
-  RiBookmark3Line,
-  RiListCheck2,
-} from "react-icons/ri";
+import { RiAddLine, RiBookmark3Line, RiListCheck2 } from "react-icons/ri";
 import { useGetBooks } from "./hooks/useGetBooks";
 import BookshelfList from "@/components/ui/BookShelfList";
 import BookshelfToolbar from "@/components/ui/BookshelfToolbar";
@@ -104,18 +99,14 @@ const BookshelfPage = () => {
   }
 
   return (
-    <main className="mx-auto max-w-295 px-5 pb-24 pt-10 sm:px-8 sm:pt-14">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end sm:gap-7">
+    <main className="mx-auto max-w-295 px-5 pb-24 pt-7 text-[#293630] sm:px-8 sm:pt-12">
+      <header className="flex flex-col justify-between gap-4 md:flex-row md:items-end md:gap-6">
         <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <div className="min-w-0">
-            <p className="flex items-center gap-2 text-[10px] tracking-[0.18em] text-[#7b8781]">
-              <RiBookShelfLine className="text-sm" aria-hidden="true" />
-              MY BOOKSHELF
-            </p>
-            <h1 className="mt-2 font-serif-jp text-3xl font-medium tracking-[-0.04em] text-[#293630] sm:mt-3 sm:text-[40px]">
+            <h1 className="font-serif-jp text-3xl font-semibold tracking-[-0.04em] sm:text-[42px]">
               わたしの本棚
             </h1>
-            <p className="mt-2 text-xs text-[#75817b] sm:mt-3 sm:text-sm">
+            <p className="mt-2 text-xs leading-6 text-[#526158] sm:text-sm">
               読みたい気持ちも、読んだ思い出も。
             </p>
           </div>
@@ -129,31 +120,31 @@ const BookshelfPage = () => {
           />
         </div>
 
-        <div className="flex w-full flex-nowrap gap-2 sm:w-auto sm:flex-wrap sm:gap-3">
+        <div className="flex w-full flex-nowrap gap-2 sm:flex-wrap sm:gap-3 md:w-auto md:justify-end">
           <Link
             href="/bookshelf/lists"
-            className="group inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-2.5 py-2 text-xs font-medium text-[#40584e] transition-colors hover:border-[#718078] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
+            className="inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2.5 py-2 text-xs font-medium text-[#43584e] transition-colors hover:border-[#344941]/35 hover:bg-white sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
           >
             <RiListCheck2 className="text-lg" aria-hidden="true" />
             リスト
           </Link>
           <Link
             href="/bookshelf/collections"
-            className="group inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md border border-[#293630]/15 bg-[#faf9f5] px-2.5 py-2 text-xs font-medium text-[#40584e] transition-colors hover:border-[#718078] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
+            className="inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2.5 py-2 text-xs font-medium text-[#43584e] transition-colors hover:border-[#344941]/35 hover:bg-white sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
           >
             <RiBookmark3Line className="text-lg" aria-hidden="true" />
             本10選
           </Link>
           <Link
             href="/books/search"
-            className="group inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-md bg-[#344941] px-2.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[#263a33] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
+            className="inline-flex min-h-9 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#344941] px-2.5 py-2 text-xs font-medium text-white transition-colors hover:bg-[#263a33] sm:min-h-0 sm:w-fit sm:flex-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
             aria-label="本を探して本棚に追加"
           >
             <RiAddLine className="text-lg font-light" aria-hidden="true" />
             本を追加
           </Link>
         </div>
-      </div>
+      </header>
 
       <BookshelfToolbar
         filterStatus={filterStatus}
