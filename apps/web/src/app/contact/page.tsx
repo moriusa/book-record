@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { RiExternalLinkLine, RiQuestionAnswerLine } from "react-icons/ri";
 import LegalPageLayout from "@/components/legal/LegalPageLayout";
 
@@ -13,46 +14,72 @@ const googleFormEmbedUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_EMBED_URL;
 export default function ContactPage() {
   return (
     <LegalPageLayout
-      eyebrow="CONTACT"
+      illustration="/legal/contact-letter.png"
       title="お問い合わせ"
       description="ご意見、ご要望、不具合のご報告などをお寄せください。内容を確認のうえ、必要に応じてご返信します。"
     >
-      <section className="py-10 sm:py-14">
-        {googleFormEmbedUrl ? (
-          <div className="overflow-hidden border border-[#293630]/10 bg-white shadow-[0_16px_40px_rgba(43,56,50,0.06)]">
-            <iframe
-              src={googleFormEmbedUrl}
-              title="つみほん お問い合わせフォーム"
-              className="block h-325 w-full border-0 sm:h-262.5"
-              loading="lazy"
+      <section aria-labelledby="contact-form-heading">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <h2
+            id="contact-form-heading"
+            className="font-serif-jp text-xl font-medium sm:text-2xl"
+          >
+            お問い合わせフォーム
+          </h2>
+          {googleFormEmbedUrl && (
+            <a
+              href={googleFormEmbedUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center gap-1.5 text-sm text-[#43584e] underline decoration-[#43584e]/45 underline-offset-4 hover:decoration-current"
             >
-              読み込んでいます…
-            </iframe>
-          </div>
+              フォームを別タブで開く
+              <RiExternalLinkLine aria-hidden="true" />
+            </a>
+          )}
+        </div>
+        {googleFormEmbedUrl ? (
+          <>
+            <p className="mb-4 text-sm leading-6 text-[#526158]">
+              送信内容は Google フォームで取り扱います。詳しくは
+              <Link
+                href="/privacy"
+                className="text-[#43584e] underline underline-offset-4"
+              >
+                プライバシーポリシー
+              </Link>
+              をご確認ください。
+            </p>
+            <div className="overflow-hidden rounded-xl border border-[#293630]/12 bg-white">
+              <iframe
+                src={googleFormEmbedUrl}
+                title="つみほん お問い合わせフォーム"
+                className="block h-325 w-full border-0 sm:h-262.5"
+                loading="lazy"
+              >
+                読み込んでいます…
+              </iframe>
+            </div>
+          </>
         ) : (
-          <div className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-9">
+          <div className="flex items-center gap-3 rounded-xl border border-[#293630]/12 bg-[#eeece5] p-4 sm:p-6">
             <RiQuestionAnswerLine
-              className="text-2xl text-[#60736a]"
+              className="shrink-0 text-xl text-[#60736a]"
               aria-hidden="true"
             />
-            <h2 className="mt-6 font-serif-jp text-2xl font-medium">
-              お問い合わせフォームを準備中です
-            </h2>
-            <p className="mt-4 max-w-150 text-sm leading-8 text-[#647069] sm:text-base">
-              もうしばらくお待ちください。
+            <p className="text-sm leading-6 text-[#526158]">
+              お問い合わせフォームを準備中です。
             </p>
-            <span className="mt-7 inline-flex items-center gap-2 text-sm text-[#75817a]">
-              <RiExternalLinkLine aria-hidden="true" />
-              フォーム公開後、この場所から送信できます
-            </span>
           </div>
         )}
-        <p className="mt-7 text-xs leading-6 text-[#7a857f]">
-          個人情報の取扱いについては、プライバシーポリシーをご確認ください。Google
-          フォームを通じて送信された内容は、Google
-          のサービス上でも取り扱われます。
-        </p>
       </section>
+      <Link
+        href="/faq"
+        className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm text-[#43584e] underline underline-offset-4"
+      >
+        <RiQuestionAnswerLine aria-hidden="true" />
+        よくある質問を見る
+      </Link>
     </LegalPageLayout>
   );
 }
