@@ -17,7 +17,9 @@ type Update = {
 type NewsItem = {
   id: string;
   type: Exclude<Tab, "all">;
-  label: string;
+  date: string;
+  dateTime: string;
+  version?: string;
   title: string;
   timestamp: number;
   href: string;
@@ -25,12 +27,19 @@ type NewsItem = {
 
 const updates = updatesData as Update[];
 
+const newsTabs = [
+  ["all", "すべて"],
+  ["updates", "更新履歴"],
+  ["articles", "ブログ記事"],
+] as const;
+
 const formatArticleDate = (date?: string) =>
   date
     ? new Intl.DateTimeFormat("ja-JP", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
+        timeZone: "Asia/Tokyo",
       }).format(new Date(date))
     : "";
 
@@ -40,17 +49,27 @@ const getUpdateTimestamp = (date: string) =>
 export default function HomeNews({ className = "" }: { className?: string }) {
   const [tab, setTab] = useState<Tab>("all");
   const [posts, setPosts] = useState<BlogPostSummary[]>([]);
+  const [articleStatus, setArticleStatus] = useState<
+    "loading" | "ready" | "error"
+  >("loading");
 
   useEffect(() => {
     const controller = new AbortController();
 
     fetch("/api/blog/latest", { signal: controller.signal })
       .then(async (response) => {
-        if (!response.ok) return null;
+        if (!response.ok) {
+          throw new Error("Could not load blog posts");
+        }
         return (await response.json()) as { posts: BlogPostSummary[] };
       })
-      .then((data) => setPosts(data?.posts ?? []))
-      .catch(() => undefined);
+      .then(({ posts }) => {
+        setPosts(posts);
+        setArticleStatus("ready");
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setArticleStatus("error");
+      });
 
     return () => controller.abort();
   }, []);
@@ -59,19 +78,22 @@ export default function HomeNews({ className = "" }: { className?: string }) {
     const updateItems: NewsItem[] = updates.slice(0, 3).map((update) => ({
       id: `update-${update.version}`,
       type: "updates",
-      label: `${update.version} · ${update.date}`,
+      date: update.date.replaceAll(".", "/"),
+      dateTime: update.date.replaceAll(".", "-"),
+      version: update.version,
       title: update.title,
       timestamp: getUpdateTimestamp(update.date),
       href: "/updates",
     }));
     const articleItems: NewsItem[] = posts.map((post) => {
-      const date = formatArticleDate(post.publishedAt ?? post.createdAt);
+      const dateTime = post.publishedAt ?? post.createdAt;
       return {
         id: `article-${post.id}`,
         type: "articles",
-        label: `BLOG · ${date}`,
+        date: formatArticleDate(dateTime),
+        dateTime,
         title: post.title,
-        timestamp: new Date(post.publishedAt ?? post.createdAt).getTime(),
+        timestamp: new Date(dateTime).getTime(),
         href: `/blog/${post.id}`,
       };
     });
@@ -89,70 +111,83 @@ export default function HomeNews({ className = "" }: { className?: string }) {
 
   return (
     <section className={className} aria-labelledby="home-news-heading">
-      <div className="pt-6">
-        <div>
-          <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-            WHAT&apos;S NEW
-          </p>
-          <h2
-            id="home-news-heading"
-            className="mt-2 font-serif-jp text-2xl font-bold sm:text-3xl"
-          >
-            お知らせ
-          </h2>
+      <header className="flex flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
+        <h2
+          id="home-news-heading"
+          className="font-serif-jp text-2xl font-semibold sm:text-3xl"
+        >
+          お知らせ
+        </h2>
+        <div
+          className="flex w-full gap-1 rounded-lg bg-[#eeece5] p-1 sm:w-auto sm:shrink-0"
+          role="group"
+          aria-label="お知らせの種類"
+        >
+          {newsTabs.map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={tab === value}
+              onClick={() => setTab(value)}
+              className={`min-h-10 flex-1 whitespace-nowrap rounded-md px-2 text-xs font-medium transition-colors sm:flex-none sm:px-4 sm:text-sm ${tab === value ? "bg-[#344941] text-white" : "text-[#526158] hover:bg-[#faf9f5]"}`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      </div>
-      <div
-        className="mt-5 flex gap-2"
-        role="tablist"
-        aria-label="お知らせの種類"
-      >
-        {(
-          [
-            ["all", "全て"],
-            ["updates", "更新履歴"],
-            ["articles", "記事"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            onClick={() => setTab(value)}
-            className={`rounded-full px-3 py-1.5 text-xs transition-colors ${tab === value ? "bg-[#40584e] text-white" : "bg-[#eeece5] text-[#647069] hover:bg-[#e2dfd5]"}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      <div className="mt-3 divide-y divide-[#293630]/10 border-y border-[#293630]/10">
-        {items.map((item) => (
-          <Link
-            key={item.id}
-            href={item.href}
-            className="group flex items-center justify-between gap-5 py-4 transition-colors hover:bg-[#eeece5]/60"
-          >
-            <div className="min-w-0">
-              <p className="text-[10px] tracking-widest text-[#7b8781]">
-                {item.label}
-              </p>
-              <p className="mt-1 truncate font-serif-jp text-sm font-medium text-[#40584e] sm:text-base">
-                {item.title}
-              </p>
-            </div>
-            <RiArrowRightLine
-              className="shrink-0 text-[#718078] transition-transform group-hover:translate-x-0.5"
-              aria-hidden="true"
-            />
-          </Link>
-        ))}
-      </div>
-      <div className="mt-5 flex flex-wrap justify-end gap-x-5 gap-y-3 text-xs text-[#50665c]">
+      </header>
+      {items.length > 0 ? (
+        <ul className="mt-3 divide-y divide-[#344941]/12 rounded-xl border border-[#344941]/12 bg-[#faf9f5]">
+          {items.map((item) => (
+            <li
+              key={item.id}
+              className="first:[&>a]:rounded-t-xl last:[&>a]:rounded-b-xl"
+            >
+              <Link
+                href={item.href}
+                className="group flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-[#eeece5]/70 sm:px-5 sm:py-4"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#526158]">
+                    <span
+                      className={`rounded px-2 py-0.5 font-medium ${item.type === "updates" ? "bg-[#e8ece1] text-[#43584e]" : "bg-[#f1e9d8] text-[#695b3d]"}`}
+                    >
+                      {item.type === "updates" ? "更新履歴" : "ブログ"}
+                    </span>
+                    <time dateTime={item.dateTime} className="tabular-nums">
+                      {item.date}
+                    </time>
+                    {item.version && <span>{item.version}</span>}
+                  </div>
+                  <p className="mt-1.5 line-clamp-2 wrap-anywhere font-serif-jp text-sm font-semibold leading-snug underline-offset-4 group-hover:underline sm:text-base">
+                    {item.title}
+                  </p>
+                </div>
+                <RiArrowRightLine
+                  className="shrink-0 text-[#718078] transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p
+          role="status"
+          className="mt-3 rounded-xl border border-[#344941]/12 bg-[#faf9f5] px-4 py-5 text-sm text-[#526158] sm:px-5"
+        >
+          {articleStatus === "loading"
+            ? "ブログ記事を読み込み中…"
+            : articleStatus === "error"
+              ? "ブログ記事を取得できませんでした。"
+              : "新着のブログ記事はありません。"}
+        </p>
+      )}
+      <div className="mt-1 flex flex-wrap justify-end gap-x-5 text-sm text-[#43584e]">
         {tab !== "articles" && (
           <Link
             href="/updates"
-            className="inline-flex items-center gap-1.5 underline underline-offset-4 hover:text-[#293630]"
+            className="inline-flex min-h-11 items-center gap-1.5 underline decoration-[#43584e]/45 underline-offset-4 hover:decoration-current"
           >
             更新履歴一覧へ <RiArrowRightLine aria-hidden="true" />
           </Link>
@@ -160,7 +195,7 @@ export default function HomeNews({ className = "" }: { className?: string }) {
         {tab !== "updates" && (
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 underline underline-offset-4 hover:text-[#293630]"
+            className="inline-flex min-h-11 items-center gap-1.5 underline decoration-[#43584e]/45 underline-offset-4 hover:decoration-current"
           >
             ブログ一覧へ <RiArrowRightLine aria-hidden="true" />
           </Link>
