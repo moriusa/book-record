@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import updatesData from "@/data/updates.json";
 
 export const metadata: Metadata = {
@@ -27,48 +28,73 @@ const kindClassNames: Record<UpdateKind, string> = {
 export default function UpdatesPage() {
   return (
     <main className="min-h-full bg-[#f7f5f0] text-[#293630]">
-      <div className="mx-auto max-w-190 px-5 pb-24 pt-8 sm:px-8 sm:pb-32 sm:pt-24">
-        <p className="text-xs tracking-[0.18em] text-[#75817a]">
-          UPDATE HISTORY
-        </p>
-        <h1 className="mt-5 font-serif-jp text-4xl font-medium tracking-[-0.045em] sm:text-5xl">
-          更新履歴
-        </h1>
-        <p className="mt-4 max-w-155 text-sm leading-8 text-[#647069] sm:text-base">
-          つみほんを、少しずつ育てています。新しい機能や改善のお知らせをお届けします。
-        </p>
+      <div className="mx-auto max-w-220 px-5 pb-20 pt-7 sm:px-8 sm:pb-28 sm:pt-12">
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-[#344941]/10 bg-[#ede9dc] px-4 py-5 sm:gap-8 sm:px-8 sm:py-6">
+          <div>
+            <h1 className="font-serif-jp text-3xl font-semibold tracking-[-0.045em] sm:text-[42px]">
+              更新履歴
+            </h1>
+            <p className="mt-2 max-w-105 text-sm leading-6 text-[#526158] sm:text-base sm:leading-7">
+              つみほんに加わった機能や、使いやすさの改善、不具合の修正をお知らせします。
+            </p>
+          </div>
+          <Image
+            src="/blog/categories/tsumihon.png"
+            alt=""
+            width={168}
+            height={168}
+            sizes="(min-width: 640px) 168px, 26vw"
+            className="size-[clamp(80px,26vw,112px)] object-contain sm:size-42"
+          />
+        </header>
 
-        <ol className="mt-14 border-t border-[#293630]/12">
-          {updates.map((update) => (
+        <ol aria-label="更新履歴一覧" className="mt-7 ml-1.5 sm:mt-10">
+          {updates.map((update, index) => (
             <li
               key={update.version}
-              className="grid gap-5 border-b border-[#293630]/12 py-9 sm:grid-cols-[124px_minmax(0,1fr)] sm:gap-10 sm:py-11"
+              className="relative pl-4 before:absolute before:top-6 before:-bottom-6 before:left-0 before:w-px before:bg-[#344941]/18 last:before:hidden sm:pl-6"
             >
-              <div className="flex items-baseline gap-3 sm:block">
-                <time className="text-xs tracking-[0.06em] text-[#78847d]">
-                  {update.date}
-                </time>
-                <p className="mt-0 text-[11px] text-[#9aa29d] sm:mt-2">
-                  {update.version}
-                </p>
-              </div>
+              <span
+                aria-hidden="true"
+                className={`absolute top-6 left-0 size-2.5 -translate-x-1/2 rounded-full border-2 border-[#f7f5f0] ${index === 0 ? "bg-[#344941]" : "bg-[#82988a]"}`}
+              />
 
-              <article>
-                <h2 className="font-serif-jp text-xl font-medium sm:text-2xl">
+              <article
+                className={`px-3 pt-5 pb-6 sm:px-5 sm:pb-8 ${index === 0 ? "rounded-xl border border-[#344941]/12 bg-[#e8ece1]" : "border-b border-[#344941]/12"}`}
+              >
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-[#526158]">
+                  <time
+                    dateTime={update.date.replaceAll(".", "-")}
+                    className="tabular-nums"
+                  >
+                    {update.date}
+                  </time>
+                  <span className="rounded bg-[#faf9f5] px-1.5 py-0.5 font-medium tabular-nums">
+                    {update.version}
+                  </span>
+                  {index === 0 && (
+                    <span className="font-medium text-[#344941]">
+                      最新の更新
+                    </span>
+                  )}
+                </div>
+                <h2 className="mt-2 font-serif-jp text-lg font-semibold leading-snug sm:mt-3 sm:text-2xl">
                   {update.title}
                 </h2>
-                <ul className="mt-5 space-y-3">
+                <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-2.5">
                   {update.changes.map((change) => (
                     <li
                       key={change.text}
-                      className="flex gap-3 text-xs leading-6 text-[#506058] sm:text-sm sm:leading-7"
+                      className="flex items-start gap-2.5 text-sm leading-6 text-[#43584e] sm:gap-3 sm:leading-7"
                     >
                       <span
-                        className={`mt-1 h-fit w-11 shrink-0 rounded-full px-1 py-0.5 text-center text-[10px] font-medium leading-4 ${kindClassNames[change.kind]}`}
+                        className={`mt-0.5 w-12 shrink-0 rounded-full px-1 py-0.5 text-center text-[11px] font-medium leading-4 sm:mt-1 ${kindClassNames[change.kind]}`}
                       >
                         {change.kind}
                       </span>
-                      <span>{change.text}</span>
+                      <span className="min-w-0 wrap-anywhere">
+                        {change.text}
+                      </span>
                     </li>
                   ))}
                 </ul>
