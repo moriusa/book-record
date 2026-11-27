@@ -81,7 +81,7 @@ export default function AuthButton({ compact = false }: Props) {
           }}
           className={
             compact
-              ? "flex size-9 items-center justify-center rounded-full border border-[#293630]/10 bg-[#eeece5] text-[#526159] transition hover:bg-[#e7e5de] hover:text-[#293630] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:ml-2"
+              ? "inline-flex size-11 shrink-0 items-center justify-center rounded-lg border border-[#344941]/15 bg-[#faf9f5] text-[#43584e] transition-colors hover:border-[#344941]/35 hover:bg-[#eeece5]"
               : "rounded-lg px-3 py-2 text-sm font-semibold text-stone-600 transition hover:bg-stone-100 hover:text-stone-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700"
           }
           aria-label={compact ? "ログアウト" : undefined}
