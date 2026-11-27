@@ -50,7 +50,7 @@ export const SearchBox = ({
       className="w-full min-w-0"
     >
       <div
-        className="inline-flex max-w-full gap-1 rounded-lg bg-[#faf9f5] p-1"
+        className="grid grid-cols-3 gap-1 rounded-lg bg-[#faf9f5] p-1 sm:inline-flex"
         role="group"
         aria-label="検索対象"
       >
@@ -63,9 +63,9 @@ export const SearchBox = ({
               type="button"
               onClick={() => setSearchField(option.value)}
               aria-pressed={isActive}
-              className={`min-h-9 rounded-md px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-5 ${
+              className={`min-h-9 rounded-md px-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-5 ${
                 isActive
-                  ? "bg-[#40584e] text-white"
+                  ? "bg-[#344941] text-white"
                   : "text-[#526158] hover:bg-[#e8ece1]"
               }`}
             >

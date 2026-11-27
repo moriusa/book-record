@@ -221,8 +221,8 @@ const SearchPage = () => {
 
   return (
     <main className="mx-auto max-w-265 px-5 pb-24 pt-7 text-[#293630] sm:px-8 sm:pt-12">
-      <header className="flex items-center gap-4 sm:gap-7">
-        <div>
+      <header className="flex items-center gap-3 sm:gap-4">
+        <div className="min-w-0">
           <h1
             id="book-search-heading"
             className="font-serif-jp text-3xl font-semibold tracking-[-0.04em] sm:text-[42px]"
@@ -245,7 +245,7 @@ const SearchPage = () => {
 
       <section
         className="mt-4 rounded-2xl border border-[#344941]/12 bg-[#e8ece1] p-4 sm:mt-6 sm:p-6"
-        aria-labelledby="book-search-heading"
+        aria-label="キーワードで本を検索"
       >
         <SearchBox
           key={`${searchField}-${searchKeyword}`}
@@ -254,45 +254,48 @@ const SearchPage = () => {
           initialKeyword={searchKeyword}
           initialSearchField={searchField}
         />
-        <div className="mt-4 grid divide-y divide-[#293630]/10 border-t border-[#293630]/10 pt-1 sm:mt-5 sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:pt-3">
+      </section>
+
+      <section className="mt-3" aria-label="本を登録するその他の方法">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           <button
             type="button"
             onClick={startBarcodeScanner}
-            className="group flex min-h-14 items-center gap-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pr-5"
+            className="group flex min-h-12 items-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2 py-2 text-left transition-colors hover:border-[#344941]/35 hover:bg-white sm:gap-3 sm:px-3"
           >
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
+            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#e8ece1] text-[#43584e] sm:size-9">
               <RiBarcodeLine className="text-lg" aria-hidden="true" />
             </span>
             <span>
-              <span className="block text-sm font-medium text-[#344941] group-hover:underline">
+              <span className="block text-xs font-medium text-[#344941] group-hover:underline sm:text-sm">
                 バーコードで追加
               </span>
-              <span className="block text-xs leading-5 text-[#526158]">
+              <span className="hidden text-xs leading-5 text-[#526158] sm:block">
                 手元の本をまとめて読み取る
               </span>
             </span>
             <RiArrowRightLine
-              className="ml-auto shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5"
+              className="ml-auto hidden shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5 sm:block"
               aria-hidden="true"
             />
           </button>
           <Link
             href="/books/manual/register"
-            className="group flex min-h-14 items-center gap-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:pl-5"
+            className="group flex min-h-12 items-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2 py-2 text-left transition-colors hover:border-[#344941]/35 hover:bg-white sm:gap-3 sm:px-3"
           >
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#faf9f5] text-[#52685e] transition group-hover:bg-white">
+            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#e8ece1] text-[#43584e] sm:size-9">
               <RiEditLine className="text-base" aria-hidden="true" />
             </span>
             <span>
-              <span className="block text-sm font-medium text-[#344941] group-hover:underline">
+              <span className="block text-xs font-medium text-[#344941] group-hover:underline sm:text-sm">
                 手動で追加
               </span>
-              <span className="block text-xs leading-5 text-[#526158]">
+              <span className="hidden text-xs leading-5 text-[#526158] sm:block">
                 同人誌など検索にない本を登録
               </span>
             </span>
             <RiArrowRightLine
-              className="ml-auto shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5"
+              className="ml-auto hidden shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5 sm:block"
               aria-hidden="true"
             />
           </Link>
