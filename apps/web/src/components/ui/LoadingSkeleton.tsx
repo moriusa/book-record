@@ -142,12 +142,13 @@ export function ReadingListCardsSkeleton() {
         <div
           key={i}
           aria-hidden="true"
-          className="min-h-42 border border-[#293630]/10 bg-[#faf9f5] p-6"
+          className="flex min-h-24 items-center gap-3 rounded-xl border border-[#344941]/15 bg-[#faf9f5] p-4"
         >
-          <div className={`${block} size-5`} />
-          <div className={`${block} mt-6 h-6 w-3/4`} />
-          <div className={`${block} mt-3 h-3 w-12`} />
-          <div className={`${block} mt-6 h-3 w-14`} />
+          <div className={`${block} size-10 shrink-0 rounded-full`} />
+          <div className="flex-1">
+            <div className={`${block} h-5 w-3/4`} />
+            <div className={`${block} mt-2 h-3 w-10`} />
+          </div>
         </div>
       ))}
     </div>

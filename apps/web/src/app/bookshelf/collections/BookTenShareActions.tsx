@@ -198,19 +198,16 @@ export default function BookTenShareActions({ collection }: Props) {
   };
 
   return (
-    <section className="mt-10 border-t border-[#293630]/10 pt-7 sm:mt-12 sm:pt-8">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <section className="mt-6 rounded-xl border border-[#344941]/10 bg-[#e8ece1] p-4 sm:mt-8 sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-[10px] tracking-[0.16em] text-[#839089]">
-            SAVE AS IMAGE
-          </p>
-          <h2 className="mt-2 font-serif-jp text-xl font-medium">
+          <h2 className="font-serif-jp text-lg font-medium sm:text-xl">
             10選を画像として保存・共有
           </h2>
-          <p className="mt-2 text-xs leading-6 text-[#75817b]">
+          <p className="mt-2 text-sm leading-6 text-[#526158]">
             10冊そろうと、選んだ本の表紙を画像として保存できます。
           </p>
-          <p className="mt-1 text-xs leading-6 text-[#75817b]">
+          <p className="mt-1 text-xs leading-6 text-[#526158]">
             iPhoneでは、共有メニューの「画像を保存」から写真アプリに保存できます。
           </p>
         </div>
@@ -218,7 +215,7 @@ export default function BookTenShareActions({ collection }: Props) {
           type="button"
           onClick={saveCard}
           disabled={!isComplete || isCreatingCard}
-          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33] disabled:opacity-50"
+          className="inline-flex min-h-11 w-fit shrink-0 items-center gap-2 rounded-lg bg-[#344941] px-4 text-sm font-medium text-white transition-colors enabled:hover:bg-[#263a33] disabled:bg-[#d6ded2] disabled:text-[#43584e]"
         >
           <RiDownloadLine aria-hidden="true" />
           {isCreatingCard
