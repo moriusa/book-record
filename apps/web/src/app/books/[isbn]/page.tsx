@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RiBook3Line } from "react-icons/ri";
+import BookDetailHeader from "@/components/ui/BookDetailHeader";
+import BookDetailSection, {
+  BookDetailInformation,
+} from "@/components/ui/BookDetailSection";
 import {
   getAmazonBookUrl,
   isAmazonAffiliateEnabled,
@@ -94,78 +96,46 @@ const Page = async ({ params }: Props) => {
           __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
         }}
       />
-      <main className="text-[#293630]">
-        <section className="border-b border-[#293630]/8">
-          <div className="mx-auto max-w-270 px-5 pb-16 pt-7 sm:px-8 sm:pb-24 sm:pt-10">
-            <div className="grid gap-12 sm:grid-cols-[220px_1fr] sm:gap-14 lg:grid-cols-[260px_1fr] lg:gap-20">
-              <div className="mx-auto w-47.5 sm:w-full">
-                <div className="relative aspect-2/3 w-full overflow-hidden rounded-r-sm rounded-l-xs border-l-[5px] border-black/10 bg-[#d9d4c5] shadow-[10px_14px_28px_rgb(38_48_43/18%)]">
-                  {book.largeImageUrl ? (
-                    <Image
-                      src={book.largeImageUrl}
-                      alt={book.title}
-                      fill
-                      sizes="(max-width: 640px) 190px, (max-width: 1024px) 220px, 260px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-[#66756d]">
-                      <RiBook3Line className="text-4xl" aria-hidden="true" />
-                    </div>
-                  )}
-                </div>
-              </div>
+      <main className="mx-auto max-w-270 px-5 pb-16 pt-7 text-[#293630] sm:px-8 sm:pb-24 sm:pt-10">
+        <BookDetailHeader
+          title={book.title}
+          imageUrl={book.largeImageUrl}
+          recordLinkLabel="本棚・記録へ"
+        >
+          {book.author && (
+            <Link
+              href={`/books/search?q=${encodeURIComponent(book.author)}&type=author`}
+              className="mt-2 inline-block wrap-anywhere text-sm leading-6 text-[#526158] underline decoration-[#526158]/50 underline-offset-4 hover:text-[#344941] hover:decoration-current sm:mt-4 sm:text-base"
+            >
+              {book.author}
+            </Link>
+          )}
+        </BookDetailHeader>
 
-              <div className="min-w-0 flex-1">
-                <h1 className="font-serif-jp text-4xl font-medium tracking-[-0.045em] text-[#293630] sm:text-5xl">
-                  {book.title}
-                </h1>
-                <Link
-                  href={`/books/search?q=${encodeURIComponent(book.author)}&type=author`}
-                  className="mt-4 inline-flex text-base text-[#65726b] underline decoration-[#aeb7b1] underline-offset-4 transition-colors hover:text-[#344941] hover:decoration-[#60736a]"
-                >
-                  {book.author}
-                </Link>
-              </div>
-            </div>
+        <div className="mt-4 grid items-start gap-8 sm:mt-6 lg:mt-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
+          <div className="min-w-0 space-y-8 sm:space-y-10">
+            <BookDetailSection id="book-description" title="作品紹介">
+              <p className="mt-4 whitespace-pre-wrap wrap-anywhere text-sm leading-7 text-[#526158] sm:text-base sm:leading-8">
+                {book.itemCaption || "作品紹介はありません。"}
+              </p>
+            </BookDetailSection>
+            <BookDetailInformation
+              rows={[
+                ["出版社", book.publisherName || "–"],
+                ["発売日", book.salesDate || "–"],
+                ["シリーズ", book.seriesName || "–"],
+                ["形式", book.size || "–"],
+                ["ISBN", book.isbn],
+              ]}
+            />
           </div>
-        </section>
-
-        <section className="mx-auto grid max-w-270 gap-14 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1fr_360px] lg:gap-20">
-          <article>
-            <h2 className="font-serif-jp text-2xl font-medium">作品紹介</h2>
-            <p className="mt-6 max-w-162.5 whitespace-pre-wrap text-sm leading-8 text-[#637069]">
-              {book.itemCaption || "作品紹介はありません。"}
-            </p>
-
-            <div className="mt-14 border-t border-[#293630]/10 pt-10">
-              <h2 className="font-serif-jp text-xl font-medium">書籍情報</h2>
-              <dl className="mt-6 divide-y divide-[#293630]/8 border-y border-[#293630]/8">
-                {[
-                  ["出版社", book.publisherName || "-"],
-                  ["発売日", book.salesDate || "-"],
-                  ["シリーズ", book.seriesName || "-"],
-                  ["形式", book.size || "-"],
-                  ["ISBN", book.isbn],
-                ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="grid grid-cols-[100px_1fr] py-4 text-xs"
-                  >
-                    <dt className="text-[#909994]">{label}</dt>
-                    <dd className="text-[#4b5b53]">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </article>
 
           <BookShelfStatus
             bookData={book}
             amazonBookUrl={amazonBookUrl}
             isAmazonAffiliate={isAmazonAffiliate}
           />
-        </section>
+        </div>
       </main>
     </>
   );

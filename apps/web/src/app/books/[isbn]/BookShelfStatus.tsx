@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { FaStar } from "react-icons/fa";
 import { RiExternalLinkLine } from "react-icons/ri";
+import BookDetailDeleteControl from "@/components/ui/BookDetailDeleteControl";
+import BookDetailSection, {
+  BOOK_READING_RECORD_ID,
+} from "@/components/ui/BookDetailSection";
+import BookReadingRecord from "@/components/ui/BookReadingRecord";
 import LoginButton from "@/components/ui/LoginButton";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useGetBookByIsbn } from "@/app/bookshelf/hooks/useGetBookByIsbn";
@@ -18,21 +20,12 @@ type Props = {
   isAmazonAffiliate: boolean;
 };
 
-const bookStatus = {
-  WANT_TO_READ: "読みたい",
-  READING: "読んでいる",
-  COMPLETED: "読み終わった",
-  ON_HOLD: "積読",
-};
-
 const BookShelfStatus = ({
   bookData,
   amazonBookUrl,
   isAmazonAffiliate,
 }: Props) => {
   const { user, isLoading: isAuthLoading } = useAuth();
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
-    useState(false);
   const {
     data: book,
     isLoading: isBookLoading,
@@ -42,48 +35,18 @@ const BookShelfStatus = ({
   });
   const deleteBookMutation = useDeleteBook();
 
-  if (isAuthLoading) {
-    return null;
-  }
-
   return (
-    <div className="space-y-6 lg:sticky lg:top-24">
-      <aside className="border border-[#293630]/10 bg-[#faf9f5] p-6 sm:p-7">
-        <p className="text-[10px] tracking-[0.16em] text-[#7c8881]">
-          BUY THIS BOOK
-        </p>
-        <h2 className="mt-3 font-serif-jp text-xl font-medium text-[#293630]">
-          Amazonでこの本を探す
-        </h2>
-        <p className="mt-3 text-[11px] leading-5 text-[#718078]">
-          Amazonの商品検索ページへ移動します。
-        </p>
-        <a
-          href={amazonBookUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
-        >
-          Amazonで探す
-          <RiExternalLinkLine className="text-sm" aria-hidden="true" />
-        </a>
-        {isAmazonAffiliate && (
-          <p className="mt-4 text-[10px] leading-5 text-[#87918b]">
-            Amazonのアソシエイトとして、つみほんは適格販売により収入を得ています。
-          </p>
-        )}
-      </aside>
-
-      <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
-        <div>
-          <h2 className="font-serif-jp text-xl font-medium">自分の記録</h2>
-        </div>
-
-        {user && isBookLoading ? (
+    <div className="min-w-0 space-y-4">
+      <BookDetailSection
+        id={BOOK_READING_RECORD_ID}
+        title="自分の記録"
+        tone="record"
+      >
+        {isAuthLoading || (user && isBookLoading) ? (
           <div
             role="status"
             aria-label="読書記録を読み込み中"
-            className="mt-7 space-y-4 border-t border-[#293630]/10 pt-6"
+            className="mt-4 space-y-4 border-t border-[#344941]/15 pt-4"
           >
             <span className="sr-only">読み込み中</span>
             <div
@@ -100,114 +63,35 @@ const BookShelfStatus = ({
             />
           </div>
         ) : user && isBookError ? (
-          <p className="mt-7 border-t border-[#293630]/10 pt-6 text-xs text-[#75817b]">
+          <p className="mt-4 border-t border-[#344941]/15 pt-4 text-sm text-[#526158]">
             読書記録を取得できませんでした。
           </p>
         ) : !user ? (
-          <div className="mt-7 border-t border-[#293630]/10 pt-6">
-            <p className="text-[11px] leading-5 text-[#7c8781]">
+          <div className="mt-4 border-t border-[#344941]/15 pt-4">
+            <p className="text-sm leading-6 text-[#526158]">
               ログインすると、この本をあなたの本棚へ登録できます。
             </p>
             <div className="mt-4">
               <LoginButton
                 label="Googleでログイン"
-                className="w-full rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+                className="min-h-11 w-full rounded-lg bg-[#344941] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
               />
             </div>
           </div>
         ) : book ? (
-          <div className="mt-7 border-t border-[#293630]/10 pt-6">
-            <p className="text-[11px] font-medium text-[#5f6e66]">
-              読書ステータス
-            </p>
-            <p className="mt-2 font-serif-jp text-lg text-[#344941]">
-              {bookStatus[book.status]}
-            </p>
-
-            {book.rating !== null && book.rating > 0 && (
-              <div className="mt-6">
-                <p className="text-[11px] font-medium text-[#5f6e66]">
-                  この本の評価
-                </p>
-                <span
-                  className="mt-3 flex gap-1 text-sm text-[#8c7951]"
-                  aria-label={`評価 ${book.rating}点`}
-                >
-                  {Array.from({ length: book.rating }, (_, index) => (
-                    <FaStar key={index} aria-hidden="true" />
-                  ))}
-                </span>
-              </div>
-            )}
-
-            {book.review && (
-              <div className="mt-6">
-                <p className="text-[11px] font-medium text-[#5f6e66]">メモ</p>
-                <p className="mt-3 whitespace-pre-wrap text-xs leading-6 text-[#526159]">
-                  {book.review}
-                </p>
-              </div>
-            )}
-
-            <div className="mt-7 border-t border-[#293630]/10 pt-5">
-              <Link
-                href={`/bookshelf/edit/${book.id}`}
-                className="block rounded-md border border-[#293630]/12 bg-[#faf9f5] px-4 py-3 text-center text-xs font-medium text-[#526159] transition hover:border-[#60736a] hover:bg-white"
-              >
-                本棚の内容を編集
-              </Link>
-            </div>
-
-            <div className="mt-7 border-t border-[#293630]/10 pt-5">
-              {isDeleteConfirmationOpen ? (
-                <div className="rounded-md border border-[#a56b62]/30 bg-[#fbf5f2] p-4">
-                  <p className="text-xs leading-6 text-[#73534d]">
-                    本棚から削除しますか？
-                    読書ステータス・評価・メモも削除されます。
-                  </p>
-                  {deleteBookMutation.error && (
-                    <p className="mt-3 text-xs text-[#a04438]" role="alert">
-                      削除に失敗しました。時間をおいてもう一度お試しください。
-                    </p>
-                  )}
-                  <div className="mt-4 grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        deleteBookMutation.mutate({
-                          id: book.id,
-                          isbn: book.isbn,
-                        })
-                      }
-                      disabled={deleteBookMutation.isPending}
-                      className="rounded-md bg-[#9b554a] px-3 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#82473e] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {deleteBookMutation.isPending ? "削除中…" : "削除する"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsDeleteConfirmationOpen(false)}
-                      disabled={deleteBookMutation.isPending}
-                      className="rounded-md border border-[#293630]/12 bg-white px-3 py-2.5 text-xs font-medium text-[#526159] transition-colors hover:border-[#60736a] disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      キャンセル
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsDeleteConfirmationOpen(true)}
-                  className="w-full rounded-md px-4 py-2.5 text-xs text-[#986157] transition-colors hover:bg-[#f7ece8] hover:text-[#82473e]"
-                >
-                  本棚から削除
-                </button>
-              )}
-            </div>
-          </div>
+          <>
+            <BookReadingRecord book={book} />
+            <BookDetailDeleteControl
+              onDelete={() =>
+                deleteBookMutation.mutate({ id: book.id, isbn: book.isbn })
+              }
+              isDeleting={deleteBookMutation.isPending}
+              hasError={Boolean(deleteBookMutation.error)}
+            />
+          </>
         ) : (
-          <div className="mt-7 border-t border-[#293630]/10 pt-6">
-            <p className="text-[11px] leading-5 text-[#7c8781]">
+          <div className="mt-4 border-t border-[#344941]/15 pt-4">
+            <p className="text-sm leading-6 text-[#526158]">
               この本はまだ本棚に登録されていません。
             </p>
             <div className="mt-4">
@@ -215,7 +99,7 @@ const BookShelfStatus = ({
             </div>
           </div>
         )}
-      </aside>
+      </BookDetailSection>
 
       {user && book && (
         <ReadingListControls
@@ -224,11 +108,28 @@ const BookShelfStatus = ({
         />
       )}
 
-      {user && book && (
-        <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
-          <BookTenToggleButton userBookId={book.id} />
-        </aside>
-      )}
+      {user && book && <BookTenToggleButton userBookId={book.id} />}
+
+      <BookDetailSection
+        id="book-amazon"
+        title="Amazonでこの本を探す"
+        tone="paper"
+      >
+        <a
+          href={amazonBookUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[#e88a00] bg-[#ff9900] px-4 text-sm font-semibold text-[#232f3e] transition-colors hover:bg-[#f28c00]"
+        >
+          Amazonで探す
+          <RiExternalLinkLine className="text-sm" aria-hidden="true" />
+        </a>
+        {isAmazonAffiliate && (
+          <p className="mt-3 text-xs leading-5 text-[#526158]">
+            Amazonのアソシエイトとして、つみほんは適格販売により収入を得ています。
+          </p>
+        )}
+      </BookDetailSection>
     </div>
   );
 };

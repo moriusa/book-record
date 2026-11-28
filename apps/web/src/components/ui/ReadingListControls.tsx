@@ -13,6 +13,7 @@ import {
 import { authFetcher } from "@/lib/fetcher";
 import type { Book } from "@/types/book";
 import type { ReadingList } from "@/types/readingList";
+import BookDetailSection from "./BookDetailSection";
 
 type Props = { userBookId: string; isFavorite: boolean };
 
@@ -74,8 +75,11 @@ export default function ReadingListControls({ userBookId, isFavorite }: Props) {
   });
 
   return (
-    <aside className="border border-[#293630]/10 bg-[#eeece5] p-6 sm:p-7">
-      <h2 className="font-serif-jp text-xl font-medium">お気に入り・リスト</h2>
+    <BookDetailSection
+      id="book-reading-lists"
+      title="お気に入り・リスト"
+      tone="paper"
+    >
       <button
         type="button"
         onClick={() => favoriteMutation.mutate()}
@@ -165,6 +169,6 @@ export default function ReadingListControls({ userBookId, isFavorite }: Props) {
           </Link>
         </div>
       )}
-    </aside>
+    </BookDetailSection>
   );
 }

@@ -64,17 +64,22 @@ export function BookDetailSkeleton() {
     >
       <span className="sr-only">読み込み中</span>
       <div aria-hidden="true">
-        <div className="grid gap-12 sm:grid-cols-[220px_1fr] sm:gap-14 lg:grid-cols-[260px_1fr]">
-          <div className={`${block} mx-auto aspect-2/3 w-47.5 sm:w-full`} />
-          <div className="space-y-5">
-            <div className={`${block} h-3 w-28`} />
-            <div className={`${block} h-10 w-4/5`} />
-            <div className={`${block} h-4 w-2/5`} />
+        <div className={`${block} mb-3 h-11 w-24`} />
+        <div className="border-b border-[#344941]/12 pb-2 lg:pb-6">
+          <div className="grid items-start gap-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8 lg:gap-12">
+            <div
+              className={`${block} mx-auto aspect-2/3 w-24 sm:mx-0 sm:w-28 lg:w-32`}
+            />
+            <div className="space-y-3">
+              <div className={`${block} h-6 w-4/5 sm:h-10`} />
+              <div className={`${block} h-4 w-2/5`} />
+            </div>
           </div>
+          <div className={`${block} mt-1 mb-3 ml-auto h-5 w-24 lg:hidden`} />
         </div>
-        <div className="mt-16 grid gap-12 lg:grid-cols-[1fr_360px]">
-          <div className={`${block} h-48 w-full`} />
-          <div className={`${block} h-56 w-full`} />
+        <div className="mt-4 grid gap-8 sm:mt-6 lg:mt-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-10">
+          <div className={`${block} h-28 w-full`} />
+          <div className={`${block} h-44 w-full`} />
         </div>
       </div>
     </main>

@@ -9,7 +9,7 @@ type Props = {
 export const AddToBookshelfButton = ({ isbn }: Props) => (
   <Link
     href={`/books/${isbn}/register`}
-    className="block rounded-md bg-[#344941] px-5 py-3 text-center text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+    className="flex min-h-11 items-center justify-center rounded-lg bg-[#344941] px-4 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
   >
     本棚に追加
   </Link>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { RiBookmark3Line } from "react-icons/ri";
 import { useGetCollections } from "@/app/bookshelf/collections/hooks/useGetCollections";
+import BookDetailSection from "@/components/ui/BookDetailSection";
 import { authFetcher } from "@/lib/fetcher";
 import type { BookCollection } from "@/types/collection";
 
@@ -45,20 +46,16 @@ export default function BookTenToggleButton({ userBookId }: Props) {
       : `いまの自分を表す本を選べます。あと${10 - selectedCount}冊追加できます。`;
 
   return (
-    <div>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-[10px] tracking-[0.14em] text-[#839089]">
-            BOOK TEN
-          </p>
-          <h3 className="mt-1 font-serif-jp text-base font-medium">
-            名刺代わりの本10選
-          </h3>
-        </div>
-        <span className="font-serif-jp text-sm text-[#60736a]">
+    <BookDetailSection
+      id="book-ten"
+      title="名刺代わりの本10選"
+      tone="paper"
+      headingAside={
+        <span className="shrink-0 text-sm tabular-nums text-[#526158]">
           {selectedCount}/10
         </span>
-      </div>
+      }
+    >
       <p className="mt-3 text-[11px] leading-5 text-[#75817b]">{message}</p>
 
       {error ? (
@@ -97,6 +94,6 @@ export default function BookTenToggleButton({ userBookId }: Props) {
       >
         10選を見る
       </Link>
-    </div>
+    </BookDetailSection>
   );
 }
