@@ -29,7 +29,7 @@ export default function GuidesPage() {
   return (
     <main className="bg-[#f7f5f0] text-[#293630]">
       <div className="mx-auto max-w-265 px-5 pb-20 pt-7 sm:px-8 sm:pb-28 sm:pt-12">
-        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-[#344941]/10 bg-[#ede9dc] px-4 py-5 sm:gap-8 sm:px-9 sm:py-6">
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 sm:gap-8 sm:py-6">
           <div>
             <h1 className="font-serif-jp text-[clamp(1.375rem,5.8vw,2rem)] font-semibold leading-snug tracking-[-0.045em] sm:text-[42px]">
               つみほんの使い方
@@ -56,22 +56,25 @@ export default function GuidesPage() {
             >
               {title}
             </h2>
-            <ul className="mt-4 grid gap-2.5 md:grid-cols-3 md:gap-3">
+            <ul className="mt-4 grid border-y border-[#344941]/20 md:grid-cols-3 md:border-x">
               {icons
                 .flatMap((icon) =>
                   guides.filter((guide) => guide.icon === icon),
                 )
                 .map((guide) => (
-                  <li key={guide.slug} className="min-w-0">
+                  <li
+                    key={guide.slug}
+                    className="min-w-0 border-[#344941]/15 [&+li]:border-t md:[&+li]:border-t-0 md:[&+li]:border-l"
+                  >
                     <Link
                       href={`/guides/${guide.slug}`}
-                      className="group grid h-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-xl border border-[#344941]/12 bg-[#faf9f5] px-3.5 py-6 transition-colors hover:border-[#344941]/35 hover:bg-white md:grid-cols-[minmax(0,1fr)_auto] md:p-5"
+                      className="group relative grid h-full grid-cols-[auto_minmax(0,1fr)_auto] content-start items-start gap-3 px-2 py-5 transition-colors hover:bg-[#344941]/5 focus-visible:z-10 md:grid-cols-[minmax(0,1fr)_auto] md:gap-y-4 md:px-6 md:py-6"
                     >
-                      <span className="grid size-9 place-items-center rounded-lg bg-[#e8ece1] text-[#43584e] md:col-start-1">
+                      <span className="mt-0.5 grid size-6 place-items-center text-[#43584e] md:col-start-1 md:justify-self-start">
                         <GuideIcon icon={guide.icon} className="text-lg" />
                       </span>
                       <div className="md:col-span-2 md:row-start-2">
-                        <h3 className="font-serif-jp text-lg font-bold leading-snug underline-offset-4 group-hover:underline sm:text-xl">
+                        <h3 className="font-serif-jp text-lg font-medium leading-snug underline-offset-4 group-hover:underline group-focus-visible:underline sm:text-xl">
                           {guide.title}
                         </h3>
                         <p className="mt-2 text-[13px] leading-6 text-[#526158] sm:text-sm">
@@ -79,7 +82,7 @@ export default function GuidesPage() {
                         </p>
                       </div>
                       <RiArrowRightLine
-                        className="mt-2.5 text-[#526158] transition-transform group-hover:translate-x-0.5 md:col-start-2 md:row-start-1"
+                        className="mt-1.5 text-[#526158] transition-transform group-hover:translate-x-0.5 md:col-start-2 md:row-start-1"
                         aria-hidden="true"
                       />
                     </Link>

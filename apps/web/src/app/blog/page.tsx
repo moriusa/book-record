@@ -65,26 +65,27 @@ export default async function BlogPage() {
           >
             ジャンルから探す
           </h2>
-          <ul className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-[#344941]/12 bg-[#dedfd6]">
+          <ul className="mt-4 grid grid-cols-2 gap-x-3 border-t border-[#344941]/12 sm:mt-6 sm:gap-x-12">
             {blogCategories.map((category) => {
               const Icon = categoryIcons[category.icon];
               return (
-                <li key={category.slug} className="min-w-0">
+                <li
+                  key={category.slug}
+                  className="min-w-0 border-b border-[#344941]/12"
+                >
                   <Link
                     href={`/blog/category/${category.slug}`}
-                    className="group grid h-full grid-cols-[auto_minmax(0,1fr)_auto] grid-rows-[auto_1fr] items-center gap-x-1.5 gap-y-1 bg-[#faf9f5] px-2.5 py-3 transition-colors hover:bg-[#e8ece1] focus-visible:outline-offset-[-3px] sm:gap-x-3 sm:px-4 sm:py-3.5"
+                    className="group grid h-full grid-cols-[auto_minmax(0,1fr)_auto] grid-rows-[auto_1fr] items-center gap-x-1.5 gap-y-1 py-3 transition-colors hover:text-[#43584e] sm:gap-x-3 sm:py-5"
                   >
-                    <span className="grid size-6 place-items-center rounded-md bg-[#344941] text-[#faf9f5] sm:size-7">
-                      <Icon
-                        className="text-base sm:text-lg"
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <span className="text-[13px] font-medium leading-snug underline-offset-4 group-hover:underline sm:text-[15px]">
+                    <Icon
+                      className="text-base text-[#526158] sm:text-lg"
+                      aria-hidden="true"
+                    />
+                    <span className="font-serif-jp text-[13px] font-medium leading-snug underline-offset-4 group-hover:underline sm:text-base">
                       {category.name}
                     </span>
                     <RiArrowRightSLine
-                      className="text-sm text-[#526158] transition-transform group-hover:translate-x-0.5 sm:text-base"
+                      className="text-sm text-[#65736c] transition-transform group-hover:translate-x-0.5"
                       aria-hidden="true"
                     />
                     <span className="col-span-3 self-start text-xs leading-5 text-[#526158] sm:col-span-2 sm:col-start-2">

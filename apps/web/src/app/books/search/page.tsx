@@ -245,8 +245,8 @@ const SearchPage = () => {
       </header>
 
       <section
-        className="mt-4 rounded-2xl border border-[#344941]/12 bg-[#e8ece1] p-4 sm:mt-6 sm:p-6"
-        aria-label="キーワードで本を検索"
+        className="mt-4 rounded-xl border border-[#344941]/12 bg-[#eeece5] px-4 pt-4 sm:mt-6 sm:px-6 sm:pt-6"
+        aria-labelledby="book-search-heading"
       >
         <SearchBox
           key={`${searchField}-${searchKeyword}`}
@@ -255,48 +255,49 @@ const SearchPage = () => {
           initialKeyword={searchKeyword}
           initialSearchField={searchField}
         />
-      </section>
-
-      <section className="mt-3" aria-label="本を登録するその他の方法">
-        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+        <div
+          role="group"
+          aria-label="本を登録するその他の方法"
+          className="mt-4 grid divide-y divide-[#344941]/12 border-t border-[#344941]/12 sm:grid-cols-2 sm:divide-x sm:divide-y-0"
+        >
           <button
             type="button"
             onClick={startBarcodeScanner}
-            className="group flex min-h-12 items-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2 py-2 text-left transition-colors hover:border-[#344941]/35 hover:bg-white sm:gap-3 sm:px-3"
+            className="group flex min-h-18 items-center gap-3 py-4 text-left sm:min-h-20 sm:py-5 sm:pr-4"
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#344941] text-white sm:size-9">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#faf9f5] text-[#344941] transition-colors group-hover:bg-white">
               <RiBarcodeLine className="text-lg" aria-hidden="true" />
             </span>
             <span>
-              <span className="block text-xs font-medium text-[#344941] group-hover:underline sm:text-sm">
+              <span className="block text-sm font-medium text-[#344941] underline-offset-4 group-hover:underline">
                 バーコードで追加
               </span>
-              <span className="hidden text-xs leading-5 text-[#526158] sm:block">
+              <span className="block text-xs leading-5 text-[#526158]">
                 手元の本をまとめて読み取る
               </span>
             </span>
             <RiArrowRightLine
-              className="ml-auto hidden shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5 sm:block"
+              className="ml-auto shrink-0 text-sm text-[#526158] transition-transform group-hover:translate-x-0.5"
               aria-hidden="true"
             />
           </button>
           <Link
             href="/books/manual/register"
-            className="group flex min-h-12 items-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2 py-2 text-left transition-colors hover:border-[#344941]/35 hover:bg-white sm:gap-3 sm:px-3"
+            className="group flex min-h-18 items-center gap-3 py-4 text-left sm:min-h-20 sm:py-5 sm:pl-4"
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#344941] text-white sm:size-9">
+            <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#faf9f5] text-[#344941] transition-colors group-hover:bg-white">
               <RiEditLine className="text-lg" aria-hidden="true" />
             </span>
             <span>
-              <span className="block text-xs font-medium text-[#344941] group-hover:underline sm:text-sm">
+              <span className="block text-sm font-medium text-[#344941] underline-offset-4 group-hover:underline">
                 手動で追加
               </span>
-              <span className="hidden text-xs leading-5 text-[#526158] sm:block">
+              <span className="block text-xs leading-5 text-[#526158]">
                 同人誌など検索にない本を登録
               </span>
             </span>
             <RiArrowRightLine
-              className="ml-auto hidden shrink-0 text-base text-[#526158] transition group-hover:translate-x-0.5 sm:block"
+              className="ml-auto shrink-0 text-sm text-[#526158] transition-transform group-hover:translate-x-0.5"
               aria-hidden="true"
             />
           </Link>

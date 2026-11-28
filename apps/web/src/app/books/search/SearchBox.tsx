@@ -50,7 +50,7 @@ export const SearchBox = ({
       className="w-full min-w-0"
     >
       <div
-        className="grid grid-cols-3 gap-1 rounded-lg bg-[#faf9f5] p-1 sm:inline-flex"
+        className="grid grid-cols-3 gap-1 sm:inline-flex"
         role="group"
         aria-label="検索対象"
       >
@@ -66,7 +66,7 @@ export const SearchBox = ({
               className={`min-h-9 rounded-md px-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#60736a] sm:px-5 ${
                 isActive
                   ? "bg-[#344941] text-white"
-                  : "text-[#526158] hover:bg-[#e8ece1]"
+                  : "text-[#526158] hover:bg-[#e2e1da]"
               }`}
             >
               {option.label}

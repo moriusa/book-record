@@ -165,9 +165,9 @@ export default function FaqPage() {
         }}
       />
       <div className="mx-auto max-w-220 px-5 pb-20 pt-7 sm:px-8 sm:pb-28 sm:pt-12">
-        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-2xl border border-[#344941]/10 bg-[#ede9dc] px-4 py-5 sm:gap-8 sm:px-8 sm:py-6">
+        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 sm:gap-8 sm:py-6">
           <div>
-            <h1 className="font-serif-jp text-[clamp(1.375rem,6vw,2rem)] font-semibold leading-snug tracking-[-0.045em] sm:text-[42px]">
+            <h1 className="font-serif-jp text-[clamp(1.5rem,6vw,2rem)] font-medium leading-snug tracking-[-0.045em] sm:text-[42px]">
               よくある質問
             </h1>
             <p className="mt-2 text-sm leading-6 text-[#526158] sm:text-base sm:leading-7">
@@ -184,12 +184,15 @@ export default function FaqPage() {
           />
         </header>
 
-        <nav aria-label="質問のジャンル" className="mt-4 flex flex-wrap gap-2">
+        <nav
+          aria-label="質問のジャンル"
+          className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 sm:flex sm:flex-wrap sm:gap-x-6"
+        >
           {faqTopics.map(({ id, title }) => (
             <a
               key={id}
               href={`#${id}`}
-              className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-3 text-xs text-[#43584e] transition-colors hover:bg-[#e8ece1] sm:text-sm"
+              className="inline-flex min-h-11 items-center gap-1 justify-self-start text-sm text-[#43584e] underline decoration-[#43584e]/40 underline-offset-4 hover:decoration-current"
             >
               {title}
               <RiArrowDownSLine aria-hidden="true" />
@@ -205,23 +208,23 @@ export default function FaqPage() {
             >
               {title}
             </h2>
-            <div className="divide-y divide-[#344941]/12 rounded-xl border border-[#344941]/12 bg-[#faf9f5]">
+            <div className="divide-y divide-[#344941]/15 border-y border-[#344941]/20">
               {faqs
                 .filter(({ topic }) => topic === id)
                 .map(({ question, answer, guide }) => (
                   <details key={question} className="group">
-                    <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium leading-6 marker:hidden hover:bg-[#eeece5] focus-visible:outline-2 focus-visible:outline-[#60736a] group-open:text-[#344941] sm:px-5 sm:text-base [&::-webkit-details-marker]:hidden">
+                    <summary className="relative flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-2 py-4 text-left font-serif-jp text-base font-medium leading-relaxed marker:hidden hover:bg-[#344941]/5 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-[#60736a] group-open:text-[#344941] sm:py-5 sm:text-lg [&::-webkit-details-marker]:hidden">
                       <span>{question}</span>
                       <span
                         aria-hidden="true"
-                        className="grid size-7 shrink-0 place-items-center rounded-full bg-[#e8ece1] text-lg text-[#43584e]"
+                        className="grid size-6 shrink-0 place-items-center text-lg text-[#43584e]"
                       >
                         <RiAddLine className="group-open:hidden" />
                         <RiSubtractLine className="hidden group-open:block" />
                       </span>
                     </summary>
-                    <div className="px-4 pb-4 sm:px-5 sm:pb-5">
-                      <div className="border-l-2 border-[#a6b6aa] pl-3 text-sm leading-7 text-[#526158]">
+                    <div className="px-2 pb-5 sm:pb-6">
+                      <div className="max-w-170 text-sm leading-7 text-[#526158] sm:text-base sm:leading-8">
                         <p>{answer}</p>
                         {guide && (
                           <Link
@@ -245,7 +248,7 @@ export default function FaqPage() {
 
         <section
           aria-labelledby="faq-contact"
-          className="mt-9 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 rounded-xl bg-[#e8ece1] p-4 sm:mt-12 sm:p-6"
+          className="mt-9 flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border border-[#344941]/15 bg-[#eeece5] p-4 sm:mt-12 sm:p-6"
         >
           <div>
             <h2 id="faq-contact" className="font-serif-jp text-lg font-medium">
@@ -257,7 +260,7 @@ export default function FaqPage() {
           </div>
           <Link
             href="/contact"
-            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-[#344941] px-4 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
+            className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md border border-[#60736a] bg-[#f7f5f0] px-4 text-sm font-medium text-[#43584e] transition-colors hover:bg-white"
           >
             お問い合わせへ
             <RiArrowRightLine className="text-base" aria-hidden="true" />
