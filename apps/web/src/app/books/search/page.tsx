@@ -29,6 +29,7 @@ import Link from "next/link";
 import {
   RiArrowRightLine,
   RiBarcodeLine,
+  RiBookOpenLine,
   RiCloseLine,
   RiEditLine,
 } from "react-icons/ri";
@@ -263,7 +264,7 @@ const SearchPage = () => {
             onClick={startBarcodeScanner}
             className="group flex min-h-12 items-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2 py-2 text-left transition-colors hover:border-[#344941]/35 hover:bg-white sm:gap-3 sm:px-3"
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#e8ece1] text-[#43584e] sm:size-9">
+            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#344941] text-white sm:size-9">
               <RiBarcodeLine className="text-lg" aria-hidden="true" />
             </span>
             <span>
@@ -283,8 +284,8 @@ const SearchPage = () => {
             href="/books/manual/register"
             className="group flex min-h-12 items-center gap-1.5 rounded-lg border border-[#344941]/15 bg-[#faf9f5] px-2 py-2 text-left transition-colors hover:border-[#344941]/35 hover:bg-white sm:gap-3 sm:px-3"
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#e8ece1] text-[#43584e] sm:size-9">
-              <RiEditLine className="text-base" aria-hidden="true" />
+            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-[#344941] text-white sm:size-9">
+              <RiEditLine className="text-lg" aria-hidden="true" />
             </span>
             <span>
               <span className="block text-xs font-medium text-[#344941] group-hover:underline sm:text-sm">
@@ -432,56 +433,58 @@ const SearchPage = () => {
       )}
       {isScannedBooksDialogOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/45 p-4"
+          className="fixed inset-0 z-50 grid place-items-center bg-[#1e2b26]/45 p-3 backdrop-blur-[3px] sm:p-5"
           role="dialog"
           aria-modal="true"
           aria-labelledby="scanned-books-dialog-title"
         >
-          <div className="flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-lg flex-col bg-[#faf9f5] shadow-2xl">
-            <div className="flex items-start justify-between gap-4 border-b border-[#293630]/10 p-6 sm:p-7">
+          <div className="flex max-h-[min(720px,calc(100dvh-1.5rem))] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[#344941]/12 bg-[#faf9f5] shadow-[0_24px_60px_rgb(43_56_50/20%)] sm:max-h-[min(720px,calc(100dvh-2.5rem))]">
+            <div className="flex shrink-0 items-start gap-3 border-b border-[#344941]/12 bg-[#ede9dc] p-4 sm:p-5">
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[#faf9f5] text-xl text-[#43584e]">
+                <RiBookOpenLine aria-hidden="true" />
+              </span>
               <div>
-                <p className="text-[10px] tracking-[0.16em] text-[#7c8881]">
-                  BARCODE SCAN
-                </p>
                 <h2
                   id="scanned-books-dialog-title"
-                  className="mt-2 font-serif-jp text-xl font-medium text-[#293630]"
+                  className="font-serif-jp text-lg font-semibold leading-snug text-[#293630] sm:text-xl"
                 >
                   読み取った本を登録
                 </h2>
+                <p className="mt-1 text-xs leading-5 text-[#526158]">
+                  読み取り結果 {scannedBooks.length}冊
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsScannedBooksDialogOpen(false)}
-                className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-[#748078] transition hover:bg-[#eeece5] hover:text-[#293630]"
+                className="ml-auto inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-[#43584e] hover:bg-[#faf9f5]"
                 aria-label="登録画面を閉じる"
               >
                 <RiCloseLine className="text-xl" aria-hidden="true" />
               </button>
             </div>
 
-            <div className="min-h-0 overflow-y-auto px-6 py-5 sm:px-7">
-              <p className="text-xs leading-6 text-[#748078]">
-                読み取り結果を確認し、全て同じ読書状況で本棚に登録します。
-              </p>
-              <ul className="mt-4 divide-y divide-[#293630]/8 border-y border-[#293630]/8">
+            <div className="min-h-0 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5">
+              <ul className="divide-y divide-[#344941]/12">
                 {scannedBooks.map((scannedBook) => (
                   <li key={scannedBook.isbn} className="py-3">
                     {scannedBook.state === "loading" ? (
-                      <p className="text-xs text-[#748078]">
-                        書籍情報を確認中…
+                      <p className="text-sm text-[#526158]">
+                        ISBN {scannedBook.isbn} の書籍情報を確認中…
                       </p>
                     ) : scannedBook.book ? (
                       <>
-                        <p className="line-clamp-1 font-serif-jp text-sm text-[#35463e]">
+                        <p className="line-clamp-2 wrap-anywhere font-serif-jp text-sm font-semibold leading-5 text-[#293630]">
                           {scannedBook.book.title}
                         </p>
-                        <p className="mt-1 text-[10px] text-[#849089]">
-                          {scannedBook.book.author} ・ ISBN {scannedBook.isbn}
+                        <p className="mt-1 text-xs leading-5 text-[#526158]">
+                          {scannedBook.book.author &&
+                            `${scannedBook.book.author} ・ `}
+                          ISBN {scannedBook.isbn}
                         </p>
                       </>
                     ) : (
-                      <p className="text-xs text-rose-700">
+                      <p className="rounded-md bg-rose-50 px-3 py-2 text-xs leading-5 text-rose-800">
                         ISBN {scannedBook.isbn} の書籍情報が見つかりませんでした
                       </p>
                     )}
@@ -490,29 +493,29 @@ const SearchPage = () => {
               </ul>
             </div>
 
-            <div className="border-t border-[#293630]/10 p-6 sm:p-7">
+            <div className="shrink-0 border-t border-[#344941]/12 bg-[#faf9f5] p-4 sm:p-5">
               {!user ? (
                 <div className="text-center">
-                  <p className="text-xs leading-6 text-[#748078]">
+                  <p className="text-sm leading-6 text-[#526158]">
                     まとめて登録するにはログインが必要です。
                   </p>
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <LoginButton
                       label="Googleでログイン"
-                      className="w-full rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+                      className="min-h-11 w-full rounded-lg bg-[#344941] px-4 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
                     />
                   </div>
                 </div>
               ) : (
                 <>
-                  <label className="block text-[11px] font-medium text-[#5f6e66]">
-                    読書状況
+                  <label className="block text-sm font-medium text-[#43584e]">
+                    まとめて設定する読書状況
                     <select
                       value={bulkStatus}
                       onChange={(event) =>
                         setBulkStatus(event.target.value as BookStatus)
                       }
-                      className="mt-2 min-h-13 w-full rounded-md border border-[#293630]/12 bg-white px-4 text-sm text-[#40584e] outline-none focus:border-[#60736a]"
+                      className="mt-1.5 min-h-11 w-full rounded-lg border border-[#344941]/20 bg-white px-3 text-base text-[#293630] focus:border-[#60736a] focus:outline-2 focus:outline-[#60736a]"
                     >
                       {bookStatusOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -537,7 +540,7 @@ const SearchPage = () => {
                       scannedBooks.some((book) => book.state === "loading") ||
                       !scannedBooks.some((book) => book.book)
                     }
-                    className="mt-5 min-h-11 w-full rounded-md bg-[#344941] px-5 text-xs font-medium text-white transition hover:bg-[#263a33] disabled:cursor-not-allowed disabled:opacity-45"
+                    className="mt-3 min-h-11 w-full rounded-lg bg-[#344941] px-4 text-sm font-medium text-white transition-colors hover:bg-[#263a33] disabled:cursor-not-allowed disabled:bg-[#e2e5de] disabled:text-[#526158]"
                   >
                     {createBooksMutation.isPending
                       ? "登録中…"
@@ -552,8 +555,9 @@ const SearchPage = () => {
                   setIsScannerOpen(true);
                 }}
                 disabled={createBooksMutation.isPending}
-                className="mt-3 min-h-10 w-full rounded-md text-xs text-[#66756d] transition hover:bg-[#eeece5] disabled:opacity-50"
+                className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#344941]/15 text-sm text-[#43584e] transition-colors hover:bg-[#eeece5] disabled:opacity-50"
               >
+                <RiBarcodeLine aria-hidden="true" />
                 さらに読み取る
               </button>
             </div>

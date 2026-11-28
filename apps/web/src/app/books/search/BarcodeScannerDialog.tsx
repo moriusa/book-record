@@ -3,7 +3,7 @@
 import type { IScannerControls } from "@zxing/browser";
 import { BarcodeFormat, DecodeHintType } from "@zxing/library";
 import { useEffect, useRef, useState } from "react";
-import { RiBarcodeLine, RiCloseLine } from "react-icons/ri";
+import { RiArrowRightLine, RiBarcodeLine, RiCloseLine } from "react-icons/ri";
 
 type Props = {
   onClose: () => void;
@@ -115,79 +115,94 @@ export const BarcodeScannerDialog = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#1e2b26]/45 p-5 backdrop-blur-[3px]"
+      className="fixed inset-0 z-50 grid place-items-center bg-[#1e2b26]/45 p-3 backdrop-blur-[3px] sm:p-5"
       role="dialog"
       aria-modal="true"
       aria-labelledby="barcode-scanner-title"
     >
-      <div className="w-full max-w-lg overflow-hidden border border-[#293630]/10 bg-[#faf9f5] shadow-[0_24px_60px_rgb(43_56_50/20%)]">
-        <div className="flex items-start justify-between gap-4 p-6 pb-5 sm:p-7 sm:pb-5">
+      <div className="max-h-[calc(100dvh-1.5rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#344941]/12 bg-[#faf9f5] shadow-[0_24px_60px_rgb(43_56_50/20%)] sm:max-h-[calc(100dvh-2.5rem)]">
+        <div className="flex items-start gap-3 border-b border-[#344941]/12 bg-[#ede9dc] p-4 sm:p-5">
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[#faf9f5] text-xl text-[#43584e]">
+            <RiBarcodeLine aria-hidden="true" />
+          </span>
           <div>
             <h2
               id="barcode-scanner-title"
-              className="font-serif-jp text-xl font-medium text-[#293630]"
+              className="font-serif-jp text-lg font-semibold leading-snug text-[#293630] sm:text-xl"
             >
               本のバーコードを読み取る
             </h2>
-            <p className="mt-2 text-[11px] text-[#748078]">
-              続けて複数冊を読み取れます。読み終えたら登録へ進みます。
+            <p className="mt-1 text-xs leading-5 text-[#526158]">
+              本の裏表紙のISBNバーコードを枠に合わせてください。
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex size-9 items-center justify-center rounded-md text-[#748078] transition hover:bg-[#eeece5] hover:text-[#293630]"
+            className="ml-auto inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-[#43584e] hover:bg-[#faf9f5]"
             aria-label="スキャナーを閉じる"
           >
             <RiCloseLine className="text-xl" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="relative mx-6 aspect-4/3 overflow-hidden bg-[#293630] sm:mx-7">
+        <div
+          className={`relative mx-4 mt-4 aspect-4/3 max-h-[45dvh] overflow-hidden rounded-xl bg-[#293630] sm:mx-5 ${errorMessage ? "hidden" : ""}`}
+        >
           <video
             ref={videoRef}
             className="size-full object-cover"
             muted
             playsInline
           />
-          <div className="pointer-events-none absolute inset-x-[12%] top-1/2 h-[38%] -translate-y-1/2 border-2 border-[#d4c56d] shadow-[0_0_0_9999px_rgb(0_0_0/35%)]" />
+          {!isStarting && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-[12%] top-1/2 h-[38%] -translate-y-1/2 rounded-lg border-2 border-[#f4df86] shadow-[0_0_0_9999px_rgb(0_0_0/35%)]"
+            />
+          )}
           {isStarting && !errorMessage && (
-            <p className="absolute inset-0 flex items-center justify-center gap-2 bg-[#1e2b26]/65 text-xs text-white">
+            <p
+              role="status"
+              className="absolute inset-0 flex items-center justify-center gap-2 bg-[#1e2b26]/65 px-3 text-center text-sm text-white"
+            >
               <RiBarcodeLine aria-hidden="true" />
               カメラを起動しています…
             </p>
           )}
         </div>
 
-        <div className="p-6 pt-5 sm:p-7 sm:pt-5">
+        <div className="p-4 sm:p-5">
           {errorMessage ? (
-            <p role="alert" className="text-xs leading-6 text-rose-700">
+            <p
+              role="alert"
+              className="rounded-lg bg-rose-50 p-3 text-sm leading-6 text-rose-800"
+            >
               {errorMessage}
             </p>
           ) : (
-            <p className="text-xs leading-6 text-[#66736c]">
-              本の裏表紙にあるISBNバーコードを枠内に合わせてください。
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[#e8ece1] px-3 py-2">
+              <p className="text-xs text-[#526158]">
+                続けて複数冊を読み取れます
+              </p>
+              <p
+                className="text-sm font-medium tabular-nums text-[#344941]"
+                aria-live="polite"
+              >
+                読み取り済み {scannedCount}冊
+              </p>
+            </div>
           )}
-          <p className="mt-3 text-[11px] text-[#748078]" aria-live="polite">
-            読み取り済み: {scannedCount}冊
-          </p>
           <button
             type="button"
             onClick={onComplete}
             disabled={scannedCount === 0}
-            className="mt-5 min-h-11 w-full rounded-md bg-[#344941] text-xs font-medium text-white transition hover:bg-[#263a33] disabled:cursor-not-allowed disabled:opacity-45"
+            className="mt-3 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#344941] px-3 text-sm font-medium text-white transition-colors hover:bg-[#263a33] disabled:cursor-not-allowed disabled:bg-[#e2e5de] disabled:text-[#526158]"
           >
             {scannedCount > 0
               ? `${scannedCount}冊の登録へ進む`
               : "本を読み取ってください"}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="mt-3 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white text-xs text-[#526159] transition hover:border-[#60736a] hover:bg-[#f3f1eb]"
-          >
-            閉じる
+            {scannedCount > 0 && <RiArrowRightLine aria-hidden="true" />}
           </button>
         </div>
       </div>
