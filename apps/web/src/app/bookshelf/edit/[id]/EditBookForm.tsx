@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { authFetcher } from "@/lib/fetcher";
 import { useQuery } from "@tanstack/react-query";
 import BookFormFields, { BookFormValues } from "@/components/ui/BookFormFields";
+import BookRecordSummary from "@/components/ui/BookRecordSummary";
 import { EditBookSkeleton } from "@/components/ui/LoadingSkeleton";
 import { useUpdateBook } from "./hooks/useUpdateBook";
 import { useRouter } from "next/navigation";
@@ -82,42 +82,19 @@ const EditBookForm = ({ id }: Props) => {
   }
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[280px_1fr] lg:gap-14">
-      <aside className="border border-[#293630]/10 bg-[#eeece5] p-5 sm:p-6 lg:sticky lg:top-24">
-        <div className="mt-1 flex items-start gap-5 lg:block">
-          <div className="relative aspect-2/3 w-23 shrink-0 self-start overflow-hidden rounded-r-[3px] rounded-l-[1px] border-l-[3px] border-black/10 bg-[#d9d4c5] shadow-[6px_8px_18px_rgb(38_48_43/16%)] lg:mx-auto lg:w-37.5">
-            {book.imageUrl ? (
-              <Image
-                src={book.imageUrl}
-                alt={book.title}
-                fill
-                sizes="(max-width: 1024px) 92px, 150px"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-xs text-[#75817b]">
-                表紙画像はありません
-              </div>
-            )}
-          </div>
-          <div className="min-w-0 lg:mt-6 lg:text-center">
-            <h2 className="font-serif-jp text-lg font-medium lg:text-xl">
-              {book.title}
-            </h2>
-            <p className="mt-2 text-xs text-[#718078]">
-              {getBookAuthorLabel(book.author)}
-            </p>
-            <p className="mt-1 text-[10px] text-[#909994]">
-              {getBookPublisherLabel(book.publisher)}
-              {book.series ? `・${book.series}` : ""}
-            </p>
-          </div>
-        </div>
-      </aside>
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-6">
+      <BookRecordSummary
+        label="編集する本"
+        title={book.title}
+        author={getBookAuthorLabel(book.author)}
+        publisher={getBookPublisherLabel(book.publisher)}
+        series={book.series}
+        imageUrl={book.imageUrl}
+      />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="border border-[#293630]/10 bg-[#faf9f5] p-6 sm:p-9"
+        className="min-w-0 rounded-xl border border-[#344941]/12 bg-[#faf9f5] p-4 sm:p-7"
       >
         <BookFormFields control={control} register={register} watch={watch} />
 

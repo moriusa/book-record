@@ -86,24 +86,24 @@ export function EditBookSkeleton() {
     <div
       role="status"
       aria-label="読書記録を読み込み中"
-      className="grid items-start gap-8 lg:grid-cols-[280px_1fr] lg:gap-14"
+      className="grid items-start gap-4 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-6"
     >
       <span className="sr-only">読み込み中</span>
       <div
         aria-hidden="true"
-        className="flex gap-5 border border-[#293630]/10 bg-[#eeece5] p-6 lg:block"
+        className="flex gap-4 rounded-xl border border-[#344941]/12 bg-[#ede9dc] p-4 sm:p-5 lg:block"
       >
         <div
-          className={`${block} h-36 w-23 shrink-0 lg:mx-auto lg:h-56 lg:w-37.5`}
+          className={`${block} aspect-2/3 w-20 shrink-0 lg:mx-auto lg:w-34`}
         />
-        <div className="flex-1 space-y-3 lg:mt-6">
+        <div className="flex-1 space-y-3 lg:mt-4">
           <div className={`${block} h-5 w-4/5`} />
           <div className={`${block} h-3 w-1/2`} />
         </div>
       </div>
       <div
         aria-hidden="true"
-        className="space-y-8 border border-[#293630]/10 bg-[#faf9f5] p-6 sm:p-9"
+        className="min-w-0 space-y-8 rounded-xl border border-[#344941]/12 bg-[#faf9f5] p-4 sm:p-7"
       >
         {Array.from({ length: 3 }, (_, i) => (
           <div key={i} className="space-y-4">

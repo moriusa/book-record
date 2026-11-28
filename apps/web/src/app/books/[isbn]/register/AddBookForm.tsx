@@ -60,6 +60,7 @@ export const AddBookForm = ({ bookData }: Props) => {
   }, [status, setValue]);
 
   const onSubmit: SubmitHandler<BookFormValues> = (data) => {
+    setErrorMessage(null);
     createBookMutation.mutate(
       { ...bookData, ...data },
       {
@@ -76,13 +77,13 @@ export const AddBookForm = ({ bookData }: Props) => {
   if (!user) {
     return (
       <div className="text-center">
-        <p className="text-sm text-[#748078]">
+        <p className="text-sm leading-6 text-[#526158]">
           本棚へ登録するにはログインが必要です。
         </p>
         <div className="mt-4">
           <LoginButton
             label="Googleでログイン"
-            className="rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+            className="min-h-11 rounded-lg bg-[#344941] px-5 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
           />
         </div>
       </div>
@@ -95,7 +96,7 @@ export const AddBookForm = ({ bookData }: Props) => {
       <button
         type="submit"
         disabled={createBookMutation.isPending}
-        className="mt-10 w-full rounded-md bg-[#344941] px-5 py-3.5 text-xs font-medium text-white transition-colors hover:bg-[#263a33] disabled:opacity-50"
+        className="mt-6 min-h-12 w-full rounded-lg bg-[#344941] px-5 text-sm font-medium text-white transition-colors hover:bg-[#263a33] disabled:cursor-wait disabled:opacity-60 sm:mt-7"
       >
         {createBookMutation.isPending ? "登録中..." : "本棚に追加"}
       </button>

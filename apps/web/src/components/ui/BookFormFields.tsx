@@ -29,26 +29,40 @@ const bookStatus = {
   ON_HOLD: "積読",
 } satisfies Record<BookStatus, string>;
 
+export function BookFieldBadge({ required = false }: { required?: boolean }) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center rounded border px-2 py-0.5 text-xs font-medium leading-4 ${required ? "border-[#344941] bg-[#344941] text-white" : "border-[#344941]/30 text-[#43584e]"}`}
+    >
+      {required ? "必須" : "任意"}
+    </span>
+  );
+}
+
 const BookFormFields = ({ control, register, watch }: Props) => {
   const status = watch("status");
 
   return (
     <div>
       <section>
-        <div className="flex items-baseline justify-between gap-4">
-          <div>
-            <p className="text-[10px] tracking-[0.14em] text-[#909994]">01</p>
-            <h2 className="mt-1.5 font-serif-jp text-lg font-medium">
-              読書ステータス
-            </h2>
-          </div>
-          <span className="text-[10px] text-[#929b96]">必須</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2
+            id="book-reading-status-heading"
+            className="font-serif-jp text-lg font-semibold sm:text-xl"
+          >
+            読書ステータス
+          </h2>
+          <BookFieldBadge required />
         </div>
         <Controller
           name="status"
           control={control}
           render={({ field }) => (
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div
+              role="group"
+              aria-labelledby="book-reading-status-heading"
+              className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4"
+            >
               {Object.entries(bookStatus).map(([value, label]) => {
                 const isSelected = field.value === value;
 
@@ -56,8 +70,9 @@ const BookFormFields = ({ control, register, watch }: Props) => {
                   <button
                     key={value}
                     type="button"
+                    aria-pressed={isSelected}
                     onClick={() => field.onChange(value)}
-                    className={`min-h-12 rounded-md border px-3 py-3 text-xs transition-colors ${isSelected ? "border-[#40584e] bg-[#40584e] text-white" : "border-[#293630]/12 bg-white text-[#69766f] hover:border-[#728179]"}`}
+                    className={`min-h-11 rounded-lg border px-2 py-2 text-sm font-medium transition-colors ${isSelected ? "border-[#344941] bg-[#344941] text-white" : "border-[#344941]/15 bg-white text-[#43584e] hover:border-[#344941]/35 hover:bg-[#e8ece1]"}`}
                   >
                     {label}
                   </button>
@@ -69,31 +84,37 @@ const BookFormFields = ({ control, register, watch }: Props) => {
       </section>
 
       {status === "COMPLETED" && (
-        <section className="mt-7 border-t border-[#293630]/9 pt-7">
+        <section className="mt-4 rounded-lg bg-[#eeece5] p-3 sm:p-4">
           <label
             htmlFor="completedAt"
-            className="block w-full min-w-0 text-[11px] font-medium text-[#5f6e66]"
+            className="block w-full min-w-0 text-sm font-medium text-[#43584e]"
           >
             読み終わった日
             <input
               id="completedAt"
               type="date"
               {...register("completedAt")}
-              className="mt-2 block w-52 max-w-full min-w-0 box-border appearance-none rounded-md border border-[#293630]/12 bg-white px-4 py-3 text-base text-[#526159] outline-none focus:border-[#60736a] sm:w-55 sm:text-xs"
+              className="mt-2 block min-h-11 w-52 max-w-full min-w-0 appearance-none rounded-lg border border-[#344941]/20 bg-white px-3 text-base text-[#293630] focus:border-[#60736a] focus:outline-2 focus:outline-[#60736a] sm:w-55"
             />
           </label>
         </section>
       )}
 
-      <section className="mt-9 border-t border-[#293630]/9 pt-8">
-        <p className="text-[10px] tracking-[0.14em] text-[#909994]">02</p>
-        <h2 className="mt-1.5 font-serif-jp text-lg font-medium">
-          この本の評価
-        </h2>
-        <p className="mt-2 text-[11px] text-[#89928d]">
-          まだ決めない場合は、空欄のままで構いません。
-        </p>
-        <div className="mt-4 flex gap-1">
+      <section className="mt-6 border-t border-[#344941]/12 pt-5 sm:mt-7 sm:pt-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2
+            id="book-rating-heading"
+            className="font-serif-jp text-lg font-semibold sm:text-xl"
+          >
+            この本の評価
+          </h2>
+          <BookFieldBadge />
+        </div>
+        <div
+          role="group"
+          aria-labelledby="book-rating-heading"
+          className="mt-2 grid max-w-40 grid-cols-5"
+        >
           <Controller
             name="rating"
             control={control}
@@ -107,7 +128,8 @@ const BookFormFields = ({ control, register, watch }: Props) => {
                       field.onChange(field.value === rating ? null : rating)
                     }
                     aria-label={`${rating}点`}
-                    className={`p-1 text-2xl transition-colors ${field.value && field.value >= rating ? "text-[#8c7951]" : "text-[#c3c4bd]"}`}
+                    aria-pressed={field.value === rating}
+                    className={`grid min-h-11 min-w-0 place-items-center rounded-md text-2xl transition-colors hover:bg-[#eeece5] ${field.value && field.value >= rating ? "text-[#78623c]" : "text-[#65736c]"}`}
                   >
                     {field.value && field.value >= rating ? (
                       <FaStar />
@@ -122,21 +144,18 @@ const BookFormFields = ({ control, register, watch }: Props) => {
         </div>
       </section>
 
-      <section className="mt-9 border-t border-[#293630]/9 pt-8">
-        <div className="flex items-baseline justify-between gap-4">
-          <div>
-            <p className="text-[10px] tracking-[0.14em] text-[#909994]">03</p>
-            <h2 className="mt-1.5 font-serif-jp text-lg font-medium">
-              感想・メモ
-            </h2>
-          </div>
-          <span className="text-[10px] text-[#929b96]">任意</span>
+      <section className="mt-6 border-t border-[#344941]/12 pt-5 sm:mt-7 sm:pt-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="font-serif-jp text-lg font-semibold sm:text-xl">
+            <label htmlFor="review">感想・メモ</label>
+          </h2>
+          <BookFieldBadge />
         </div>
         <textarea
           id="review"
-          rows={7}
+          rows={5}
           {...register("review")}
-          className="mt-5 w-full resize-y rounded-md border border-[#293630]/12 bg-white px-4 py-3.5 text-sm leading-7 text-[#405048] outline-none placeholder:text-[#a4aaa6] focus:border-[#60736a]"
+          className="mt-3 w-full resize-y rounded-lg border border-[#344941]/20 bg-white px-3 py-2.5 text-base leading-7 text-[#293630] placeholder:text-[#64716a] focus:border-[#60736a] focus:outline-2 focus:outline-[#60736a]"
           placeholder="なぜ読みたいと思ったか、読んで感じたことなど"
         />
       </section>

@@ -13,6 +13,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoginButton from "@/components/ui/LoginButton";
 import { useAuth } from "@/components/providers/AuthProvider";
 import BookFormFields, {
+  BookFieldBadge,
   type BookFormValues,
 } from "@/components/ui/BookFormFields";
 import { authFetcher } from "@/lib/fetcher";
@@ -22,6 +23,9 @@ type ManualBookFormValues = BookFormValues & {
   author: string;
   publisherName: string;
 };
+
+const inputClassName =
+  "mt-2 min-h-11 w-full rounded-lg border border-[#344941]/20 bg-white px-3 text-base text-[#293630] placeholder:text-[#64716a] focus:border-[#60736a] focus:outline-2 focus:outline-[#60736a]";
 
 const getToday = () => {
   const today = new Date();
@@ -37,18 +41,24 @@ export default function ManualBookForm() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { control, register, watch, setValue, handleSubmit } =
-    useForm<ManualBookFormValues>({
-      defaultValues: {
-        title: "",
-        author: "",
-        publisherName: "",
-        status: "WANT_TO_READ",
-        completedAt: null,
-        rating: null,
-        review: null,
-      },
-    });
+  const {
+    control,
+    register,
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ManualBookFormValues>({
+    defaultValues: {
+      title: "",
+      author: "",
+      publisherName: "",
+      status: "WANT_TO_READ",
+      completedAt: null,
+      rating: null,
+      review: null,
+    },
+  });
   // eslint-disable-next-line react-hooks/incompatible-library
   const status = watch("status");
 
@@ -85,13 +95,13 @@ export default function ManualBookForm() {
   if (!user) {
     return (
       <div className="text-center">
-        <p className="text-sm text-[#748078]">
+        <p className="text-sm leading-6 text-[#526158]">
           本棚へ登録するにはログインが必要です。
         </p>
         <div className="mt-4">
           <LoginButton
             label="Googleでログイン"
-            className="rounded-md bg-[#344941] px-5 py-3 text-xs font-medium text-white transition-colors hover:bg-[#263a33]"
+            className="min-h-11 rounded-lg bg-[#344941] px-5 text-sm font-medium text-white transition-colors hover:bg-[#263a33]"
           />
         </div>
       </div>
@@ -101,50 +111,70 @@ export default function ManualBookForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <section>
-        <p className="text-[10px] tracking-[0.14em] text-[#909994]">
-          BOOK INFO
+        <h2 className="font-serif-jp text-lg font-semibold sm:text-xl">
+          本の情報
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-[#526158]">
+          タイトルは必須です。著者や出版社は分かる範囲で入力してください。
         </p>
-        <h2 className="mt-1.5 font-serif-jp text-lg font-medium">本の情報</h2>
-        <p className="mt-2 text-[11px] leading-6 text-[#89928d]">
-          分かる範囲で入力してください。表紙画像や外部リンクは登録されません。
-        </p>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <label className="block sm:col-span-2">
-            <span className="text-[11px] font-medium text-[#5f6e66]">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label
+              htmlFor="manual-book-title"
+              className="flex flex-wrap items-center gap-2 text-sm font-medium text-[#43584e]"
+            >
               タイトル
-            </span>
-            <span className="ml-2 text-[10px] text-[#929b96]">必須</span>
+              <BookFieldBadge required />
+            </label>
             <input
+              id="manual-book-title"
               {...register("title", { required: "タイトルを入力してください" })}
-              className="mt-2 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white px-4 text-sm text-[#405048] outline-none focus:border-[#60736a]"
+              aria-required="true"
+              aria-invalid={Boolean(errors.title)}
+              aria-describedby={
+                errors.title ? "manual-book-title-error" : undefined
+              }
+              className={inputClassName}
               placeholder="本のタイトル"
             />
-          </label>
+            {errors.title?.message && (
+              <p
+                id="manual-book-title-error"
+                role="alert"
+                className="mt-1.5 text-sm text-red-700"
+              >
+                {errors.title.message}
+              </p>
+            )}
+          </div>
           <label className="block">
-            <span className="text-[11px] font-medium text-[#5f6e66]">
+            <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-[#43584e]">
               著者・サークル名
+              <BookFieldBadge />
             </span>
-            <span className="ml-2 text-[10px] text-[#929b96]">任意</span>
             <input
               {...register("author")}
-              className="mt-2 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white px-4 text-sm text-[#405048] outline-none focus:border-[#60736a]"
-              placeholder="例：つみほん文庫"
+              className={inputClassName}
+              placeholder="例：山田 花子"
             />
           </label>
           <label className="block">
-            <span className="text-[11px] font-medium text-[#5f6e66]">
+            <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-[#43584e]">
               出版社・頒布元
+              <BookFieldBadge />
             </span>
-            <span className="ml-2 text-[10px] text-[#929b96]">任意</span>
             <input
               {...register("publisherName")}
-              className="mt-2 min-h-11 w-full rounded-md border border-[#293630]/12 bg-white px-4 text-sm text-[#405048] outline-none focus:border-[#60736a]"
-              placeholder="例：文学フリマ"
+              className={inputClassName}
+              placeholder="例：青空出版"
             />
           </label>
         </div>
+        <p className="mt-3 text-xs leading-5 text-[#526158]">
+          手動登録では、表紙画像や外部リンクは登録されません。
+        </p>
       </section>
-      <div className="mt-9 border-t border-[#293630]/9 pt-8">
+      <div className="mt-6 border-t border-[#344941]/12 pt-5 sm:mt-7 sm:pt-6">
         <BookFormFields
           control={control as unknown as Control<BookFormValues>}
           register={register as unknown as UseFormRegister<BookFormValues>}
@@ -154,7 +184,7 @@ export default function ManualBookForm() {
       <button
         type="submit"
         disabled={createManualBookMutation.isPending}
-        className="mt-10 w-full rounded-md bg-[#344941] px-5 py-3.5 text-xs font-medium text-white transition-colors hover:bg-[#263a33] disabled:opacity-50"
+        className="mt-6 min-h-12 w-full rounded-lg bg-[#344941] px-5 text-sm font-medium text-white transition-colors hover:bg-[#263a33] disabled:cursor-wait disabled:opacity-60 sm:mt-7"
       >
         {createManualBookMutation.isPending ? "登録中…" : "本棚に追加"}
       </button>
